@@ -249,6 +249,8 @@ The earlier blocker — hand-built import maps don't scale to the full AppModule
 - **Caveat (documented):** Deno ignores yarn.lock, so `^x-dev` ranges drift — `@typescript/native-preview` (tsgo) resolves a newer build that rejects `esModuleInterop=false`/`moduleResolution=node10`, breaking the **nx BUILD toolchain** (twenty-shared's `vite build` → `nx typecheck`). This only affects nx-based typecheck/test under Deno, NOT running the app. A clean nx run needs exact-pinning the drifting tools (a yarn.lock→deno.lock equivalent) — deferred.
 - My slice changes don't break existing tests: the only spec touching a changed unit is `object-record-event-publisher.spec.ts`, which **mocks** `SubscriptionService` (`provide/useValue`, no `new`); the config-var/factory changes are additive + config-gated with no dedicated specs.
 
+Deno ESM compat note (ongoing): `typescript/consistent-type-imports` is **off** in twenty-server's `.oxlintrc.json`, so a few files import a TS-only symbol as a value (`import { MessageQueueDriver }` instead of `import { type … }`). tsc erases these; Deno (per-file transpile) keeps them → runtime `does not provide an export named …`. They're rare (the boot loaded many files before hitting one) — fix outliers to `import type` as the boot surfaces them (fixed: `message-queue.service.ts`). A mass `import type` pass isn't needed.
+
 ### Configurable "deno mode" vs "redis mode" (per the user's requirement)
 Every Redis concern is an independent config var, each defaulting to the Redis/BullMQ behaviour, so nothing changes unless explicitly flipped. To run Redis-free ("deno mode") set:
 ```
