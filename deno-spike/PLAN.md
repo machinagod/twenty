@@ -258,7 +258,7 @@ The hand-import-map ceiling is gone: with the prepared node_modules, the **real 
 - **Resolution-scope rule learned:** the entrypoint must run from the workspace-member scope (auto-discovered member `deno.json`, NOT `--config`). `--config` detaches the run from the member's package.json, so its npm deps stop resolving. So the harness runs from `packages/twenty-server/`.
 - **Road to the full AppModule boot (recon done — bounded, sequential Deno-compat steps):**
   1. ✅ JSON imports need `with { type: 'json' }` (only 2 in the server: `ai-providers.json` import in `default-ai-catalog.service.ts` + its spec — fixed; standard attribute works on Node 20+/TS 5.3+/Deno).
-  2. ⬜ Build the remaining workspace packages' `dist` — `twenty-emails` (and likely `twenty-client-sdk`) resolve only via `dist/index.mjs`, like twenty-shared. Their build must run (watch for the `tsgo` `.d.ts` drift — runtime `.mjs` from vite is what matters).
+  2. ✅ Build the remaining workspace packages' `dist` — `twenty-emails` resolves only via `dist/index.mjs`. Two parts (both now in `prepare-deno-deps.sh`): (a) create Node-style `node_modules/<pkg>` symlinks — Deno's layout doesn't, and Node build tools (vite) need them, else `Cannot find module 'twenty-shared/translations'`; (b) `vite build` each dist-only package (twenty-shared, twenty-emails). Runtime `.mjs` builds fine; the `tsgo` `.d.ts` step is types-only.
   3. ⬜ `graphql/language` (and similar) **directory imports** → ESM needs the explicit `/index.mjs`.
   4. ⬜ Remaining bare-import / CJS-default-import / type-only-value-import outliers, surfaced one at a time.
   The MQ boot stubs `TwentyConfigService` to stay focused; the full AppModule boot is the next milestone and clears these in order.

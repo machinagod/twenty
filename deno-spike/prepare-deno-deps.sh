@@ -99,4 +99,23 @@ PY
 echo "running deno install ..."
 deno install
 
+# Node-style workspace symlinks. Deno's node_modules layout resolves workspace members
+# its own way, but Node-based build tools (vite) need real node_modules/<pkg> symlinks
+# (which Yarn would create). Without these, building twenty-emails fails on
+# `Cannot find module 'twenty-shared/translations'`.
+for pkg in twenty-shared twenty-emails twenty-client-sdk; do
+  ln -sfn "../packages/$pkg" "node_modules/$pkg"
+done
+
+# Build the workspace packages that consumers resolve only via dist/ (their package
+# exports point at dist). Runtime .mjs comes from vite; the tsgo .d.ts step may fail on
+# the drifted toolchain but that's types-only and irrelevant to running the app.
+for pkg in twenty-shared twenty-emails; do
+  if [ ! -f "packages/$pkg/dist/index.mjs" ]; then
+    echo "building $pkg ..."
+    ( cd "packages/$pkg" && ../../node_modules/.bin/vite build ) || \
+      echo "WARN: $pkg vite build returned non-zero (check dist/index.mjs)"
+  fi
+done
+
 echo "done. Next: bash deno-spike/apply-patches.sh"
