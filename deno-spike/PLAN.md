@@ -256,7 +256,12 @@ The hand-import-map ceiling is gone: with the prepared node_modules, the **real 
 - **Root `deno.json`** with `nodeModulesDir: "auto"` + the scoped `workspace` list — required to link workspace members (twenty-shared resolves to its built `dist/`). `nodeModulesDir` must be in the ROOT deno.json (Deno warns otherwise).
 - **Member `packages/twenty-server/deno.json`** with the `src/` → `./src/` path alias (Deno doesn't read tsconfig paths) + **node-builtin specifiers mapped to `node:`** (the server imports `crypto`/`fs`/`path`/… bare — 139 files — which Deno won't resolve as builtins; the import-map alias fixes it source-free).
 - **Resolution-scope rule learned:** the entrypoint must run from the workspace-member scope (auto-discovered member `deno.json`, NOT `--config`). `--config` detaches the run from the member's package.json, so its npm deps stop resolving. So the harness runs from `packages/twenty-server/`.
-- **Next Deno-compat issues on the road to the full AppModule boot** (surfaced when the real config graph is loaded instead of the stub): `graphql/language` directory imports need `/index.mjs` (ESM dir-import), plus more bare-import / CJS-default cases. The MQ boot stubs `TwentyConfigService` to stay focused; the full AppModule boot is the next milestone and will clear these one by one.
+- **Road to the full AppModule boot (recon done — bounded, sequential Deno-compat steps):**
+  1. ✅ JSON imports need `with { type: 'json' }` (only 2 in the server: `ai-providers.json` import in `default-ai-catalog.service.ts` + its spec — fixed; standard attribute works on Node 20+/TS 5.3+/Deno).
+  2. ⬜ Build the remaining workspace packages' `dist` — `twenty-emails` (and likely `twenty-client-sdk`) resolve only via `dist/index.mjs`, like twenty-shared. Their build must run (watch for the `tsgo` `.d.ts` drift — runtime `.mjs` from vite is what matters).
+  3. ⬜ `graphql/language` (and similar) **directory imports** → ESM needs the explicit `/index.mjs`.
+  4. ⬜ Remaining bare-import / CJS-default-import / type-only-value-import outliers, surfaced one at a time.
+  The MQ boot stubs `TwentyConfigService` to stay focused; the full AppModule boot is the next milestone and clears these in order.
 - twenty-shared is already built (`dist/*.mjs`) — its vite build succeeded; only the `tsgo` `.d.ts` step failed (types only, irrelevant at runtime).
 
 ### Configurable "deno mode" vs "redis mode" (per the user's requirement)
