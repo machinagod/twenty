@@ -1,0 +1,22 @@
+{
+  "tasks": {
+    "start": "deno run -A --unstable-cron main.ts",
+    "cache": "deno install"
+  },
+  "nodeModulesDir": "auto",
+  "unstable": ["cron"],
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "imports": {
+    "reflect-metadata": "npm:reflect-metadata@0.2.2",
+    "@nestjs/common": "npm:@nestjs/common@11",
+    "@nestjs/core": "npm:@nestjs/core@11",
+    "@nestjs/platform-express": "npm:@nestjs/platform-express@11",
+    "@nestjs/typeorm": "npm:@nestjs/typeorm@11",
+    "typeorm": "npm:typeorm@0.3.20",
+    "pg": "npm:pg@8.12.0",
+    "rxjs": "npm:rxjs@7"
+  }
+}
