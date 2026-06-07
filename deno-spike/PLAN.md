@@ -203,6 +203,20 @@ Booted the REAL wired `PgDriver` + REAL `typeorm-sql-executor.ts` against a REAL
 - **BUG #2 (fixed): `UPDATE … RETURNING` result shape.** TypeORM `query()` returns a flat rows array for SELECT but a `[rows, affectedCount]` tuple for INSERT/UPDATE/DELETE … RETURNING (node-postgres returns plain rows for both). `claimBatch` relies on `UPDATE … RETURNING`, so jobs came back with `id === "undefined"`. Fix: `typeorm-sql-executor.ts` now unwraps the write-result tuple (`toRows`) to honour the `SqlExecutor` "returns rows" contract.
 - **Deno resolution learnings for the eventual full-AppModule boot:** (a) a full `deno install` over the Yarn workspace is **blocked** by a malformed transitive version spec (`linkifyjs: "==4.3.3"` via `linkify-react`, a *frontend* dep) — so use explicit `npm:pkg@ver` import-map specifiers with on-demand fetch (as the spike/typecheck do) and boot small real slices, not the whole graph at once; (b) the real server's extensionless imports need `--sloppy-imports` + an import map mapping `src/` → `packages/twenty-server/src/`; (c) `twenty-shared` resolves only via `dist/` (must be built) or by mapping its subpaths (`twenty-shared/utils`, …) to `packages/twenty-shared/src/*` source.
 
+Real-MODULE boot probe (slice 3.1b) — diagnostic only (not committed):
+Tried booting the real `MessageQueueModule` under a real NestJS DI container (Pg selected). Finding: it is **not independently bootable** — its transitive graph reaches most of core-modules:
+- `MessageQueueModule → MetricsModule → MetricsCacheService → TwentyConfigService → config-variables` drags in the **entire config system** (+ `@nestjs/graphql`, `twenty-shared` barrels, every driver enum).
+- `cache-storage.service.ts` **hard-imports `cache-manager-redis-yet` + `redis` at module-load time** (pulled in because `metrics.service` references `CacheStorageService` as a value for `emitDecoratorMetadata`) → confirms the queue module transitively needs Redis. Removing this is exactly the **cache slice**.
+- `message-queue.module.ts` has a top-level `import { MessageQueueExplorer }` (for `registerExplorer`) that **eager-loads even when unused**, dragging in `exception-handler → graphql`. Booting `MessageQueueCoreModule` directly avoids it.
+- `twenty-shared/utils` is a **barrel of 187 files pulling browser libs** (`react-router-dom`, `handlebars`, `temporal-polyfill`, …); the Deno server bundle must vite-build twenty-shared (tree-shaken), not import the source barrel.
+- Conclusion: hand-built import maps don't scale past leaf modules; a real-module/AppModule boot needs a proper npm-resolution strategy (populate `node_modules`, or build twenty-shared) **and** the cache slice. The bounded leaf (driver) is green (slice 3.1).
+
+GraphQL head-on (slice 3.2) — ✅ DONE & GREEN (`deno-spike/graphql-schema-build.ts` + `apply-patches.sh`):
+Confronted the GraphQL layer directly (the scariest Phase-3 unknown). Two results:
+- **`@nestjs/graphql` code-first schema building WORKS under Deno node-compat** — decorators + `emitDecoratorMetadata` + reflection produce correct SDL (`@ObjectType`/`@Field`/`@Resolver`/`@Query` → `GraphQLSchemaFactory.create()`). Twenty is 100% code-first, so this green-lights the whole GraphQL layer.
+- **The Yarn `patch:` patches can be applied on Deno via a build step** (`deno-spike/apply-patches.sh`): Yarn's `patch:` protocol doesn't exist on Deno and Deno Deploy reinstalls fresh, so the script applies the three `.patch` files in-place to the Deno-resolved `node_modules` packages (idempotent: reverse dry-run detects already-applied). Verified Deno then **runs the patched code** (`computeReachableTypes` present; schema still builds). Keeping packages as `npm:` specifiers (vs vendoring local CJS) preserves Deno's CJS→ESM named-export interop + automatic transitive-dep resolution — vendoring a local CJS file loses the named exports (`does not provide an export named 'Field'`).
+- For Deno Deploy: run `apply-patches.sh` as the build step after install. (Open: confirm Deploy persists a patched `node_modules` from the build step; if not, fall back to vendoring patched packages + import-map — needs the CJS-interop wrinkle solved.)
+
 Still TODO in Phase 2:
 - [ ] PG (or memory) cache store in `cache-storage.module-factory.ts` (un-hardcode Redis).
 - [ ] Session store: PG or JWT-stateless in `session-storage.module-factory.ts`.
@@ -216,10 +230,13 @@ New files (this initiative):
 - `packages/twenty-server/src/database/commands/upgrade-version-command/2-9/2-9-instance-command-fast-1799000040000-create-pg-message-queue-tables.ts` (slice 3)
 - `deno-spike/validate-pg-driver.ts`
 - `deno-spike/boot-real-driver.ts` + `deno-spike/boot-real-driver.json` (slice 3.1 — real driver on real TypeORM under Deno; run with `--sloppy-imports`)
+- `deno-spike/graphql-schema-build.ts` + `deno-spike/graphql-schema-build.json` (slice 3.2 — code-first GraphQL schema builds on Deno + patch verification)
+- `deno-spike/apply-patches.sh` (slice 3.2 — Deno-native replacement for Yarn `patch:`; build step that patches the resolved node_modules)
 
 ### Phase 3 — Deno entrypoint + frontend
 - [ ] Single Deno entrypoint: real `AppModule` via `Deno.serve` + static `Deno.cron` heartbeats (drain + schedule eval). Fold the `queue-worker` ApplicationContext into the same isolate (it just registers `work()` handlers).
-- [ ] Resolve TypeORM / `@nestjs/graphql` patches without Yarn (vendor). NOTE (slice 3.1): only needed for the **GraphQL schema build**, not for boot — they're schema-gen/type-level only.
+- [x] Resolve TypeORM / `@nestjs/graphql` / nestjs-query-graphql patches without Yarn — **`deno-spike/apply-patches.sh`** patches the Deno-resolved node_modules in place as a build step (idempotent). Verified Deno runs the patched code (slice 3.2). Open: confirm Deno Deploy persists this from its build step; else vendor + import-map.
+- [x] Confirm code-first `@nestjs/graphql` schema generation works under Deno (slice 3.2 — it does).
 - [ ] `vite build` (run via Deno) → static assets → Deno static-mode Deploy app (`--single-page-app`).
 - [ ] `deno deploy create` config; provision + assign Prisma Postgres; env vars via `deno deploy env`.
 

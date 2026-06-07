@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "nodeModulesDir": "auto",
+  "imports": {
+    "reflect-metadata": "npm:reflect-metadata@0.2.2",
+    "@nestjs/common": "npm:@nestjs/common@11.1.16",
+    "@nestjs/core": "npm:@nestjs/core@11.1.16",
+    "@nestjs/graphql": "npm:@nestjs/graphql@12.1.1",
+    "graphql": "npm:graphql@16.8.1",
+    "rxjs": "npm:rxjs@7.8.1"
+  }
+}
