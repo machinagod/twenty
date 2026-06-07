@@ -25,6 +25,7 @@ import { ExceptionHandlerDriver } from 'src/engine/core-modules/exception-handle
 import { StorageDriverType } from 'src/engine/core-modules/file-storage/interfaces';
 import { LoggerDriverType } from 'src/engine/core-modules/logger/interfaces';
 import { MessageQueueDriverType } from 'src/engine/core-modules/message-queue/interfaces';
+import { PubSubDriverType } from 'src/engine/subscriptions/enums/pub-sub-driver-type.enum';
 import { type MeterDriver } from 'src/engine/core-modules/metrics/types/meter-driver.type';
 import { CastToLogLevelArray } from 'src/engine/core-modules/twenty-config/decorators/cast-to-log-level-array.decorator';
 import { CastToMeterDriverArray } from 'src/engine/core-modules/twenty-config/decorators/cast-to-meter-driver.decorator';
@@ -1084,6 +1085,17 @@ export class ConfigVariables {
   @IsOptional()
   // No @CastToUpperSnakeCase — same lowercase-enum reason as CACHE_STORAGE_TYPE.
   SESSION_STORAGE_TYPE: CacheStorageType = CacheStorageType.Redis;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Transport for GraphQL subscriptions pub/sub. "redis" is the default; "postgres" runs a Redis-free LISTEN/NOTIFY transport (Deno Deploy target).',
+    type: ConfigVariableType.ENUM,
+    options: Object.values(PubSubDriverType),
+  })
+  @IsOptional()
+  // No @CastToUpperSnakeCase — lowercase enum values ('redis', 'postgres').
+  PUB_SUB_DRIVER_TYPE: PubSubDriverType = PubSubDriverType.Redis;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,

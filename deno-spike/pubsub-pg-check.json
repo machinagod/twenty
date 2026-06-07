@@ -1,0 +1,9 @@
+{
+  "compilerOptions": { "experimentalDecorators": true, "emitDecoratorMetadata": true },
+  "nodeModulesDir": "auto",
+  "imports": {
+    "src/": "../packages/twenty-server/src/",
+    "graphql-subscriptions": "npm:graphql-subscriptions@2.0.0",
+    "pg": "npm:pg@8.12.0"
+  }
+}

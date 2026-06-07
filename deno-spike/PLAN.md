@@ -233,10 +233,28 @@ Un-hardcoded Redis in `session-storage.module-factory.ts` (same hardcoded `Cache
 - [x] Verified on Deno: `memory` returns a valid session config (no store, no `REDIS_URL`, no throw), cookie opts preserved.
 - **Limitation (documented + warned at runtime):** per-instance `MemoryStore` breaks **OIDC SSO across multiple isolates** (the PKCE verifier won't be on the isolate that handles the callback). A **shared PG-backed session store** (connect-pg-simple over a `core` session table) is the follow-up to make SSO work Redis-free on Deno Deploy. Deployments not using OIDC SSO are unaffected.
 
+Pub/sub slice (slice 3.5) — ✅ DONE & GREEN (`deno-spike/pubsub-pg-check.ts`, **3/3**):
+Replaced the Redis-only GraphQL-subscriptions transport with a config-gated Postgres `LISTEN/NOTIFY` one.
+- [x] `engine/subscriptions/drivers/postgres-pub-sub.driver.ts` — `PostgresPubSub extends PubSubEngine` (graphql-subscriptions), so `asyncIterator()` comes for free. A dedicated `pg.Client` LISTENs; publish via `pg_notify`. **Channel hashing**: Twenty's channels (`EVENT_STREAM_CHANNEL:<uuid>:<id>`) exceed Postgres's 63-byte channel limit, so each logical trigger is hashed to `tw_<sha1>` and the real trigger is carried in the body + filtered on (no cross-delivery on hash collision).
+- [x] Config var **`PUB_SUB_DRIVER_TYPE`** (enum `PubSubDriverType` {redis, postgres}, default redis).
+- [x] `SubscriptionService` now resolves the engine via `getPubSubEngine()` (lazy, config-gated) instead of hardcoding `redisClient.getPubSubClient()`; both RedisPubSub and PostgresPubSub are `PubSubEngine`. Added `onModuleDestroy` to close the PG client.
+- [x] Verified on Deno against real Postgres: subscribe/publish round-trip, >63-char channel hashing, cross-channel filtering, and the `asyncIterator` path all work (3/3).
+- **Deno/Node interop fix:** `import pg from 'pg'; const { Client } = pg;` (not `import { Client } from 'pg'`) — pg does `module.exports = {...}`, which Deno's CJS named-export lexer can't split. Same pattern needed wherever the Deno path imports a CJS-default package (e.g. ioredis).
+- **Follow-ups (documented in the driver, per §7):** NOTIFY's ~8000-byte payload cap → store large payloads in a table + NOTIFY the id (§7.5); robust reconnection/re-LISTEN under Deploy idle-shutdown (§7.2, basic drop-and-reconnect is in).
+
+### Configurable "deno mode" vs "redis mode" (per the user's requirement)
+Every Redis concern is an independent config var, each defaulting to the Redis/BullMQ behaviour, so nothing changes unless explicitly flipped. To run Redis-free ("deno mode") set:
+```
+MESSAGE_QUEUE_DRIVER_TYPE=pg
+CACHE_STORAGE_TYPE=memory
+SESSION_STORAGE_TYPE=memory      # or a future PG store for OIDC SSO
+PUB_SUB_DRIVER_TYPE=postgres
+```
+Unset (or the defaults `bull-mq`/`redis`/`redis`/`redis`) = "redis mode". They can be mixed (e.g. PG queue + Redis cache) as needed.
+
 Still TODO in Phase 2:
 - [ ] PG-backed shared session store (connect-pg-simple) for OIDC SSO on Deno (memory mode covers non-SSO).
-- [ ] `LISTEN/NOTIFY` PubSub to replace `engine/subscriptions` Redis pub/sub.
-- [ ] Retire `redis-client.service.ts`; update admin-panel health indicators.
+- [ ] Retire `redis-client.service.ts`; update admin-panel health indicators (only needed once "redis mode" is dropped — keep for now since it's config-selectable).
 
 New files (this initiative):
 - `packages/twenty-server/src/engine/core-modules/message-queue/drivers/pg-driver-core.ts`
@@ -249,6 +267,7 @@ New files (this initiative):
 - `deno-spike/apply-patches.sh` (slice 3.2 — Deno-native replacement for Yarn `patch:`; build step that patches the resolved node_modules)
 - `deno-spike/cache-memory-check.ts` + `.json` (+ `shims/twenty-config-service.ts`) (slice 3.3 — Redis-free memory cache via the real factory on Deno)
 - `deno-spike/session-memory-check.ts` + `.json` (+ `shims/resolve-session-cookie-secrets.ts`) (slice 3.4 — Redis-free memory session config via the real factory on Deno)
+- `deno-spike/pubsub-pg-check.ts` + `.json` (slice 3.5 — PG LISTEN/NOTIFY pub/sub round-trip on Deno). Server: `engine/subscriptions/drivers/postgres-pub-sub.driver.ts` + `enums/pub-sub-driver-type.enum.ts`.
 
 ### Phase 3 — Deno entrypoint + frontend
 - [ ] Single Deno entrypoint: real `AppModule` via `Deno.serve` + static `Deno.cron` heartbeats (drain + schedule eval). Fold the `queue-worker` ApplicationContext into the same isolate (it just registers `work()` handlers).
