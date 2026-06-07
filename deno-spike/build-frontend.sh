@@ -24,9 +24,16 @@ if [ ! -x "$VITE" ] || [ ! -x "$TSC" ]; then
   exit 1
 fi
 
-echo "==> twenty-shared .d.ts (tsc declaration-only)"
+echo "==> twenty-shared .d.ts (tsc declaration-only, --noCheck)"
+# --noCheck emits .d.ts without re-running type checks against the source.
+# Twenty's CI typechecks twenty-shared separately; we only need the declaration
+# files so twenty-ui's vite-plugin-dts can resolve types at its build time.
+# Avoids transient narrowing differences across TS minor versions (e.g.
+# Deno Deploy's build env resolves class-validator typings without a type
+# predicate on `isDefined`, which made tsc 2026-vintage flag two real
+# `number | null | undefined` callsites in resolveRelativeDateFilter).
 ( cd "$ROOT/packages/twenty-shared" && \
-  "$TSC" -p tsconfig.lib.json --declaration --emitDeclarationOnly \
+  "$TSC" -p tsconfig.lib.json --declaration --emitDeclarationOnly --noCheck \
          --noEmit false --outDir dist --rootDir src )
 
 echo "==> twenty-ui (vite with checker/dts stripped)"
