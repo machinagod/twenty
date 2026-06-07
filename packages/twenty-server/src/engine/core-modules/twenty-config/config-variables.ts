@@ -23,6 +23,7 @@ import { EmailDriver } from 'src/engine/core-modules/email/enums/email-driver.en
 import { ExceptionHandlerDriver } from 'src/engine/core-modules/exception-handler/interfaces';
 import { StorageDriverType } from 'src/engine/core-modules/file-storage/interfaces';
 import { LoggerDriverType } from 'src/engine/core-modules/logger/interfaces';
+import { MessageQueueDriverType } from 'src/engine/core-modules/message-queue/interfaces';
 import { type MeterDriver } from 'src/engine/core-modules/metrics/types/meter-driver.type';
 import { CastToLogLevelArray } from 'src/engine/core-modules/twenty-config/decorators/cast-to-log-level-array.decorator';
 import { CastToMeterDriverArray } from 'src/engine/core-modules/twenty-config/decorators/cast-to-meter-driver.decorator';
@@ -1088,6 +1089,21 @@ export class ConfigVariables {
     allow_underscores: true,
   })
   REDIS_QUEUE_URL: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Driver backing the message queue. "bull-mq" (Redis) is the default; "pg" runs the Redis-free Postgres queue driver (Deno Deploy target).',
+    type: ConfigVariableType.ENUM,
+    options: Object.values(MessageQueueDriverType),
+  })
+  @IsOptional()
+  // No @CastToUpperSnakeCase here (unlike the other driver enums): the
+  // MessageQueueDriverType values are lowercase-hyphenated ('bull-mq', 'sync',
+  // 'pg'), matching the existing MESSAGE_QUEUE_TYPE convention in app.module.ts.
+  // Upper-snake casting would mangle the value so it never matches the enum.
+  MESSAGE_QUEUE_DRIVER_TYPE: MessageQueueDriverType =
+    MessageQueueDriverType.BullMQ;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,

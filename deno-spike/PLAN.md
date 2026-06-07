@@ -1,6 +1,6 @@
 # Twenty → Pure Deno Deploy (PG-only) — Migration Plan
 
-> **Status:** Phase 1 complete (✅ go). Phase 2 not started.
+> **Status:** Phase 1 complete (✅ go). Phase 2 in progress — PG queue driver written, validated, and now WIRED in behind `MESSAGE_QUEUE_DRIVER_TYPE` (BullMQ still default).
 > **Last updated:** 2026-06-07
 > **Scope owner:** Ricardo A
 > **Home of this initiative:** `deno-spike/` (spike + this plan). The real port
@@ -186,17 +186,27 @@ Queue driver (slice 1+2) — ✅ DONE & validated:
 - [x] Validated in spike: `deno run -A deno-spike/validate-pg-driver.ts` → **18/18** (imports the REAL core; runs against `deno_spike`).
 - Tables = `messageQueueJob` + `messageQueueJobSchedule` (schema `core` in server, `public` in spike).
 
+Queue driver wiring (slice 3) — ✅ DONE:
+- [x] Added `MessageQueueDriverType.Pg` + `PgDriverFactoryOptions` ({ type: Pg; sql: SqlExecutor; options: PgDriverOptions }) to the `MessageQueueModuleOptions` union.
+- [x] `message-queue-core.module.ts` `createDriver` Pg case → `new PgDriver(config.sql, config.options)`.
+- [x] `drivers/typeorm-sql-executor.ts` — TypeORM-backed `SqlExecutor` from the core DataSource (`query` → `dataSource.query`; `withTransaction` → `dataSource.transaction(em => fn(executorFromManager(em)))`, reusing one EntityManager for nested calls so `FOR UPDATE` locks stay on one connection).
+- [x] Config var **`MESSAGE_QUEUE_DRIVER_TYPE`** (enum, default `bull-mq`) in `twenty-config/config-variables.ts`, group `SERVER_CONFIG`. NOTE: intentionally **no** `@CastToUpperSnakeCase` — unlike the other driver enums, `MessageQueueDriverType` values are lowercase-hyphen (`bull-mq`/`sync`/`pg`), so upper-snake casting would mangle the value and it would never match the enum (the existing `app.module.ts` compares this enum against a raw lowercase env value too).
+- [x] `message-queue.module-factory.ts` branches on the config var; Pg returns the Pg factory options with the SqlExecutor + PgDriverOptions (`metricsService`, `cronNextRun`). Added `getDataSourceToken()` to the factory inject array in `core-engine.module.ts`.
+- [x] `cron-parser` (already a twenty-server dep, `5.1.1`) wired as `CronNextRun` in the factory via `CronExpressionParser.parse(pattern, { currentDate: from }).next().toDate()`.
+- [x] Instance-command migration (core, fast) **`CreatePgMessageQueueTablesFastInstanceCommand`** (`2-9/2-9-instance-command-fast-1799000040000-create-pg-message-queue-tables.ts`, registered in `instance-commands.constant.ts`) runs `new PgMessageQueueCore(executor, DEFAULT_TABLES).buildSchemaSql()` to create `core.messageQueueJob` + `core.messageQueueJobSchedule` (down: DROP both).
+- Gates: `deno run -A deno-spike/validate-pg-driver.ts` → still **18/18**. Server typecheck via `deno check` (server compiler flags: strictNullChecks + noImplicitAny) on the new driver files `pg.driver.ts` + `typeorm-sql-executor.ts` → clean (no `MessageQueueDriver` signature drift). Full `nx typecheck`/`nx lint` need Yarn (unavailable in the Deno-only env); the novel type relationships (union narrowing, MetricsService→MetricsLike, factory `satisfies`) were verified with isolated `deno check` harnesses.
+
 Still TODO in Phase 2:
-- [ ] Wire `MessageQueueDriverType.Pg` + `PgDriver` into `message-queue.module-factory.ts` behind config (keep BullMQ default). Inject DataSource adapter + cron-parser `CronNextRun` + MetricsService. **NOTE:** server typecheck of `pg.driver.ts` deferred to this step (uses `src/` aliases; mirrors `bullmq.driver.ts` patterns).
-- [ ] Instance-command migration creating the two tables (reuse `core.buildSchemaSql()`); add `cron-parser` dep to twenty-server.
 - [ ] PG (or memory) cache store in `cache-storage.module-factory.ts` (un-hardcode Redis).
 - [ ] Session store: PG or JWT-stateless in `session-storage.module-factory.ts`.
 - [ ] `LISTEN/NOTIFY` PubSub to replace `engine/subscriptions` Redis pub/sub.
 - [ ] Retire `redis-client.service.ts`; update admin-panel health indicators.
 
-New files (this slice):
+New files (this initiative):
 - `packages/twenty-server/src/engine/core-modules/message-queue/drivers/pg-driver-core.ts`
 - `packages/twenty-server/src/engine/core-modules/message-queue/drivers/pg.driver.ts`
+- `packages/twenty-server/src/engine/core-modules/message-queue/drivers/typeorm-sql-executor.ts` (slice 3)
+- `packages/twenty-server/src/database/commands/upgrade-version-command/2-9/2-9-instance-command-fast-1799000040000-create-pg-message-queue-tables.ts` (slice 3)
 - `deno-spike/validate-pg-driver.ts`
 
 ### Phase 3 — Deno entrypoint + frontend
