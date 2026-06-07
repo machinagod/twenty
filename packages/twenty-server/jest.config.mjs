@@ -17,7 +17,9 @@ const jestConfig = {
   testEnvironment: 'node',
   setupFilesAfterEnv: ['./setupTests.ts'],
   transformIgnorePatterns: [
-    '/node_modules/(?!(file-type|@file-type|strtok3|token-types|@borewit|@tokenizer|uint8array-extras|read-next-line|digest-fetch|md5|js-sha256|js-sha512|base-64|charenc|crypt|email-reply-parser)/)',
+    // `.deno/` allows Deno's nested install layout (node_modules/.deno/pkg@ver/node_modules/pkg/…)
+    // to fall through to the package-name check at the second `/node_modules/` segment.
+    '/node_modules/(?!(\\.deno|file-type|@file-type|strtok3|token-types|@borewit|@tokenizer|uint8array-extras|read-next-line|digest-fetch|md5|js-sha256|js-sha512|base-64|charenc|crypt|email-reply-parser)/)',
   ],
   testRegex: '.*\\.spec\\.ts$',
   transform: {

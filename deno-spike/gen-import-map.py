@@ -60,10 +60,29 @@ imports = {
   'qs': 'npm:qs@6.14.2',
 }
 imports = {**deep_map, **imports}  # manual mappings win (e.g. lingui macro shim)
+# Tasks define the end-to-end Deno-only workflow. Each shells out to either an
+# in-repo script or a node-tool binary from node_modules/.bin — no yarn, no nx.
+tasks = {
+  'prepare': 'bash deno-spike/prepare-deno-deps.sh',
+  'apply-patches': 'bash deno-spike/apply-patches.sh ./ node_modules',
+  'build:front': 'bash deno-spike/build-frontend.sh',
+  # Full one-shot bootstrap: install + scaffold + patch + build the frontend.
+  # Named `build:all` (not `build`) to avoid being shadowed by twenty-front's
+  # own `build` script in its package.json, which Deno auto-exposes as a task.
+  'build:all': 'deno task prepare && deno task apply-patches && deno task build:front',
+  # DB setup + migrations (read PG_DATABASE_URL etc. from the environment).
+  'db:setup': 'cd packages/twenty-server && deno run -A --sloppy-imports boot-setup-db.ts',
+  'db:migrate': 'cd packages/twenty-server && deno run -A --sloppy-imports boot-migrate.ts',
+  # The unified API + Deno.cron entrypoint.
+  'serve': 'cd packages/twenty-server && deno run -A --unstable-cron --sloppy-imports boot-serve.ts',
+}
 root = {
   'nodeModulesDir': 'auto',
   'workspace': ['./packages/twenty-server', './packages/twenty-shared',
-                './packages/twenty-emails', './packages/twenty-client-sdk'],
+                './packages/twenty-emails', './packages/twenty-client-sdk',
+                './packages/twenty-front', './packages/twenty-ui',
+                './packages/twenty-front-component-renderer'],
+  'tasks': tasks,
   'imports': imports,
 }
 json.dump(root, open('deno.json', 'w'), indent=2)

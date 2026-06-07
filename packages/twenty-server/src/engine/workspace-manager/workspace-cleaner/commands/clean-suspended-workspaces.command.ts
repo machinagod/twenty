@@ -12,7 +12,7 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import {
   CLEAN_SUSPENDED_WORKSPACES_OPERATIONS,
   CleanerWorkspaceService,
-  CleanSuspendedWorkspacesOperation,
+  type CleanSuspendedWorkspacesOperation,
   type CleanSuspendedWorkspacesOptions,
 } from 'src/engine/workspace-manager/workspace-cleaner/services/cleaner.workspace-service';
 

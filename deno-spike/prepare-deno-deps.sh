@@ -39,12 +39,18 @@ SERVER_WORKSPACES = [
     'packages/twenty-shared',
     'packages/twenty-emails',
     'packages/twenty-client-sdk',
+    'packages/twenty-front',
+    'packages/twenty-ui',
+    'packages/twenty-front-component-renderer',
 ]
 
 def depatch(deps):
     for name, spec in list(deps.items()):
         if isinstance(spec, str) and spec.startswith('patch:'):
-            match = re.search(r'@([0-9][^@#]*)#', spec)
+            # Two shapes seen in this repo:
+            #   patch:<name>@<ver>#<file>            (root/server)
+            #   patch:<name>@npm%3A<ver>#<file>      (twenty-front)
+            match = re.search(r'(?:@npm%3A|@)([0-9][^@#]*)#', spec)
             if match:
                 deps[name] = match.group(1)
                 print(f'  de-patched {name}: -> {match.group(1)}')
@@ -56,10 +62,18 @@ for section in ('dependencies', 'devDependencies'):
 json.dump(root, open('package.json', 'w'), indent=2)
 print('scoped workspaces ->', SERVER_WORKSPACES)
 
-server = json.load(open('packages/twenty-server/package.json'))
-for section in ('dependencies', 'devDependencies'):
-    depatch(server.get(section, {}))
-json.dump(server, open('packages/twenty-server/package.json', 'w'), indent=2)
+# De-patch every scoped workspace member, not just the server. twenty-front pulls
+# react-phone-number-input via `patch:` too; leaving it as `patch:` makes Deno
+# resolve nothing for it, and Rollup can't find the package at build time.
+for ws in SERVER_WORKSPACES:
+    pkg_path = f'{ws}/package.json'
+    try:
+        pkg = json.load(open(pkg_path))
+    except FileNotFoundError:
+        continue
+    for section in ('dependencies', 'devDependencies'):
+        depatch(pkg.get(section, {}))
+    json.dump(pkg, open(pkg_path, 'w'), indent=2)
 PY
 
 # Minimal ROOT deno.json so `deno install` links the workspace members (twenty-shared
@@ -73,7 +87,10 @@ cat > deno.json <<'JSON'
     "./packages/twenty-server",
     "./packages/twenty-shared",
     "./packages/twenty-emails",
-    "./packages/twenty-client-sdk"
+    "./packages/twenty-client-sdk",
+    "./packages/twenty-front",
+    "./packages/twenty-ui",
+    "./packages/twenty-front-component-renderer"
   ]
 }
 JSON
@@ -85,9 +102,50 @@ deno install
 # its own way, but Node-based build tools (vite) need real node_modules/<pkg> symlinks
 # (which Yarn would create). Without these, building twenty-emails fails on
 # `Cannot find module 'twenty-shared/translations'`.
-for pkg in twenty-shared twenty-emails twenty-client-sdk; do
+for pkg in twenty-shared twenty-emails twenty-client-sdk twenty-front twenty-ui twenty-front-component-renderer; do
   ln -sfn "../packages/$pkg" "node_modules/$pkg"
 done
+
+# Yarn-style flat hoisting: every package Deno installed into `.deno/<pkg>@<ver>/`
+# gets a top-level `node_modules/<pkg>` symlink IF none already exists. Node-based
+# build tools (vite, rollup) walk up `node_modules` looking for transitive deps;
+# Deno's nested layout hides them. This makes the layout look like what yarn's
+# nodeLinker: node-modules produces, without requiring yarn. First wins on
+# version conflicts — fine for build tooling, which doesn't care about version
+# diversity at this level.
+python3 - <<'PY'
+import os
+linked = 0
+for d in sorted(os.listdir('node_modules/.deno')):
+    p = f'node_modules/.deno/{d}/node_modules'
+    if not os.path.isdir(p):
+        continue
+    for entry in os.listdir(p):
+        if entry.startswith('.'):
+            continue
+        if entry.startswith('@'):
+            scope_dir = f'{p}/{entry}'
+            if not os.path.isdir(scope_dir):
+                continue
+            for sub in os.listdir(scope_dir):
+                # symlink lives at node_modules/<scope>/<sub>. The target is
+                # resolved from node_modules/<scope>/, so escape ONE level back
+                # to node_modules/ and then descend into .deno/.
+                src = f'../.deno/{d}/node_modules/{entry}/{sub}'
+                dst = f'node_modules/{entry}/{sub}'
+                if os.path.lexists(dst):
+                    continue
+                os.makedirs(f'node_modules/{entry}', exist_ok=True)
+                os.symlink(src, dst); linked += 1
+        else:
+            # symlink lives at node_modules/<pkg>, target is relative to node_modules/.
+            src = f'.deno/{d}/node_modules/{entry}'
+            dst = f'node_modules/{entry}'
+            if os.path.lexists(dst):
+                continue
+            os.symlink(src, dst); linked += 1
+print(f'flat-hoisted {linked} package(s) to node_modules/')
+PY
 
 # Build the workspace packages that consumers resolve only via dist/ (their package
 # exports point at dist). Runtime .mjs comes from vite; the tsgo .d.ts step may fail on

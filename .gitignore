@@ -57,3 +57,9 @@ TRANSLATION_QA_REPORT.md
 .playwright-cli/
 output/playwright/
 screenshots/
+# Deno-prepare-mutated/generated state — do not commit
+/deno.json
+/deno.lock
+/packages/twenty-server/deno.json
+/packages/twenty-server/src/front/
+/deno-twenty-*.png
