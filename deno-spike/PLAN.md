@@ -259,8 +259,10 @@ The hand-import-map ceiling is gone: with the prepared node_modules, the **real 
 - **Road to the full AppModule boot (recon done — bounded, sequential Deno-compat steps):**
   1. ✅ JSON imports need `with { type: 'json' }` (only 2 in the server: `ai-providers.json` import in `default-ai-catalog.service.ts` + its spec — fixed; standard attribute works on Node 20+/TS 5.3+/Deno).
   2. ✅ Build the remaining workspace packages' `dist` — `twenty-emails` resolves only via `dist/index.mjs`. Two parts (both now in `prepare-deno-deps.sh`): (a) create Node-style `node_modules/<pkg>` symlinks — Deno's layout doesn't, and Node build tools (vite) need them, else `Cannot find module 'twenty-shared/translations'`; (b) `vite build` each dist-only package (twenty-shared, twenty-emails). Runtime `.mjs` builds fine; the `tsgo` `.d.ts` step is types-only.
-  3. ⬜ `graphql/language` (and similar) **directory imports** → ESM needs the explicit `/index.mjs`.
-  4. ⬜ Remaining bare-import / CJS-default-import / type-only-value-import outliers, surfaced one at a time.
+  3. ⬜ **Workspace-package transitive deps**: `twenty-emails/dist/index.mjs` imports `react`, which Deno doesn't resolve from the symlinked workspace package's scope (Deno's resolution of a workspace member's own deps via the node_modules symlink is finicky). Options: map `react`/`react-dom`/`@react-email/*` in the import map, or bundle twenty-emails self-contained, or load its source. (twenty-emails is only used for transactional email rendering.)
+  4. ⬜ `graphql/language` (and similar) **directory imports** → ESM needs the explicit `/index.mjs`.
+  5. ⬜ Remaining bare-import / CJS-default-import / type-only-value-import outliers, surfaced one at a time.
+  Each is bounded; the cascade is the bulk of the remaining AppModule-boot work (multi-session).
   The MQ boot stubs `TwentyConfigService` to stay focused; the full AppModule boot is the next milestone and clears these in order.
 - twenty-shared is already built (`dist/*.mjs`) — its vite build succeeded; only the `tsgo` `.d.ts` step failed (types only, irrelevant at runtime).
 
