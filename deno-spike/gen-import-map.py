@@ -40,7 +40,11 @@ for spec in sorted(deep):
     rel = spec[len(name)+1:]
     for c in (f'{rel}.mjs', f'{rel}.js', f'{rel}/index.mjs', f'{rel}/index.js'):
         if os.path.isfile(f'{pdir}/{c}'):
-            deep_map[spec] = f'npm:{name}@{ver}/{c}'; break
+            # Map to the node_modules FILE PATH (same package instance as the bare
+            # `import 'pkg'`), NOT an `npm:` specifier — npm: spins up a SEPARATE
+            # instance, splitting singleton state (TypeMetadataStorage, typeorm/Nest
+            # metadata storages) and causing duplicate GraphQL types / lost metadata.
+            deep_map[spec] = f'./{pdir}/{c}'; break
 
 imports = {
   'react': 'npm:react@18.3.1',
