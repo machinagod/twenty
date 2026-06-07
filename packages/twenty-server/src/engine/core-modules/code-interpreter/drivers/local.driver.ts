@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
@@ -19,7 +20,7 @@ export type LocalDriverOptions = {
   timeoutMs?: number;
 };
 
-const SANDBOX_SCRIPTS_PATH = join(__dirname, '..', 'sandbox-scripts');
+const SANDBOX_SCRIPTS_PATH = join(getModuleDirname(), '..', 'sandbox-scripts');
 
 async function copyDirectoryRecursive(src: string, dest: string) {
   await fs.mkdir(dest, { recursive: true });

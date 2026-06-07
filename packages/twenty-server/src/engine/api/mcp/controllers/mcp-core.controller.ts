@@ -21,7 +21,7 @@ import { McpProtocolService } from 'src/engine/api/mcp/services/mcp-protocol.ser
 import { writeSseEvent } from 'src/engine/api/mcp/utils/write-sse-event.util';
 import { RestApiExceptionFilter } from 'src/engine/api/rest/rest-api-exception.filter';
 import { FlatApiKey } from 'src/engine/core-modules/api-key/types/flat-api-key.type';
-import { FlatWorkspace } from 'src/engine/core-modules/workspace/types/flat-workspace.type';
+import { type FlatWorkspace } from 'src/engine/core-modules/workspace/types/flat-workspace.type';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { AuthApiKey } from 'src/engine/decorators/auth/auth-api-key.decorator';
 import { AuthUserWorkspaceId } from 'src/engine/decorators/auth/auth-user-workspace-id.decorator';

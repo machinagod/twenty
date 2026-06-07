@@ -1,7 +1,8 @@
 import { ALL_METADATA_NAME } from 'twenty-shared/metadata';
 import { isDefined } from 'twenty-shared/utils';
 
-import { plural } from 'pluralize';
+import pluralize from 'pluralize';
+const { plural } = pluralize;
 
 import {
   BaseGraphQLError,

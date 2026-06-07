@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import {
   type DynamicModule,
   type MiddlewareConsumer,
@@ -80,7 +81,7 @@ const MIGRATED_REST_METHODS = [
 export class AppModule {
   private static getConditionalModules(): DynamicModule[] {
     const modules: DynamicModule[] = [];
-    const frontPath = join(__dirname, 'front');
+    const frontPath = join(getModuleDirname(), 'front');
 
     // NestJS DevTools - can be useful for debugging and profiling
     /* if (process.env.NODE_ENV === NodeEnvironment.DEVELOPMENT) {

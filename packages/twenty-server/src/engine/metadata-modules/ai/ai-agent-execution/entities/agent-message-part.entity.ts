@@ -7,7 +7,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Relation,
+  type Relation,
 } from 'typeorm';
 
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';

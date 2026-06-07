@@ -13,8 +13,8 @@ import {
 import GraphQLJSON from 'graphql-type-json';
 
 import { UUIDScalarType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/scalars';
-import { AgentResponseFormat } from 'src/engine/metadata-modules/ai/ai-agent/types/agent-response-format.type';
-import { ModelConfiguration } from 'src/engine/metadata-modules/ai/ai-agent/types/modelConfiguration';
+import { type AgentResponseFormat } from 'src/engine/metadata-modules/ai/ai-agent/types/agent-response-format.type';
+import { type ModelConfiguration } from 'src/engine/metadata-modules/ai/ai-agent/types/modelConfiguration';
 import { AgentResponseFormatJson } from 'src/engine/metadata-modules/ai/ai-agent/validators/agent-response-format-json.validator';
 import { AgentResponseFormatText } from 'src/engine/metadata-modules/ai/ai-agent/validators/agent-response-format-text.validator';
 import { type ModelId } from 'src/engine/metadata-modules/ai/ai-models/types/model-id.type';

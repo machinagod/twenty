@@ -2,7 +2,7 @@
 
 import { Controller, Post, Req, UseFilters, UseGuards } from '@nestjs/common';
 
-import { Request } from 'express';
+import { type Request } from 'express';
 
 import { AuthRestApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-rest-api-exception.filter';
 import { CloudflareSecretMatchGuard } from 'src/engine/core-modules/cloudflare/guards/cloudflare-secret.guard';

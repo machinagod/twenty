@@ -1,10 +1,11 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import { promises as fs } from 'fs';
 import { resolve, join } from 'path';
 
 import { ASSET_PATH } from 'src/constants/assets-path';
 
 const EXECUTOR_FILE_PATH = resolve(
-  __dirname,
+  getModuleDirname(),
   join(
     ASSET_PATH,
     `engine/core-modules/logic-function/logic-function-drivers/constants/executor`,

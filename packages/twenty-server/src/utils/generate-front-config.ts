@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -26,7 +27,7 @@ export function generateFrontConfig(): void {
     </script>
     <!-- END: Twenty Config -->`;
 
-  const distPath = path.join(__dirname, '..', 'front');
+  const distPath = path.join(getModuleDirname(), '..', 'front');
   const indexPath = path.join(distPath, 'index.html');
 
   try {

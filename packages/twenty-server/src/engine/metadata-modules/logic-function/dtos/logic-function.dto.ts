@@ -22,11 +22,11 @@ import {
 } from 'class-validator';
 import graphqlTypeJson from 'graphql-type-json';
 import {
-  CronTriggerSettings,
-  DatabaseEventTriggerSettings,
-  HttpRouteTriggerSettings,
-  ToolTriggerSettings,
-  WorkflowActionTriggerSettings,
+  type CronTriggerSettings,
+  type DatabaseEventTriggerSettings,
+  type HttpRouteTriggerSettings,
+  type ToolTriggerSettings,
+  type WorkflowActionTriggerSettings,
 } from 'twenty-shared/application';
 
 import { UUIDScalarType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/scalars';

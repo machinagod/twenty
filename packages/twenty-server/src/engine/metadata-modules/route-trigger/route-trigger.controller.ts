@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { Request, Response } from 'express';
+import { type Request, type Response } from 'express';
 import { HTTPMethod } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 

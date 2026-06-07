@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { Response } from 'express';
+import { type Response } from 'express';
 import { isDefined } from 'twenty-shared/utils';
 
 import {

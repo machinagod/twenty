@@ -1,4 +1,5 @@
 /* oxlint-disable no-console */
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import fs from 'fs';
 import path from 'path';
 
@@ -77,7 +78,7 @@ async function recordMigration(filename: string, client: ClickHouseClient) {
 }
 
 async function runMigrations() {
-  const dir = path.join(__dirname);
+  const dir = path.join(getModuleDirname());
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.sql'));
 
   await ensureDatabaseExists();

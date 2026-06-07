@@ -10,7 +10,7 @@ import {
 
 import { pipeline } from 'stream/promises';
 
-import { Response } from 'express';
+import { type Response } from 'express';
 
 import {
   FileStorageException,

@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
@@ -20,7 +21,7 @@ export type E2BDriverOptions = {
   timeoutMs?: number;
 };
 
-const SANDBOX_SCRIPTS_PATH = join(__dirname, '..', 'sandbox-scripts');
+const SANDBOX_SCRIPTS_PATH = join(getModuleDirname(), '..', 'sandbox-scripts');
 
 async function uploadDirectoryToSandbox(
   sbx: Sandbox,

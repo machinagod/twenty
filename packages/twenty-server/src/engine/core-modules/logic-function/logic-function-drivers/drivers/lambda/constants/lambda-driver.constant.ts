@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import { join, resolve } from 'path';
 
 import { ASSET_PATH } from 'src/constants/assets-path';
@@ -27,7 +28,7 @@ export const PREBUILT_INSTALL_LOCK_RETRY_MS = 1_000;
 export const PREBUILT_INSTALL_LOCK_MAX_RETRIES = 180;
 
 export const YARN_INSTALL_HANDLER_PATH = resolve(
-  __dirname,
+  getModuleDirname(),
   join(
     ASSET_PATH,
     'engine/core-modules/logic-function/logic-function-drivers/constants/yarn-install/index.mjs',
@@ -35,7 +36,7 @@ export const YARN_INSTALL_HANDLER_PATH = resolve(
 );
 
 export const BUILDER_HANDLER_PATH = resolve(
-  __dirname,
+  getModuleDirname(),
   join(
     ASSET_PATH,
     'engine/core-modules/logic-function/logic-function-drivers/constants/builder/index.mjs',

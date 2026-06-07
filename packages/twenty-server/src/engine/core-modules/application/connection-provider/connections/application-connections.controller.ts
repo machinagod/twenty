@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { Request } from 'express';
+import { type Request } from 'express';
 import { isDefined } from 'twenty-shared/utils';
 
 import { type AppConnectionDto } from 'src/engine/core-modules/application/connection-provider/connections/dtos/app-connection.dto';

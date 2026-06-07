@@ -12,7 +12,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { generateServiceProviderMetadata } from '@node-saml/node-saml';
-import { Response } from 'express';
+import { type Response } from 'express';
 import { AppPath, ConnectedAccountProvider } from 'twenty-shared/types';
 import { assertIsDefinedOrThrow } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
@@ -26,8 +26,8 @@ import { EnterpriseFeaturesEnabledGuard } from 'src/engine/core-modules/auth/gua
 import { OIDCAuthGuard } from 'src/engine/core-modules/auth/guards/oidc-auth.guard';
 import { SAMLAuthGuard } from 'src/engine/core-modules/auth/guards/saml-auth.guard';
 import { AuthService } from 'src/engine/core-modules/auth/services/auth.service';
-import { OIDCRequest } from 'src/engine/core-modules/auth/strategies/oidc.auth.strategy';
-import { SAMLRequest } from 'src/engine/core-modules/auth/strategies/saml.auth.strategy';
+import { type OIDCRequest } from 'src/engine/core-modules/auth/strategies/oidc.auth.strategy';
+import { type SAMLRequest } from 'src/engine/core-modules/auth/strategies/saml.auth.strategy';
 import { LoginTokenService } from 'src/engine/core-modules/auth/token/services/login-token.service';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { GuardRedirectService } from 'src/engine/core-modules/guard-redirect/services/guard-redirect.service';

@@ -45,7 +45,7 @@ import { RefreshTokenService } from 'src/engine/core-modules/auth/token/services
 import { RenewTokenService } from 'src/engine/core-modules/auth/token/services/renew-token.service';
 import { TransientTokenService } from 'src/engine/core-modules/auth/token/services/transient-token.service';
 import { WorkspaceAgnosticTokenService } from 'src/engine/core-modules/auth/token/services/workspace-agnostic-token.service';
-import { AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
+import { type AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { JwtTokenTypeEnum } from 'src/engine/core-modules/auth/types/jwt-token-type.enum';
 import { LoginTokenJwtPayload } from 'src/engine/core-modules/auth/types/login-token-jwt-payload.type';
 import { CaptchaGuard } from 'src/engine/core-modules/captcha/captcha.guard';
@@ -56,7 +56,7 @@ import { EmailVerificationTrigger } from 'src/engine/core-modules/email-verifica
 import { EmailVerificationService } from 'src/engine/core-modules/email-verification/services/email-verification.service';
 import { PreventNestToAutoLogGraphqlErrorsFilter } from 'src/engine/core-modules/graphql/filters/prevent-nest-to-auto-log-graphql-errors.filter';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
-import { I18nContext } from 'src/engine/core-modules/i18n/types/i18n-context.type';
+import { type I18nContext } from 'src/engine/core-modules/i18n/types/i18n-context.type';
 import { SSOService } from 'src/engine/core-modules/sso/services/sso.service';
 import { TwoFactorAuthenticationVerificationInput } from 'src/engine/core-modules/two-factor-authentication/dto/two-factor-authentication-verification.input';
 import { TwoFactorAuthenticationExceptionFilter } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication-exception.filter';

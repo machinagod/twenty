@@ -14,7 +14,7 @@ import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user
 import { AgentMessageEntity } from 'src/engine/metadata-modules/ai/ai-agent-execution/entities/agent-message.entity';
 import { AgentTurnEntity } from 'src/engine/metadata-modules/ai/ai-agent-execution/entities/agent-turn.entity';
 import type { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
-import { EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
+import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
 
 @Entity({ name: 'agentChatThread', schema: 'core' })
 @Index('IDX_AGENT_CHAT_THREAD_ID_DELETED_AT', ['id', 'deletedAt'])

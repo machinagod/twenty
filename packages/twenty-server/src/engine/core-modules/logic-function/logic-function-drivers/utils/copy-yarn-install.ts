@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import { promises as fs } from 'fs';
 import { resolve, join } from 'path';
 
@@ -5,7 +6,7 @@ import { ASSET_PATH } from 'src/constants/assets-path';
 import { YARN_ENGINE_DIRNAME } from 'src/engine/core-modules/application/application-package/constants/yarn-engine-dirname';
 
 const YARN_INSTALL_FILE_PATH = resolve(
-  __dirname,
+  getModuleDirname(),
   join(
     ASSET_PATH,
     'engine/core-modules/logic-function/logic-function-drivers/constants/yarn-install',

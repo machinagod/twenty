@@ -3,7 +3,7 @@ import { ArgsType, Field, registerEnumType } from '@nestjs/graphql';
 import { IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
 import GraphQLJSON from 'graphql-type-json';
 
-import { TrackEventName } from 'src/engine/core-modules/event-logs/emit/events.type';
+import { type TrackEventName } from 'src/engine/core-modules/event-logs/emit/events.type';
 import { type PageviewProperties } from 'src/engine/core-modules/event-logs/emit/events/pageview/pageview';
 
 enum AnalyticsType {

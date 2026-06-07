@@ -14,7 +14,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { Request } from 'express';
+import { type Request } from 'express';
 import { isDefined } from 'twenty-shared/utils';
 
 import { AppBillingService } from 'src/engine/core-modules/billing/app-billing/app-billing.service';

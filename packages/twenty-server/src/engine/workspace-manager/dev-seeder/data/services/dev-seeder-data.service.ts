@@ -1,3 +1,4 @@
+import { getModuleDirname } from 'src/utils/get-module-dirname';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
@@ -437,13 +438,13 @@ export class DevSeederDataService {
     entityManager: WorkspaceEntityManager,
     fileSeedMetadata: AttachmentFileSeedMetadata[],
   ): Promise<void> {
-    const IS_BUILT = __dirname.includes('/dist/');
+    const IS_BUILT = getModuleDirname().includes('/dist/');
     const sampleFilesDir = IS_BUILT
       ? join(
-          __dirname,
+          getModuleDirname(),
           '../../../../../assets/engine/workspace-manager/dev-seeder/data/sample-files',
         )
-      : join(__dirname, '../sample-files');
+      : join(getModuleDirname(), '../sample-files');
 
     // Read each sample file once and cache the buffer
     const sampleFileBuffers: Buffer[] = [];

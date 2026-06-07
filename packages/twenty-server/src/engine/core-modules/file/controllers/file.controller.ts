@@ -12,7 +12,7 @@ import {
 import { pipeline } from 'node:stream/promises';
 import { join } from 'path';
 
-import { Request, Response } from 'express';
+import { type Request, type Response } from 'express';
 import { FileFolder } from 'twenty-shared/types';
 
 import { validateFilePath } from 'src/engine/core-modules/file-storage/utils/validate-file-path.util';
@@ -23,7 +23,7 @@ import {
 import { FileApiExceptionFilter } from 'src/engine/core-modules/file/filters/file-api-exception.filter';
 import {
   FileByIdGuard,
-  SupportedFileFolder,
+  type SupportedFileFolder,
 } from 'src/engine/core-modules/file/guards/file-by-id.guard';
 import { FileService } from 'src/engine/core-modules/file/services/file.service';
 import { setFileResponseHeaders } from 'src/engine/core-modules/file/utils/set-file-response-headers.utils';

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Response } from 'express';
+import { type Response } from 'express';
 import { AppPath, SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
@@ -22,7 +22,7 @@ import { MicrosoftAPIsOauthExchangeCodeForTokenGuard } from 'src/engine/core-mod
 import { MicrosoftAPIsOauthRequestCodeGuard } from 'src/engine/core-modules/auth/guards/microsoft-apis-oauth-request-code.guard';
 import { MicrosoftAPIsService } from 'src/engine/core-modules/auth/services/microsoft-apis.service';
 import { TransientTokenService } from 'src/engine/core-modules/auth/token/services/transient-token.service';
-import { APIsOAuthRequest } from 'src/engine/core-modules/auth/types/apis-oauth-request.type';
+import { type APIsOAuthRequest } from 'src/engine/core-modules/auth/types/apis-oauth-request.type';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { GuardRedirectService } from 'src/engine/core-modules/guard-redirect/services/guard-redirect.service';
 import { OnboardingService } from 'src/engine/core-modules/onboarding/onboarding.service';

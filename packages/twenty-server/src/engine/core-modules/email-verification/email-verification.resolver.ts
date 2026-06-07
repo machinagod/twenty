@@ -9,7 +9,7 @@ import { EmailVerificationExceptionFilter } from 'src/engine/core-modules/email-
 import { EmailVerificationService } from 'src/engine/core-modules/email-verification/services/email-verification.service';
 import { PreventNestToAutoLogGraphqlErrorsFilter } from 'src/engine/core-modules/graphql/filters/prevent-nest-to-auto-log-graphql-errors.filter';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
-import { I18nContext } from 'src/engine/core-modules/i18n/types/i18n-context.type';
+import { type I18nContext } from 'src/engine/core-modules/i18n/types/i18n-context.type';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
 

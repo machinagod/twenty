@@ -11,7 +11,7 @@ import {
   NavigationMenuItemDeletionJob,
   type NavigationMenuItemDeletionJobData,
 } from 'src/engine/metadata-modules/navigation-menu-item/jobs/navigation-menu-item-deletion.job';
-import { WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
+import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
 
 @Injectable()
 export class NavigationMenuItemDeletionListener {
