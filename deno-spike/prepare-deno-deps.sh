@@ -62,6 +62,40 @@ for section in ('dependencies', 'devDependencies'):
 json.dump(server, open('packages/twenty-server/package.json', 'w'), indent=2)
 PY
 
+# Deno workspace config: nodeModulesDir + the scoped member list must live in a ROOT
+# deno.json (Deno warns if nodeModulesDir is set on a member). This is what links the
+# workspace packages (twenty-shared etc.) into the resolution graph.
+cat > deno.json <<'JSON'
+{
+  "nodeModulesDir": "auto",
+  "workspace": [
+    "./packages/twenty-server",
+    "./packages/twenty-shared",
+    "./packages/twenty-emails",
+    "./packages/twenty-client-sdk"
+  ]
+}
+JSON
+
+# Member config for twenty-server: the `src/` path alias (tsconfig paths, which Deno
+# doesn't read) + node-builtin specifiers mapped to `node:` (the server imports them
+# bare, e.g. `from 'crypto'`, which Deno doesn't resolve as builtins). Source-free.
+python3 - <<'PY'
+import json
+builtins = ['assert','buffer','child_process','crypto','dns','events','fs','fs/promises',
+  'http','http2','https','net','os','path','perf_hooks','process','querystring','stream',
+  'stream/promises','string_decoder','timers','tls','url','util','zlib','async_hooks',
+  'dgram','readline','worker_threads','constants','module','vm','inspector']
+imports = {'src/': './src/'}
+imports.update({b: f'node:{b}' for b in builtins})
+cfg = {
+  'compilerOptions': {'experimentalDecorators': True, 'emitDecoratorMetadata': True},
+  'imports': imports,
+}
+json.dump(cfg, open('packages/twenty-server/deno.json','w'), indent=2)
+print('wrote packages/twenty-server/deno.json (src/ alias + node: builtins)')
+PY
+
 echo "running deno install ..."
 deno install
 
