@@ -100,6 +100,11 @@ for pkg in twenty-shared twenty-emails twenty-client-sdk; do
   fi
 done
 
+# Merge Deno's peer-dependency package variants to single instances (reflect-metadata,
+# @nestjs/*, … keep global singleton state; two instances split it → DI / metadata
+# failures at boot).
+python3 deno-spike/dedup-packages.py
+
 # Generate the full root + member deno.json import map (needs node_modules present so
 # it can auto-resolve extensionless deep npm subpaths).
 python3 deno-spike/gen-import-map.py

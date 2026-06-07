@@ -270,7 +270,17 @@ Full-AppModule import on Deno (slice 3.8) — ✅ MILESTONE: **the entire real `
 - **CJS globals `__dirname` / `require`** (16 files) — don't exist in ESM, and `import.meta` is illegal under tsc (module: commonjs). Added a **cross-runtime helper** `src/utils/get-module-dirname.ts` (`getModuleDirname`/`getModuleRequire`) that resolves the caller's location from the V8 stack — works in Node-CJS (jest/swc) AND Deno-ESM AND passes tsc (verified both runtimes). Per the user's "keep both" choice.
 - **Tiny runtime fixes**: `aws-lambda` `import { type X }` → top-level `import type` (Deno elides it — it's never used at runtime); `pluralize` named import → default-import+destructure (CJS named-export interop, same as `pg`).
 - **Import map** (`gen-import-map.py`, run by prepare): node-builtins → `node:`, auto-resolved extensionless deep npm subpaths (typeorm/graphql/@nestjs internals), the lingui shim, and undeclared/externalized deps (react, esbuild, p-limit, qs, …).
-- **Next:** actually BOOT it — `NestFactory.create(AppModule)` (needs DB + the config-gated PG/memory backends), then the `Deno.serve`/`Deno.cron` entrypoint.
+
+Booting the AppModule (slice 3.9) — IN PROGRESS. `NestFactory.createApplicationContext(AppModule)` in deno mode (`MESSAGE_QUEUE_DRIVER_TYPE=pg` etc.) against local Postgres now **constructs the full DI container, connects to Postgres, and reaches GraphQL schema building.** Blockers cleared:
+- **Peer-dependency package variants** — Deno installs `@nestjs+core@11.1.16` AND `@nestjs+core@11.1.16_1` (peer-context variants) as *separate instances*; singleton state (reflect-metadata registry, Nest/TypeORM/ptc-org metadata storages) splits → "Nest can't resolve ModuleRef" / "No metadata for X". Fixed by **`deno-spike/dedup-packages.py`** (merges every same-version variant to one instance; run by prepare).
+- **Entity glob path** — `core.datasource.ts` globs `dist/**/*.entity.js`; running source there is no dist. Made the `isJest` source-toggle Deno-aware (`typeof Deno !== 'undefined'`) so it globs `src/` — 1-line, cross-runtime-safe. Entities then load + the DB connects.
+- **graphql-type-json default import** — Deno's CJS interop returns `module.exports` (object) as the default import where Node's esModuleInterop returns `exports.default` (the scalar), so `import GraphQLJSON from 'graphql-type-json'` broke `() => GraphQLJSON`. Fixed with an import-map **shim** (`deno-spike/shims/graphql-type-json.ts`) re-exporting the real default — no source change (39 files left untouched).
+Remaining boot blockers (documented, next):
+- **TypeORM glob entity loader double-loads** (uses `require()` = CJS cache, separate from the ESM module graph) → entity files load twice → duplicate `@ObjectType` ("Schema must contain uniquely named types"). Fix: explicit entity array (no glob) or force the loader to `import()`.
+- DB is un-migrated (`relation "core.appToken" does not exist` — non-fatal, config falls back to env; needs `database:init` adapted for Deno).
+- Then: HTTP via `Deno.serve` + the `Deno.cron` drain/schedule heartbeats.
+
+**Boot env (deno mode):** `MESSAGE_QUEUE_DRIVER_TYPE=pg CACHE_STORAGE_TYPE=memory SESSION_STORAGE_TYPE=memory PUB_SUB_DRIVER_TYPE=postgres APP_SECRET=… PG_DATABASE_URL=… NODE_ENV=development`.
   The MQ boot stubs `TwentyConfigService` to stay focused; the full AppModule boot is the next milestone and clears these in order.
 - twenty-shared is already built (`dist/*.mjs`) — its vite build succeeded; only the `tsgo` `.d.ts` step failed (types only, irrelevant at runtime).
 

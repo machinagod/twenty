@@ -35,7 +35,9 @@ const getLoggingConfig = (): LogLevel[] => {
   }
 };
 
-const isJest = process.argv.some((arg) => arg.includes('jest'));
+const isJest =
+  process.argv.some((arg) => arg.includes('jest')) ||
+  typeof (globalThis as { Deno?: unknown }).Deno !== 'undefined';
 
 export const typeORMCoreModuleOptions: TypeOrmModuleOptions = {
   url: process.env.PG_DATABASE_URL,

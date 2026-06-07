@@ -50,6 +50,7 @@ imports = {
   '@lingui/core/macro': './deno-spike/shims/lingui-macro.ts',
   '@lingui/react/macro': './deno-spike/shims/lingui-macro.ts',
   'esbuild': 'npm:esbuild@0.25.12',
+  'graphql-type-json': './deno-spike/shims/graphql-type-json.ts',
   '@tiptap/core': 'npm:@tiptap/core@3.26.0',
   'p-limit': 'npm:p-limit@2.3.0',
   'qs': 'npm:qs@6.14.2',
