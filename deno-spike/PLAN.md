@@ -1,6 +1,6 @@
 # Twenty → Pure Deno Deploy (PG-only) — Migration Plan
 
-> **Status:** Phase 1 ✅. Phase 2 ✅. Phase 3 ✅ (entrypoint + vite-built frontend served by Deno + DB migrated + Chrome E2E auth flow). Jest suite ✅ (5601/5610 passing). Remaining: integration suite + `deno deploy` provisioning + Phase 4 hardening.
+> **Status:** Phase 1 ✅. Phase 2 ✅. Phase 3 ✅ (entrypoint + vite-built frontend served by Deno + DB migrated + Chrome E2E auth flow). Jest suite ✅ (5601/5610 passing). Phase 3.14 in progress: deploying from GitHub source to `machinagod/twenty-deno` (Deno Deploy CLI has no `--branch`, so deploys follow the default branch; main = our deno-spike tip).
 > **Last updated:** 2026-06-07
 > **Scope owner:** Ricardo A
 > **Home of this initiative:** `deno-spike/` (spike + this plan). The real port
