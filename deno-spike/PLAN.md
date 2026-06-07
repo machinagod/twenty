@@ -242,6 +242,13 @@ Replaced the Redis-only GraphQL-subscriptions transport with a config-gated Post
 - **Deno/Node interop fix:** `import pg from 'pg'; const { Client } = pg;` (not `import { Client } from 'pg'`) — pg does `module.exports = {...}`, which Deno's CJS named-export lexer can't split. Same pattern needed wherever the Deno path imports a CJS-default package (e.g. ioredis).
 - **Follow-ups (documented in the driver, per §7):** NOTIFY's ~8000-byte payload cap → store large payloads in a table + NOTIFY the id (§7.5); robust reconnection/re-LISTEN under Deploy idle-shutdown (§7.2, basic drop-and-reconnect is in).
 
+npm resolution for the real boot (slice 3.6) — ✅ MECHANISM PROVEN (`deno-spike/prepare-deno-deps.sh`):
+The earlier blocker — hand-built import maps don't scale to the full AppModule — is solved: **`deno install` can resolve twenty-server's entire npm graph** (2504 pkgs incl. nx, tsc, jest, @nestjs/*, typeorm, graphql), so a real boot only needs an `src/` (+ `twenty-shared`) mapping, not per-dep enumeration. Two transforms were required (both in `prepare-deno-deps.sh`):
+- **Scope `workspaces`** to the server-needed set (`twenty-server`, `twenty-shared`, `twenty-emails`, `twenty-client-sdk`). Deno walks every workspace member and twenty-front pulls `linkify-react@4.3.3`, whose published manifest has a malformed requirement (`linkifyjs: "==4.3.3"`) that Deno's semver parser rejects — aborting the whole install. (npm `overrides` don't help: Deno parses the manifest before applying them. A root `deno.json` `workspace` field doesn't help either: Deno still reads package.json `workspaces`.)
+- **De-patch** the Yarn `patch:NAME@VER#file` specs → exact `VER`. Deno can't parse `patch:` and otherwise resolves the wrong versions (got typeorm@0.3.30 / @nestjs/graphql@12.2.2 instead of the patched 0.3.20 / 12.1.1). After install, `apply-patches.sh` re-applies the patches (needs the exact versions).
+- **Caveat (documented):** Deno ignores yarn.lock, so `^x-dev` ranges drift — `@typescript/native-preview` (tsgo) resolves a newer build that rejects `esModuleInterop=false`/`moduleResolution=node10`, breaking the **nx BUILD toolchain** (twenty-shared's `vite build` → `nx typecheck`). This only affects nx-based typecheck/test under Deno, NOT running the app. A clean nx run needs exact-pinning the drifting tools (a yarn.lock→deno.lock equivalent) — deferred.
+- My slice changes don't break existing tests: the only spec touching a changed unit is `object-record-event-publisher.spec.ts`, which **mocks** `SubscriptionService` (`provide/useValue`, no `new`); the config-var/factory changes are additive + config-gated with no dedicated specs.
+
 ### Configurable "deno mode" vs "redis mode" (per the user's requirement)
 Every Redis concern is an independent config var, each defaulting to the Redis/BullMQ behaviour, so nothing changes unless explicitly flipped. To run Redis-free ("deno mode") set:
 ```
@@ -265,6 +272,7 @@ New files (this initiative):
 - `deno-spike/boot-real-driver.ts` + `deno-spike/boot-real-driver.json` (slice 3.1 — real driver on real TypeORM under Deno; run with `--sloppy-imports`)
 - `deno-spike/graphql-schema-build.ts` + `deno-spike/graphql-schema-build.json` (slice 3.2 — code-first GraphQL schema builds on Deno + patch verification)
 - `deno-spike/apply-patches.sh` (slice 3.2 — Deno-native replacement for Yarn `patch:`; build step that patches the resolved node_modules)
+- `deno-spike/prepare-deno-deps.sh` (slice 3.6 — scope workspaces + de-patch so `deno install` resolves the full server graph)
 - `deno-spike/cache-memory-check.ts` + `.json` (+ `shims/twenty-config-service.ts`) (slice 3.3 — Redis-free memory cache via the real factory on Deno)
 - `deno-spike/session-memory-check.ts` + `.json` (+ `shims/resolve-session-cookie-secrets.ts`) (slice 3.4 — Redis-free memory session config via the real factory on Deno)
 - `deno-spike/pubsub-pg-check.ts` + `.json` (slice 3.5 — PG LISTEN/NOTIFY pub/sub round-trip on Deno). Server: `engine/subscriptions/drivers/postgres-pub-sub.driver.ts` + `enums/pub-sub-driver-type.enum.ts`.
