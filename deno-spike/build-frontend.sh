@@ -24,6 +24,15 @@ if [ ! -x "$VITE" ] || [ ! -x "$TSC" ]; then
   exit 1
 fi
 
+# If the pre-built frontend bundle is already committed (deploy branches do this
+# to fit under Deno Deploy's 5-min build cap), skip the entire vite chain.
+# Override with FORCE_FRONTEND_REBUILD=1 to rebuild anyway.
+if [ -f "$ROOT/packages/twenty-server/src/front/index.html" ] && [ "${FORCE_FRONTEND_REBUILD:-0}" != "1" ]; then
+  echo "==> twenty-server/src/front already populated — skipping frontend rebuild"
+  echo "    (set FORCE_FRONTEND_REBUILD=1 to rebuild)"
+  exit 0
+fi
+
 echo "==> twenty-shared .d.ts (tsc declaration-only, --noCheck)"
 # --noCheck emits .d.ts without re-running type checks against the source.
 # Twenty's CI typechecks twenty-shared separately; we only need the declaration
@@ -33,6 +42,15 @@ echo "==> twenty-shared .d.ts (tsc declaration-only, --noCheck)"
 # predicate on `isDefined`, which made tsc 2026-vintage flag two real
 # `number | null | undefined` callsites in resolveRelativeDateFilter).
 ( cd "$ROOT/packages/twenty-shared" && \
+  "$TSC" -p tsconfig.lib.json --declaration --emitDeclarationOnly --noCheck \
+         --noEmit false --outDir dist --rootDir src )
+
+echo "==> twenty-front-component-renderer (vite + tsc --noCheck for .d.ts)"
+# Workspace package twenty-front depends on at build time. nx-cached locally
+# (so this used to be a no-op), but the Deno Deploy clone starts without any
+# dist/ so the symlink in node_modules has no entry to resolve.
+( cd "$ROOT/packages/twenty-front-component-renderer" && \
+  "$VITE" build -c vite.config.ts && \
   "$TSC" -p tsconfig.lib.json --declaration --emitDeclarationOnly --noCheck \
          --noEmit false --outDir dist --rootDir src )
 

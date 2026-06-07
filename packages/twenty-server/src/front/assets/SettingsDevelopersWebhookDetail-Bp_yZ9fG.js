@@ -1,0 +1,1 @@
+import{DU as e,vz as t}from"./index-DrA-SXmV.js";import{S as r,W as s}from"./SettingsDevelopersWebhookForm-iy7mpth_.js";import"./index.esm-DBfMwRxe.js";import"./zod-DQqKUEKK.js";import"./SettingsDatabaseEventsForm-DqxuJFec.js";const b=()=>{const{webhookId:o}=e();return t.jsx(r,{mode:s.Edit,webhookId:o})};export{b as SettingsDevelopersWebhookDetail};

@@ -1,0 +1,1 @@
+import{uM as t,d0 as o,tZ as s,iX as e}from"./index-DrA-SXmV.js";import{S as i}from"./SettingsNonCompositeFieldTypeConfigs-DeW9NioS.js";const I=a=>{if(t(a)||a===o.RELATION)return i[a]?.label;if(s(a))return e[a]?.label};export{I as g};

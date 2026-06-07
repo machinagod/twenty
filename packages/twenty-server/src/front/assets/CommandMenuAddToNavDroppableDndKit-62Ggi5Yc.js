@@ -1,0 +1,1 @@
+import{Cl as p,vz as e,t as r}from"./index-DrA-SXmV.js";const t=({children:o,isDropDisabled:d})=>{const{ref:n}=p({id:r,disabled:d}),a={innerRef:n,droppableProps:{"data-dnd-group":r},placeholder:null};return e.jsx(e.Fragment,{children:o(a)})};export{t as CommandMenuAddToNavDroppableDndKit};

@@ -1,0 +1,1 @@
+import{Ci as s,vz as t,t as d}from"./index-DrA-SXmV.js";const i=({id:e,dragIndex:a,menuItemContent:o})=>{const{ref:r}=s({id:e,data:{sourceDroppableId:d,sourceIndex:a},disabled:!1,feedback:"clone"});return t.jsx("div",{ref:r,children:o})};export{i as CommandMenuItemWithAddToNavigationDragDndKit};

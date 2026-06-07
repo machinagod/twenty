@@ -1,0 +1,1 @@
+import{yE as s,xe as o,gj as a}from"./index-DrA-SXmV.js";const D=s.createContext({isDragging:!1}),g=({navigationMenuItemSection:e,droppableId:t})=>{if(!o(t))return!1;const n=e==="workspace"?a.WORKSPACE_DROPPABLE_PREFIX:a.FAVORITE_DROPPABLE_PREFIX;return t.startsWith(n)},r="::",c=(e,t)=>`${e}${r}${t}`;export{D as N,g as c,c as g};

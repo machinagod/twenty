@@ -1,0 +1,1 @@
+import{vz as t,y as i,qz as r,tE as n}from"./index-DrA-SXmV.js";const a=({status:e})=>t.jsxs(t.Fragment,{children:[e===i.OPERATIONAL&&t.jsx(r,{color:"green",text:n._({id:"8m1COB"}),weight:"medium"}),e===i.OUTAGE&&t.jsx(r,{color:"red",text:n._({id:"yL8XdR"}),weight:"medium"})]});export{a as S};

@@ -1,0 +1,1 @@
+import{pb as a}from"./index-DrA-SXmV.js";const O=a({key:"lastAuthenticatedMethodState",defaultValue:null,useLocalStorage:!0});var S=(function(t){return t.EMAIL="EMAIL",t.GOOGLE="GOOGLE",t.MICROSOFT="MICROSOFT",t.SSO="SSO",t})({});export{S as A,O as l};

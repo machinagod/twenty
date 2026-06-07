@@ -1,0 +1,1 @@
+import{bk as e,b3 as o,a6 as l,bf as t}from"./index-DrE1u8Nc.js";const s={},c={class:"*:border-t-1/2 xl:*:border-l-1/2 custom-scroll flex flex-col pr-0 first:*:border-t-0 xl:flex-row xl:*:border-t-0 xl:first:*:border-l-0"};function f(r,n){return o(),l("div",c,[t(r.$slots,"default")])}const x=e(s,[["render",f]]);export{x};

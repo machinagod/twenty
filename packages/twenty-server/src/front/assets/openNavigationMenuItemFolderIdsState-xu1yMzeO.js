@@ -1,0 +1,1 @@
+import{yE as t,pb as e}from"./index-DrA-SXmV.js";const o=t.createContext({activeDropTargetId:null,setActiveDropTargetId:()=>{},forbiddenDropTargetId:null,setForbiddenDropTargetId:()=>{},addToNavigationFallbackDestination:null}),r=e({key:"openNavigationMenuItemFolderIdsState",defaultValue:[]});export{o as N,r as o};

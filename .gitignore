@@ -61,5 +61,8 @@ screenshots/
 /deno.json
 /deno.lock
 /packages/twenty-server/deno.json
-/packages/twenty-server/src/front/
 /deno-twenty-*.png
+# packages/twenty-server/src/front/ is INTENTIONALLY tracked on deploy branches:
+# pre-built twenty-front bundle so Deno Deploy's 5-min build cap doesn't have
+# to re-run vite for twenty-front + workspace deps; the install command still
+# builds twenty-shared/emails/client-sdk dists fresh.

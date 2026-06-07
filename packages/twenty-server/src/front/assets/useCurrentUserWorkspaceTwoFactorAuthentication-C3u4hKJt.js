@@ -1,0 +1,1 @@
+import{BM as s,pr as a,Dp as n,eW as c,yE as i}from"./index-DrA-SXmV.js";const h=()=>{const t=s(a),[o]=n(c);return{currentUserWorkspaceTwoFactorAuthenticationMethods:i.useMemo(()=>{const r={};return(t?.twoFactorAuthenticationMethodSummary??[]).forEach(e=>r[e.strategy]=e),r},[t]),initiateCurrentUserWorkspaceOtpProvisioning:o}};export{h as u};

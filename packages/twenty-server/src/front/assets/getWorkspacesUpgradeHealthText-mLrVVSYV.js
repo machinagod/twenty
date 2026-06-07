@@ -1,0 +1,1 @@
+import{kZ as a,tE as s}from"./index-DrA-SXmV.js";const g=(r,e)=>e>0?a.FAILED:r>0?a.BEHIND:a.UP_TO_DATE,c=(r,e,t)=>e>0&&r>0?s._({id:"8ob0vY",values:{0:e+r}}):e>0?s._({id:"nRKZKb",values:{failedCount:e}}):r>0?s._({id:"y9covz",values:{behindCount:r}}):t;export{c as a,g};

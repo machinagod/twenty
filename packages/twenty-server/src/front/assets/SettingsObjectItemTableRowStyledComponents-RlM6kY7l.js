@@ -1,0 +1,1 @@
+import{Az as t,vz as a,jQ as e,yx as s}from"./index-DrA-SXmV.js";const p="minmax(180px, 1fr) 140px 80px 100px 36px",c=t("div")({name:"StyledStickyFirstCell",class:"s4d6il8",propsAsIs:!1}),n=l=>a.jsx(e,{color:s.font.color.primary,gap:s.spacing[2],...l}),o=l=>a.jsx(e,{align:"center",padding:`0 ${s.spacing[1]} 0 ${s.spacing[2]}`,...l});export{p as S,o as a,n as b,c};

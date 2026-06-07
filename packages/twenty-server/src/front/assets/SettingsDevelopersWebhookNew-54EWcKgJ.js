@@ -1,0 +1,1 @@
+import{vz as o}from"./index-DrA-SXmV.js";import{S as e,W as r}from"./SettingsDevelopersWebhookForm-iy7mpth_.js";import"./index.esm-DBfMwRxe.js";import"./zod-DQqKUEKK.js";import"./SettingsDatabaseEventsForm-DqxuJFec.js";const n=()=>o.jsx(e,{mode:r.Create});export{n as SettingsDevelopersWebhookNew};

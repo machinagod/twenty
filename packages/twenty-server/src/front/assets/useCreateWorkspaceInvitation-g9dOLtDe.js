@@ -1,0 +1,1 @@
+import{Dp as a,je as r,EI as s,ej as i}from"./index-DrA-SXmV.js";const I=()=>{const[n]=a(r),{enqueueErrorSnackBar:t}=s();return{sendInvitation:async e=>await n({variables:e,refetchQueries:[i],onError:o=>{t({apolloError:o})}})}};export{I as u};

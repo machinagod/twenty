@@ -1,0 +1,1 @@
+import{tE as e,kZ as r}from"./index-DrA-SXmV.js";const l=a=>{switch(a){case r.UP_TO_DATE:return{color:"green",label:e._({id:"j5CWO4"})};case r.BEHIND:return{color:"orange",label:e._({id:"+MqoSu"})};case r.FAILED:return{color:"red",label:e._({id:"7Bj3x9"})};default:return{color:"gray",label:e._({id:"Ef7StM"})}}};export{l as g};

@@ -1,0 +1,1 @@
+import{EN as e,yE as s,om as n,xe as o,Az as r}from"./index-DrA-SXmV.js";const p=()=>{const a=e();return{readCaptchaToken:s.useCallback(()=>{const t=a.get(n.atom);if(o(t))return t},[a])}},i=/^.{8,50}$/,l=r("div")({name:"StyledOnboardingContentContainer",class:"s1slnm83",propsAsIs:!1});export{i as P,l as S,p as u};

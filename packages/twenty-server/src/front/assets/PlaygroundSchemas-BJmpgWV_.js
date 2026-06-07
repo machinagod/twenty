@@ -1,0 +1,1 @@
+import{pb as a,xe as r}from"./index-DrA-SXmV.js";const p=a({key:"playgroundApiKeyState",defaultValue:null}),i=(e,t=0)=>r(e)&&new Date(e.expiresAt).getTime()-Date.now()>t;var n=(function(e){return e.METADATA="metadata",e.CORE="core",e})({});export{n as P,i,p};

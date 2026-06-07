@@ -1,0 +1,1 @@
+import{vz as t,k as i,fC as r,tE as s}from"./index-DrA-SXmV.js";import{S as n}from"./SettingsAccountsListEmptyStateCard-OzoAy-Xe.js";const c=()=>t.jsxs(i,{children:[t.jsx(r,{title:s._({id:"Kcr9Fr"}),description:s._({id:"D8ATlr"})}),t.jsx(n,{})]});export{c as S};
