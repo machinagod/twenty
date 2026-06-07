@@ -1,0 +1,13 @@
+{
+  "compilerOptions": { "experimentalDecorators": true, "emitDecoratorMetadata": true },
+  "nodeModulesDir": "auto",
+  "imports": {
+    "src/": "../packages/twenty-server/src/",
+    "@nestjs/common": "npm:@nestjs/common@11.1.16",
+    "connect-redis": "npm:connect-redis@7.1.1",
+    "redis": "npm:redis@4.7.0",
+    "express-session": "npm:express-session@1.18.0",
+    "src/engine/core-modules/twenty-config/twenty-config.service": "./shims/twenty-config-service.ts",
+    "src/engine/core-modules/secret-encryption/utils/resolve-session-cookie-secrets.util": "./shims/resolve-session-cookie-secrets.ts"
+  }
+}

@@ -1076,6 +1076,17 @@ export class ConfigVariables {
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Backend for express-session storage (only OIDC SSO uses sessions). "redis" is the default; "memory" runs a Redis-free per-instance store — fine unless you use OIDC SSO across multiple instances, where the PKCE flow needs a shared store (use redis, or a future PG store).',
+    type: ConfigVariableType.ENUM,
+    options: Object.values(CacheStorageType),
+  })
+  @IsOptional()
+  // No @CastToUpperSnakeCase — same lowercase-enum reason as CACHE_STORAGE_TYPE.
+  SESSION_STORAGE_TYPE: CacheStorageType = CacheStorageType.Redis;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
     isSensitive: true,
     description: 'Redis connection URL used for cache and queues by default',
     isEnvOnly: true,

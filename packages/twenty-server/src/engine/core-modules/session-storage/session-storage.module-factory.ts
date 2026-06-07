@@ -16,7 +16,7 @@ const REDIS_PING_INTERVAL_MS = 60_000;
 export const getSessionStorageOptions = (
   twentyConfigService: TwentyConfigService,
 ): session.SessionOptions => {
-  const cacheStorageType = CacheStorageType.Redis;
+  const sessionStorageType = twentyConfigService.get('SESSION_STORAGE_TYPE');
 
   const SERVER_URL = twentyConfigService.get('SERVER_URL');
 
@@ -37,14 +37,18 @@ export const getSessionStorageOptions = (
     },
   };
 
-  switch (cacheStorageType) {
-    /* case CacheStorageType.Memory: {
-      Logger.warn(
-        'Memory session storage is not recommended for production. Prefer Redis.',
+  switch (sessionStorageType) {
+    case CacheStorageType.Memory: {
+      // express-session's default per-instance MemoryStore (Redis-free, Deno Deploy
+      // target). NOTE: OIDC SSO stores its PKCE verifier/state in the session across
+      // the redirect→callback round-trip, so this breaks SSO when those requests hit
+      // different instances — use a shared store (redis, or a future PG store) for SSO.
+      sessionStorageLogger.warn(
+        'Using in-memory session storage — OIDC SSO across multiple instances requires a shared store.',
       );
 
       return sessionStorage;
-    }*/
+    }
     case CacheStorageType.Redis: {
       const connectionString = twentyConfigService.get('REDIS_URL');
 
@@ -77,7 +81,7 @@ export const getSessionStorageOptions = (
     }
     default:
       throw new Error(
-        `Invalid session-storage (${cacheStorageType}), check your .env file`,
+        `Invalid session-storage (${sessionStorageType}), check your .env file`,
       );
   }
 };

@@ -225,8 +225,16 @@ Un-hardcoded Redis in `cache-storage.module-factory.ts` (it had `const cacheStor
 - Follow-up (noted): the factory still STATICALLY imports `redis` + `cache-manager-redis-yet` at top level, so memory mode loads them (idle, no connection) — mirrors the queue slice keeping `bullmq` imported. Make these dynamic `import()` inside the Redis branch when trimming the Deno bundle.
 - This removes the cache Redis hard-dependency that blocked the real-module boot (slice 3.1b: MetricsModule → cache). PG-backed shared cache (vs per-isolate memory) is still the deferred §6 decision — gate on real Prisma-DB RTT.
 
+Sessions slice (slice 3.4) — ✅ DONE & GREEN (`deno-spike/session-memory-check.ts`, **3/3**):
+Un-hardcoded Redis in `session-storage.module-factory.ts` (same hardcoded `CacheStorageType.Redis` + commented Memory branch as the cache).
+- **Who actually uses `express-session`** (answers §6's open question): only **OIDC SSO**. `main.ts` installs the middleware but NO code reads/writes `req.session` except the OIDC passport strategy (`usePKCE: true` + `passReqToCallback` + `sessionKey` → `openid-client` stores the PKCE verifier/state in the session across redirect→callback). Normal auth is JWT. The "billing session" hits are Stripe, not express-session.
+- [x] Added config var **`SESSION_STORAGE_TYPE`** (enum `CacheStorageType`, default `redis`), no `@CastToUpperSnakeCase`.
+- [x] Factory reads it and wires the `memory` branch (express-session's default per-instance `MemoryStore`, Redis-free). Default stays redis.
+- [x] Verified on Deno: `memory` returns a valid session config (no store, no `REDIS_URL`, no throw), cookie opts preserved.
+- **Limitation (documented + warned at runtime):** per-instance `MemoryStore` breaks **OIDC SSO across multiple isolates** (the PKCE verifier won't be on the isolate that handles the callback). A **shared PG-backed session store** (connect-pg-simple over a `core` session table) is the follow-up to make SSO work Redis-free on Deno Deploy. Deployments not using OIDC SSO are unaffected.
+
 Still TODO in Phase 2:
-- [ ] Session store: PG or JWT-stateless in `session-storage.module-factory.ts`.
+- [ ] PG-backed shared session store (connect-pg-simple) for OIDC SSO on Deno (memory mode covers non-SSO).
 - [ ] `LISTEN/NOTIFY` PubSub to replace `engine/subscriptions` Redis pub/sub.
 - [ ] Retire `redis-client.service.ts`; update admin-panel health indicators.
 
@@ -240,6 +248,7 @@ New files (this initiative):
 - `deno-spike/graphql-schema-build.ts` + `deno-spike/graphql-schema-build.json` (slice 3.2 — code-first GraphQL schema builds on Deno + patch verification)
 - `deno-spike/apply-patches.sh` (slice 3.2 — Deno-native replacement for Yarn `patch:`; build step that patches the resolved node_modules)
 - `deno-spike/cache-memory-check.ts` + `.json` (+ `shims/twenty-config-service.ts`) (slice 3.3 — Redis-free memory cache via the real factory on Deno)
+- `deno-spike/session-memory-check.ts` + `.json` (+ `shims/resolve-session-cookie-secrets.ts`) (slice 3.4 — Redis-free memory session config via the real factory on Deno)
 
 ### Phase 3 — Deno entrypoint + frontend
 - [ ] Single Deno entrypoint: real `AppModule` via `Deno.serve` + static `Deno.cron` heartbeats (drain + schedule eval). Fold the `queue-worker` ApplicationContext into the same isolate (it just registers `work()` handlers).
