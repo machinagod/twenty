@@ -134,8 +134,22 @@ export class PgMessageQueueCore {
     `;
   }
 
+  // Split the DDL into individual statements. node-postgres' simple protocol runs a
+  // multi-statement string in one go, but TypeORM/queryRunner.query sends queries via
+  // the extended (parameterized) protocol, which executes ONLY the first statement of
+  // a multi-statement string and silently drops the rest. Running one statement at a
+  // time is correct under both, so the server migration and ensureSchema both use it.
+  buildSchemaStatements(): string[] {
+    return this.buildSchemaSql()
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter((statement) => statement.length > 0);
+  }
+
   async ensureSchema(): Promise<void> {
-    await this.sql.query(this.buildSchemaSql());
+    for (const statement of this.buildSchemaStatements()) {
+      await this.sql.query(statement);
+    }
   }
 
   // === producer side (driver.add) ===

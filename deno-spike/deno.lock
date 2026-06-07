@@ -4,7 +4,7 @@
     "npm:@nestjs/common@11": "11.1.24_reflect-metadata@0.2.2_rxjs@7.8.2",
     "npm:@nestjs/core@11": "11.1.24_@nestjs+common@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_@nestjs+platform-express@11.1.24_reflect-metadata@0.2.2_rxjs@7.8.2",
     "npm:@nestjs/platform-express@11": "11.1.24_@nestjs+common@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_@nestjs+core@11.1.24_reflect-metadata@0.2.2_rxjs@7.8.2",
-    "npm:@nestjs/typeorm@11": "11.0.1_@nestjs+common@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_@nestjs+core@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+platform-express@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_reflect-metadata@0.2.2_rxjs@7.8.2_typeorm@0.3.20__pg@8.12.0_@nestjs+platform-express@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+core@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_pg@8.12.0",
+    "npm:@nestjs/typeorm@11": "11.0.1_@nestjs+common@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_@nestjs+core@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+platform-express@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_reflect-metadata@0.2.2_rxjs@7.8.2_typeorm@0.3.20__pg@8.12.0_@nestjs+platform-express@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+core@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2",
     "npm:pg@8.12.0": "8.12.0",
     "npm:reflect-metadata@0.2.2": "0.2.2",
     "npm:rxjs@7": "7.8.2",
@@ -71,7 +71,7 @@
         "tslib"
       ]
     },
-    "@nestjs/typeorm@11.0.1_@nestjs+common@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_@nestjs+core@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+platform-express@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_reflect-metadata@0.2.2_rxjs@7.8.2_typeorm@0.3.20__pg@8.12.0_@nestjs+platform-express@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+core@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_pg@8.12.0": {
+    "@nestjs/typeorm@11.0.1_@nestjs+common@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_@nestjs+core@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+platform-express@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2_reflect-metadata@0.2.2_rxjs@7.8.2_typeorm@0.3.20__pg@8.12.0_@nestjs+platform-express@11.1.24__@nestjs+common@11.1.24___reflect-metadata@0.2.2___rxjs@7.8.2__@nestjs+core@11.1.24__reflect-metadata@0.2.2__rxjs@7.8.2": {
       "integrity": "sha512-8rw/nKT0S+L+MkzgE9F2/mox7mAgsPlwfzmW9gsESN1lmQtIrVEfiiBwC2O8+guS1jBfQehJIdcdUj2OAp4VUQ==",
       "dependencies": [
         "@nestjs/common",

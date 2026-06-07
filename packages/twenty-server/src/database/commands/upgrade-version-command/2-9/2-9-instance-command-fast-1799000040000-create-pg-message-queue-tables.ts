@@ -29,7 +29,11 @@ export class CreatePgMessageQueueTablesFastInstanceCommand
       DEFAULT_TABLES,
     );
 
-    await queryRunner.query(core.buildSchemaSql());
+    // One statement per query: queryRunner.query() uses the extended protocol, which
+    // runs only the first statement of a multi-statement string (see buildSchemaStatements).
+    for (const statement of core.buildSchemaStatements()) {
+      await queryRunner.query(statement);
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
