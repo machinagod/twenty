@@ -217,8 +217,15 @@ Confronted the GraphQL layer directly (the scariest Phase-3 unknown). Two result
 - **The Yarn `patch:` patches can be applied on Deno via a build step** (`deno-spike/apply-patches.sh`): Yarn's `patch:` protocol doesn't exist on Deno and Deno Deploy reinstalls fresh, so the script applies the three `.patch` files in-place to the Deno-resolved `node_modules` packages (idempotent: reverse dry-run detects already-applied). Verified Deno then **runs the patched code** (`computeReachableTypes` present; schema still builds). Keeping packages as `npm:` specifiers (vs vendoring local CJS) preserves Deno's CJS→ESM named-export interop + automatic transitive-dep resolution — vendoring a local CJS file loses the named exports (`does not provide an export named 'Field'`).
 - For Deno Deploy: run `apply-patches.sh` as the build step after install. (Open: confirm Deploy persists a patched `node_modules` from the build step; if not, fall back to vendoring patched packages + import-map — needs the CJS-interop wrinkle solved.)
 
+Cache slice (slice 3.3) — ✅ DONE & GREEN (`deno-spike/cache-memory-check.ts`, **3/3**):
+Un-hardcoded Redis in `cache-storage.module-factory.ts` (it had `const cacheStorageType = CacheStorageType.Redis` with the Memory branch commented out, and threw if `REDIS_URL` was unset).
+- [x] Added config var **`CACHE_STORAGE_TYPE`** (enum `CacheStorageType`, default `redis`), same pattern as `MESSAGE_QUEUE_DRIVER_TYPE` — no `@CastToUpperSnakeCase` (lowercase enum values `redis`/`memory`).
+- [x] Factory now reads `CACHE_STORAGE_TYPE` and wires the `memory` branch (no `store` → cache-manager's default per-instance in-memory cache; Redis-free, each cold isolate rebuilds from Postgres on demand). Redis stays the default so nothing breaks.
+- [x] Verified on Deno: real factory + `memory` builds a working cache, set/get round-trips, no `REDIS_URL`, `store.name !== 'redis'`. `CacheStorageModule.onModuleDestroy` already guards `store.name === 'redis'`, so memory mode skips the quit cleanly.
+- Follow-up (noted): the factory still STATICALLY imports `redis` + `cache-manager-redis-yet` at top level, so memory mode loads them (idle, no connection) — mirrors the queue slice keeping `bullmq` imported. Make these dynamic `import()` inside the Redis branch when trimming the Deno bundle.
+- This removes the cache Redis hard-dependency that blocked the real-module boot (slice 3.1b: MetricsModule → cache). PG-backed shared cache (vs per-isolate memory) is still the deferred §6 decision — gate on real Prisma-DB RTT.
+
 Still TODO in Phase 2:
-- [ ] PG (or memory) cache store in `cache-storage.module-factory.ts` (un-hardcode Redis).
 - [ ] Session store: PG or JWT-stateless in `session-storage.module-factory.ts`.
 - [ ] `LISTEN/NOTIFY` PubSub to replace `engine/subscriptions` Redis pub/sub.
 - [ ] Retire `redis-client.service.ts`; update admin-panel health indicators.
@@ -232,6 +239,7 @@ New files (this initiative):
 - `deno-spike/boot-real-driver.ts` + `deno-spike/boot-real-driver.json` (slice 3.1 — real driver on real TypeORM under Deno; run with `--sloppy-imports`)
 - `deno-spike/graphql-schema-build.ts` + `deno-spike/graphql-schema-build.json` (slice 3.2 — code-first GraphQL schema builds on Deno + patch verification)
 - `deno-spike/apply-patches.sh` (slice 3.2 — Deno-native replacement for Yarn `patch:`; build step that patches the resolved node_modules)
+- `deno-spike/cache-memory-check.ts` + `.json` (+ `shims/twenty-config-service.ts`) (slice 3.3 — Redis-free memory cache via the real factory on Deno)
 
 ### Phase 3 — Deno entrypoint + frontend
 - [ ] Single Deno entrypoint: real `AppModule` via `Deno.serve` + static `Deno.cron` heartbeats (drain + schedule eval). Fold the `queue-worker` ApplicationContext into the same isolate (it just registers `work()` handlers).

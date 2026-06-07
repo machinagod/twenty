@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "nodeModulesDir": "auto",
+  "imports": {
+    "src/": "../packages/twenty-server/src/",
+    "reflect-metadata": "npm:reflect-metadata@0.2.2",
+    "@nestjs/common": "npm:@nestjs/common@11.1.16",
+    "@nestjs/core": "npm:@nestjs/core@11.1.16",
+    "@nestjs/cache-manager": "npm:@nestjs/cache-manager@2.3.0",
+    "cache-manager": "npm:cache-manager@5.4.0",
+    "cache-manager-redis-yet": "npm:cache-manager-redis-yet@4.1.2",
+    "redis": "npm:redis@4.7.0",
+    "rxjs": "npm:rxjs@7.8.1",
+    "src/engine/core-modules/twenty-config/twenty-config.service": "./shims/twenty-config-service.ts"
+  }
+}

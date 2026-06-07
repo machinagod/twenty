@@ -15,7 +15,7 @@ const REDIS_PING_INTERVAL_MS = 60_000;
 export const cacheStorageModuleFactory = (
   twentyConfigService: TwentyConfigService,
 ): CacheModuleOptions => {
-  const cacheStorageType = CacheStorageType.Redis;
+  const cacheStorageType = twentyConfigService.get('CACHE_STORAGE_TYPE');
   const cacheStorageTtl = twentyConfigService.get('CACHE_STORAGE_TTL');
   const cacheModuleOptions: CacheModuleOptions = {
     isGlobal: true,
@@ -23,9 +23,12 @@ export const cacheStorageModuleFactory = (
   };
 
   switch (cacheStorageType) {
-    /* case CacheStorageType.Memory: {
+    case CacheStorageType.Memory: {
+      // No `store` → cache-manager's default per-instance in-memory store. Redis-free
+      // (Deno Deploy target); each cold isolate starts empty and rebuilds its cache
+      // from Postgres on demand.
       return cacheModuleOptions;
-    }*/
+    }
     case CacheStorageType.Redis: {
       const redisUrl = twentyConfigService.get('REDIS_URL');
 

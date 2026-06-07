@@ -17,6 +17,7 @@ import { type AwsRegion } from 'src/engine/core-modules/twenty-config/interfaces
 import { NodeEnvironment } from 'src/engine/core-modules/twenty-config/interfaces/node-environment.interface';
 import { SupportDriver } from 'src/engine/core-modules/twenty-config/interfaces/support.interface';
 
+import { CacheStorageType } from 'src/engine/core-modules/cache-storage/types/cache-storage-type.enum';
 import { CaptchaDriverType } from 'src/engine/core-modules/captcha/interfaces';
 import { CodeInterpreterDriverType } from 'src/engine/core-modules/code-interpreter/code-interpreter.interface';
 import { EmailDriver } from 'src/engine/core-modules/email/enums/email-driver.enum';
@@ -1059,6 +1060,19 @@ export class ConfigVariables {
   })
   @CastToPositiveNumber()
   CACHE_STORAGE_TTL: number = 3600 * 24 * 7;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Backend for cache storage. "redis" is the default; "memory" runs a Redis-free per-instance in-memory cache (Deno Deploy target — each cold isolate rebuilds its cache from Postgres).',
+    type: ConfigVariableType.ENUM,
+    options: Object.values(CacheStorageType),
+  })
+  @IsOptional()
+  // No @CastToUpperSnakeCase: CacheStorageType values are lowercase ('redis',
+  // 'memory'), like MESSAGE_QUEUE_DRIVER_TYPE. Upper-snake casting would mangle the
+  // value so it never matches the enum.
+  CACHE_STORAGE_TYPE: CacheStorageType = CacheStorageType.Redis;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,
