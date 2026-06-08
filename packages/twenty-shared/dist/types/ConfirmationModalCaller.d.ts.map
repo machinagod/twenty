@@ -1,0 +1,1 @@
+{"version":3,"file":"ConfirmationModalCaller.d.ts","sourceRoot":"","sources":["../../src/types/ConfirmationModalCaller.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,uBAAuB,GAC/B;IAAE,IAAI,EAAE,gBAAgB,CAAC;IAAC,gBAAgB,EAAE,MAAM,CAAA;CAAE,GACpD;IAAE,IAAI,EAAE,iBAAiB,CAAC;IAAC,iBAAiB,EAAE,MAAM,CAAA;CAAE,CAAC"}

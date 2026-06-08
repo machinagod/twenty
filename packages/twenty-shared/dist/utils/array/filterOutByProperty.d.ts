@@ -1,0 +1,2 @@
+export declare const filterOutByProperty: <T, K extends keyof T>(property: K, valueToExclude: T[K] | null | undefined) => (itemToFilter: T) => boolean;
+//# sourceMappingURL=filterOutByProperty.d.ts.map

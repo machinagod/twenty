@@ -1,0 +1,1 @@
+{"version":3,"file":"object-record-create.event.d.ts","sourceRoot":"","sources":["../../src/database-events/object-record-create.event.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,MAAM,4CAA4C,CAAC;AAEnF,qBAAa,uBAAuB,CAClC,CAAC,GAAG,MAAM,CACV,SAAQ,qBAAqB,CAAC,CAAC,CAAC;IACxB,UAAU,EAAE;QAClB,KAAK,EAAE,CAAC,CAAC;KACV,CAAC;CACH"}

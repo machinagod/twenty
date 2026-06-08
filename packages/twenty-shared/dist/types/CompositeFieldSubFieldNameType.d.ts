@@ -1,0 +1,4 @@
+declare const _allSubFieldValues: ("addressStreet1" | "addressStreet2" | "addressCity" | "addressState" | "addressPostcode" | "addressCountry" | "addressLat" | "addressLng" | "firstName" | "lastName" | "blocknote" | "markdown" | "amountMicros" | "currencyCode" | "primaryEmail" | "additionalEmails" | "primaryLinkUrl" | "primaryLinkLabel" | "secondaryLinks" | "primaryPhoneCallingCode" | "primaryPhoneCountryCode" | "primaryPhoneNumber" | "additionalPhones" | "source" | "name" | "workspaceMemberId" | "context")[];
+export type CompositeFieldSubFieldName = (typeof _allSubFieldValues)[number];
+export {};
+//# sourceMappingURL=CompositeFieldSubFieldNameType.d.ts.map

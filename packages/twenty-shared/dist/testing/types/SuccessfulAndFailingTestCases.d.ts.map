@@ -1,0 +1,1 @@
+{"version":3,"file":"SuccessfulAndFailingTestCases.d.ts","sourceRoot":"","sources":["../../../src/testing/types/SuccessfulAndFailingTestCases.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,kBAAkB,EAAE,MAAM,yCAAyC,CAAC;AAElF,MAAM,MAAM,6BAA6B,CAAC,CAAC,IAAI;IAC7C,UAAU,EAAE,kBAAkB,CAAC,CAAC,CAAC,EAAE,CAAC;IACpC,OAAO,EAAE,kBAAkB,CAAC,CAAC,CAAC,EAAE,CAAC;CAClC,CAAC"}

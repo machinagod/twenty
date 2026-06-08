@@ -1,0 +1,1 @@
+{"version":3,"file":"RelationCreationPayload.d.ts","sourceRoot":"","sources":["../../src/types/RelationCreationPayload.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,YAAY,EAAE,MAAM,sBAAsB,CAAC;AAEzD,MAAM,MAAM,uBAAuB,GAAG;IACpC,IAAI,EAAE,YAAY,CAAC;IACnB,sBAAsB,EAAE,MAAM,CAAC;IAC/B,gBAAgB,EAAE,MAAM,CAAC;IACzB,eAAe,EAAE,MAAM,CAAC;CACzB,CAAC"}

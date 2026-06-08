@@ -1,0 +1,2 @@
+export declare const extractAndSanitizeObjectStringFields: <T extends object, TKeys extends (keyof T)[]>(obj: T, keys: TKeys, maxDepth?: number) => { [P in TKeys[number]]: T[P]; };
+//# sourceMappingURL=extractAndSanitizeObjectStringFields.d.ts.map

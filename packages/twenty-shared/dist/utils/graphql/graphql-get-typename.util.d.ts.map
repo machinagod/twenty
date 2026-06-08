@@ -1,0 +1,1 @@
+{"version":3,"file":"graphql-get-typename.util.d.ts","sourceRoot":"","sources":["../../../src/utils/graphql/graphql-get-typename.util.ts"],"names":[],"mappings":"AAEA,eAAO,MAAM,eAAe,GAAI,MAAM,MAAM,KAAG,MAA0B,CAAC;AAE1E,eAAO,MAAM,qBAAqB,GAAI,oBAAoB,MAAM,KAAG,MACpB,CAAC;AAEhD,eAAO,MAAM,eAAe,GAAI,oBAAoB,MAAM,KAAG,MACpB,CAAC;AAE1C,eAAO,MAAM,4BAA4B,GACvC,oBAAoB,MAAM,KACzB,MAA8D,CAAC"}

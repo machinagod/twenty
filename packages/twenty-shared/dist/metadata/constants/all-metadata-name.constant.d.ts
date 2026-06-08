@@ -1,0 +1,33 @@
+export declare const ALL_METADATA_NAME: {
+    readonly fieldMetadata: "fieldMetadata";
+    readonly objectMetadata: "objectMetadata";
+    readonly view: "view";
+    readonly viewField: "viewField";
+    readonly viewFieldGroup: "viewFieldGroup";
+    readonly viewGroup: "viewGroup";
+    readonly viewSort: "viewSort";
+    readonly rowLevelPermissionPredicate: "rowLevelPermissionPredicate";
+    readonly rowLevelPermissionPredicateGroup: "rowLevelPermissionPredicateGroup";
+    readonly viewFilterGroup: "viewFilterGroup";
+    readonly index: "index";
+    readonly logicFunction: "logicFunction";
+    readonly viewFilter: "viewFilter";
+    readonly role: "role";
+    readonly roleTarget: "roleTarget";
+    readonly agent: "agent";
+    readonly skill: "skill";
+    readonly pageLayout: "pageLayout";
+    readonly pageLayoutWidget: "pageLayoutWidget";
+    readonly pageLayoutTab: "pageLayoutTab";
+    readonly commandMenuItem: "commandMenuItem";
+    readonly navigationMenuItem: "navigationMenuItem";
+    readonly rolePermissionFlag: "rolePermissionFlag";
+    readonly permissionFlag: "permissionFlag";
+    readonly objectPermission: "objectPermission";
+    readonly fieldPermission: "fieldPermission";
+    readonly frontComponent: "frontComponent";
+    readonly webhook: "webhook";
+    readonly applicationVariable: "applicationVariable";
+    readonly connectionProvider: "connectionProvider";
+};
+//# sourceMappingURL=all-metadata-name.constant.d.ts.map

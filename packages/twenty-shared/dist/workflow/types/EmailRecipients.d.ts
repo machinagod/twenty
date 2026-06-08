@@ -1,0 +1,6 @@
+export type EmailRecipients = {
+    to: string;
+    cc?: string;
+    bcc?: string;
+};
+//# sourceMappingURL=EmailRecipients.d.ts.map

@@ -1,0 +1,35 @@
+export declare const APP_LOCALES: {
+    readonly en: "en";
+    readonly 'pseudo-en': "pseudo-en";
+    readonly 'af-ZA': "af-ZA";
+    readonly 'ar-SA': "ar-SA";
+    readonly 'ca-ES': "ca-ES";
+    readonly 'cs-CZ': "cs-CZ";
+    readonly 'da-DK': "da-DK";
+    readonly 'de-DE': "de-DE";
+    readonly 'el-GR': "el-GR";
+    readonly 'es-ES': "es-ES";
+    readonly 'fi-FI': "fi-FI";
+    readonly 'fr-FR': "fr-FR";
+    readonly 'he-IL': "he-IL";
+    readonly 'hu-HU': "hu-HU";
+    readonly 'it-IT': "it-IT";
+    readonly 'ja-JP': "ja-JP";
+    readonly 'ko-KR': "ko-KR";
+    readonly 'nl-NL': "nl-NL";
+    readonly 'no-NO': "no-NO";
+    readonly 'pl-PL': "pl-PL";
+    readonly 'pt-BR': "pt-BR";
+    readonly 'pt-PT': "pt-PT";
+    readonly 'ro-RO': "ro-RO";
+    readonly 'ru-RU': "ru-RU";
+    readonly 'sr-Cyrl': "sr-Cyrl";
+    readonly 'sv-SE': "sv-SE";
+    readonly 'tr-TR': "tr-TR";
+    readonly 'uk-UA': "uk-UA";
+    readonly 'vi-VN': "vi-VN";
+    readonly 'zh-CN': "zh-CN";
+    readonly 'zh-TW': "zh-TW";
+};
+export type AppLocale = keyof typeof APP_LOCALES;
+//# sourceMappingURL=AppLocales.d.ts.map

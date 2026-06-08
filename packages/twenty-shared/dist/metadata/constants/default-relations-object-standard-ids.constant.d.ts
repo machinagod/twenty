@@ -1,0 +1,2 @@
+export declare const DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS: ["timelineActivity", "attachment", "noteTarget", "taskTarget"];
+//# sourceMappingURL=default-relations-object-standard-ids.constant.d.ts.map

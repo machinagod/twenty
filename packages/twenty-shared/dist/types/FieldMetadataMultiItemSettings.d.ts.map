@@ -1,0 +1,1 @@
+{"version":3,"file":"FieldMetadataMultiItemSettings.d.ts","sourceRoot":"","sources":["../../src/types/FieldMetadataMultiItemSettings.ts"],"names":[],"mappings":"AAAA,oBAAY,kCAAkC;IAC5C,IAAI,SAAS;IACb,SAAS,cAAc;IACvB,WAAW,gBAAgB;CAC5B;AAED,MAAM,MAAM,8BAA8B,GAAG;IAC3C,iBAAiB,CAAC,EAAE,MAAM,CAAC;IAC3B,WAAW,CAAC,EAAE,kCAAkC,CAAC;CAClD,CAAC"}

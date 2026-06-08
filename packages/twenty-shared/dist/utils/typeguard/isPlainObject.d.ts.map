@@ -1,0 +1,1 @@
+{"version":3,"file":"isPlainObject.d.ts","sourceRoot":"","sources":["../../../src/utils/typeguard/isPlainObject.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,aAAa,GACxB,OAAO,OAAO,KACb,KAAK,IAAI,MAAM,CAAC,MAAM,EAAE,OAAO,CACoC,CAAC"}

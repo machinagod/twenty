@@ -1,0 +1,1 @@
+{"version":3,"file":"isFieldMetadataEligibleForFieldsWidget.d.ts","sourceRoot":"","sources":["../../../src/utils/fieldMetadata/isFieldMetadataEligibleForFieldsWidget.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,MAAM,SAAS,CAAC;AAE5C,eAAO,MAAM,sCAAsC,GAAI,mDAIpD;IACD,SAAS,EAAE,MAAM,CAAC;IAClB,SAAS,EAAE,iBAAiB,CAAC;IAC7B,sBAAsB,EAAE,OAAO,CAAC;CACjC,KAAG,OAsBH,CAAC"}

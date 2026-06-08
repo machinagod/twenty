@@ -1,0 +1,1 @@
+{"version":3,"file":"emails.composite-type.d.ts","sourceRoot":"","sources":["../../../src/types/composite-types/emails.composite-type.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,KAAK,aAAa,EAAE,MAAM,6CAA6C,CAAC;AAEjF,eAAO,MAAM,mBAAmB,EAAE,aAiBjC,CAAC;AAEF,MAAM,MAAM,cAAc,GAAG;IAC3B,YAAY,EAAE,MAAM,CAAC;IACrB,gBAAgB,EAAE,MAAM,EAAE,GAAG,IAAI,CAAC;CACnC,CAAC"}

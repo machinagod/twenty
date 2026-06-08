@@ -1,0 +1,1 @@
+{"version":3,"file":"indexFieldManifestType.d.ts","sourceRoot":"","sources":["../../src/application/indexFieldManifestType.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,qBAAqB,EAAE,MAAM,yCAAyC,CAAC;AAErF,MAAM,MAAM,kBAAkB,GAAG,qBAAqB,GAAG;IACvD,wBAAwB,EAAE,MAAM,CAAC;IACjC,YAAY,CAAC,EAAE,MAAM,CAAC;CACvB,CAAC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"RecordGqlOperationOrderBy.d.ts","sourceRoot":"","sources":["../../src/types/RecordGqlOperationOrderBy.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,OAAO,EAAE,MAAM,WAAW,CAAC;AAIzC,KAAK,YAAY,GAAG,OAAO,GAAG;IAAE,CAAC,SAAS,EAAE,MAAM,GAAG,YAAY,CAAA;CAAE,CAAC;AAMpE,MAAM,MAAM,yBAAyB,GAAG,KAAK,CAAC;IAC5C,CAAC,SAAS,EAAE,MAAM,GAAG,YAAY,CAAC;CACnC,CAAC,CAAC"}

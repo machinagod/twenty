@@ -1,0 +1,2 @@
+export declare const OBJECTS_WITH_CHANNEL_VISIBILITY_CONSTRAINTS: readonly ["blocklist", "message", "messageThread", "messageParticipant", "messageChannelMessageAssociation", "messageChannelMessageAssociationMessageFolder", "messageThreadSubscriber", "calendarEvent", "calendarChannelEventAssociation", "calendarEventParticipant"];
+//# sourceMappingURL=ObjectsWithChannelVisibilityConstraints.d.ts.map

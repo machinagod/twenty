@@ -1,0 +1,24 @@
+import { type AllMetadataName } from '@/metadata/types/all-metadata-name.type';
+type SyncCreateAction = {
+    type: 'create';
+    metadataName: AllMetadataName;
+    flatEntity?: {
+        name?: string | null;
+        nameSingular?: string | null;
+        universalIdentifier?: string | null;
+        [key: string]: unknown;
+    };
+};
+type SyncUpdateAction = {
+    type: 'update';
+    metadataName: AllMetadataName;
+    universalIdentifier: string;
+};
+type SyncDeleteAction = {
+    type: 'delete';
+    metadataName: AllMetadataName;
+    universalIdentifier: string;
+};
+export type SyncAction = SyncCreateAction | SyncUpdateAction | SyncDeleteAction;
+export {};
+//# sourceMappingURL=sync-action.type.d.ts.map

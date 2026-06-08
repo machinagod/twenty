@@ -1,0 +1,2970 @@
+/**
+ * Important notice:
+ * - Never ever mutate an existing universal identifier
+ * - Deleting an existing unniversal identifier should be very rare
+ */
+export declare const STANDARD_OBJECTS: {
+    readonly attachment: {
+        readonly universalIdentifier: "20202020-bd3d-4c60-8dca-571c71d4447a";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-a01a-4001-8a01-1d5f8e3c7b2a";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-a01b-4002-9b02-2e6f9f4d8c3b";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-a01c-4003-8c03-3f7fa05d9d4c";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-a01d-4004-9d04-4f8fb16eae5d";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-87a5-48f8-bbf7-ade388825a57";
+            };
+            readonly file: {
+                readonly universalIdentifier: "20202020-15db-460e-8166-c7b5d87ad4be";
+            };
+            readonly fullPath: {
+                readonly universalIdentifier: "20202020-0d19-453d-8e8d-fbcda8ca3747";
+            };
+            readonly fileCategory: {
+                readonly universalIdentifier: "20202020-8c3f-4d9e-9a1b-2e5f7a8c9d0e";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "395be3bd-a5c9-463d-aafe-9bc3bbec3f15";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "376239d1-3e65-4cb6-b5d8-e0917d43cc93";
+            };
+            readonly targetTask: {
+                readonly universalIdentifier: "20202020-51e5-4621-9cf8-215487951c4b";
+            };
+            readonly targetNote: {
+                readonly universalIdentifier: "20202020-4f4b-4503-a6fc-6b982f3dffb5";
+            };
+            readonly targetPerson: {
+                readonly universalIdentifier: "20202020-0158-4aa2-965c-5cdafe21ffa2";
+            };
+            readonly targetCompany: {
+                readonly universalIdentifier: "20202020-ceab-4a28-b546-73b06b4c08d5";
+            };
+            readonly targetOpportunity: {
+                readonly universalIdentifier: "20202020-7374-499d-bea3-9354890755b5";
+            };
+            readonly targetDashboard: {
+                readonly universalIdentifier: "20202020-5324-43f3-9dbf-1a33e7de0ce6";
+            };
+            readonly targetWorkflow: {
+                readonly universalIdentifier: "20202020-f1e8-4c9d-8a7b-3f5e1d2c9a8b";
+            };
+            readonly position: {
+                readonly universalIdentifier: "cef8f62c-cd46-4444-8cbb-17d463b7464a";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "e7b42835-cb2e-4456-8558-9225362aa52d";
+            };
+        };
+        readonly morphIds: {
+            readonly targetMorphId: {
+                readonly morphId: "20202020-f634-435d-ab8d-e1168b375c69";
+            };
+        };
+        readonly indexes: {
+            readonly taskIdIndex: {
+                readonly universalIdentifier: "b8d4f9a3-0c25-4e7b-9f6a-2d3e4c5b6f70";
+            };
+            readonly noteIdIndex: {
+                readonly universalIdentifier: "9d31ea73-13b6-4e06-84ee-c66c72bf7787";
+            };
+            readonly personIdIndex: {
+                readonly universalIdentifier: "55637a5a-1edc-4351-8d76-d40020bf8944";
+            };
+            readonly companyIdIndex: {
+                readonly universalIdentifier: "4137ba06-184d-438f-b484-080f02a97659";
+            };
+            readonly opportunityIdIndex: {
+                readonly universalIdentifier: "8cc162d1-c127-4981-878d-f78622f8f12d";
+            };
+            readonly dashboardIdIndex: {
+                readonly universalIdentifier: "c10eba2d-ff1a-4eab-9285-50481c12a003";
+            };
+            readonly workflowIdIndex: {
+                readonly universalIdentifier: "fadeab4b-79ee-4173-af79-72c51fbad888";
+            };
+        };
+        readonly views: {
+            readonly allAttachments: {
+                readonly universalIdentifier: "3f7f3363-7087-44cc-902d-5e8904262316";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "be56712f-d7a6-4fbe-b92b-d750f0708a0a";
+                    };
+                    readonly file: {
+                        readonly universalIdentifier: "873cf114-5477-4b62-9023-7ea6ad69fbe5";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "fa363372-0fdf-4bb3-bdf1-0ead354b9225";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "6c092c26-b1cb-488f-ae2e-5af4bec1162b";
+                    };
+                    readonly targetPerson: {
+                        readonly universalIdentifier: "73a4c3a7-c7f9-4ed6-a2b6-117d7efad0f3";
+                    };
+                    readonly targetCompany: {
+                        readonly universalIdentifier: "b335ad04-059e-4c36-8666-f40431849044";
+                    };
+                    readonly targetOpportunity: {
+                        readonly universalIdentifier: "15f2d457-dc09-4c52-bf2a-47083d6bf017";
+                    };
+                    readonly targetTask: {
+                        readonly universalIdentifier: "c2913c5e-6cc6-438d-9c2f-3212a9b2a82b";
+                    };
+                    readonly targetNote: {
+                        readonly universalIdentifier: "fc8dba49-bcf2-41b8-a435-0c4a3bbf2af6";
+                    };
+                    readonly targetDashboard: {
+                        readonly universalIdentifier: "bcc6d6e1-7c0b-4291-9270-66e42024d8dd";
+                    };
+                    readonly targetWorkflow: {
+                        readonly universalIdentifier: "11fcf58b-dbab-42dd-be67-689462111070";
+                    };
+                };
+            };
+        };
+    };
+    readonly blocklist: {
+        readonly universalIdentifier: "20202020-0408-4f38-b8a8-4d5e3e26e24d";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-b01a-4011-8b11-5a9fc27fbf6e";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-b01b-4012-9c12-6bafd38fcf7f";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-b01c-4013-8d13-7cbfe49fdf8f";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-b01d-4014-9e14-8dcff5affef9";
+            };
+            readonly handle: {
+                readonly universalIdentifier: "20202020-eef3-44ed-aa32-4641d7fd4a3e";
+            };
+            readonly workspaceMember: {
+                readonly universalIdentifier: "20202020-548d-4084-a947-fa20a39f7c06";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "b80db15d-8dc2-4f47-a072-15030941a9d1";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "11aaa404-f04b-421d-a451-c453bf77cc78";
+            };
+            readonly position: {
+                readonly universalIdentifier: "72a27e60-3542-46dc-90db-684d79bd7f11";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "5fa758da-30b4-412e-8a4f-975f2848ce60";
+            };
+        };
+        readonly indexes: {
+            readonly workspaceMemberIdIndex: {
+                readonly universalIdentifier: "4daf320e-74d0-4f24-a45a-af3a09d741cb";
+            };
+        };
+        readonly views: {
+            readonly allBlocklists: {
+                readonly universalIdentifier: "5a98e88c-67c2-4f61-a5ab-a0d3d6a836bb";
+                readonly viewFields: {
+                    readonly handle: {
+                        readonly universalIdentifier: "155ae00d-0def-4f62-9473-8a8efa209eee";
+                    };
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "05a2f0b9-f2ef-4729-bc42-9e2ad2a34fb2";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "e7cfcf05-2676-4d43-9eee-4da1016b12ff";
+                    };
+                };
+            };
+            readonly blocklistRecordPageFields: {
+                readonly universalIdentifier: "5c679d04-7a1c-41be-9429-c9317ac7a0ea";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "94009e34-52fb-4534-89ce-6c6d0a774056";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "35dace44-6e63-4cdb-b761-a92bcf126a7e";
+                    };
+                };
+                readonly viewFields: {
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "f2f5732f-7435-44be-986b-4c4d834fdfeb";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "b2594a03-e00f-4de9-89da-b34bb95c2221";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "80a60507-6c7a-4713-b5de-b94ac293bf23";
+                    };
+                };
+            };
+        };
+    };
+    readonly calendarChannelEventAssociation: {
+        readonly universalIdentifier: "20202020-491b-4aaa-9825-afd1bae6ae00";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-c01a-4021-8a21-9edf06bfef0a";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-c01b-4022-9b22-afefd7cffefb";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-c01c-4023-8c23-bffef8dffef0";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-c01d-4024-9d24-cffef9effef1";
+            };
+            readonly calendarChannelId: {
+                readonly universalIdentifier: "20202020-93ee-4da4-8d58-0282c4a9cb7d";
+            };
+            readonly calendarEvent: {
+                readonly universalIdentifier: "20202020-5aa5-437e-bb86-f42d457783e3";
+            };
+            readonly eventExternalId: {
+                readonly universalIdentifier: "20202020-9ec8-48bb-b279-21d0734a75a1";
+            };
+            readonly recurringEventExternalId: {
+                readonly universalIdentifier: "20202020-c58f-4c69-9bf8-9518fa31aa50";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "8daa2bc8-bce2-4309-8a48-b929f3ee2c34";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "55d810d2-fe47-44b4-b1de-b9c32113b695";
+            };
+            readonly position: {
+                readonly universalIdentifier: "4fa18346-bb2b-49b0-ab35-23df86eed1c8";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "1844a9cf-6d35-46d7-99ba-011626a6d71b";
+            };
+        };
+        readonly indexes: {
+            readonly calendarChannelIdIndex: {
+                readonly universalIdentifier: "ff6b86c1-3112-4dfa-b734-c4789111a716";
+            };
+            readonly calendarEventIdIndex: {
+                readonly universalIdentifier: "47a3c8d2-9f14-4b6e-8c5d-1a2b3f4e5c69";
+            };
+        };
+        readonly views: {
+            readonly allCalendarChannelEventAssociations: {
+                readonly universalIdentifier: "001893be-c06c-4ba1-9f18-53bd26f0179f";
+                readonly viewFields: {
+                    readonly calendarChannelId: {
+                        readonly universalIdentifier: "e3adffd2-d820-4c89-912c-34908d90057e";
+                    };
+                    readonly calendarEvent: {
+                        readonly universalIdentifier: "35656a84-ecb8-4075-a610-8b538d6f8120";
+                    };
+                    readonly eventExternalId: {
+                        readonly universalIdentifier: "f779d7e8-f1d8-44a7-b0ef-4409c9b6b466";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "8ca74f2f-210b-4afc-81f0-506047400e82";
+                    };
+                };
+            };
+            readonly calendarChannelEventAssociationRecordPageFields: {
+                readonly universalIdentifier: "766f254a-a0eb-45c8-b4d2-12311201e08f";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "9c27f771-9f85-492f-b1f1-9bc7a175f6f3";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "c7b18e05-dd60-4ee4-911a-290790e8c425";
+                    };
+                };
+                readonly viewFields: {
+                    readonly calendarChannelId: {
+                        readonly universalIdentifier: "cd6c6714-fc1d-4511-a664-ec5e8dfd8692";
+                    };
+                    readonly calendarEvent: {
+                        readonly universalIdentifier: "4790ca84-255e-4cb7-9b20-c17f4d94df8e";
+                    };
+                    readonly eventExternalId: {
+                        readonly universalIdentifier: "dbe16c1b-ece2-4d2f-b634-094742ac3e16";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "2702ae80-9108-4757-8a25-317a4357484e";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "201e0c45-fddc-4217-bfd4-40c13d7f7916";
+                    };
+                };
+            };
+        };
+    };
+    readonly calendarEventParticipant: {
+        readonly universalIdentifier: "20202020-a1c3-47a6-9732-27e5b1e8436d";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-c03a-4041-8a41-5e6f7a8b9cad";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-c03b-4042-9b42-6f7a8b9cadbe";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-c03c-4043-8c43-7a8b9cadbecf";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-c03d-4044-9d44-8b9cadbecd0f";
+            };
+            readonly calendarEvent: {
+                readonly universalIdentifier: "20202020-fe3a-401c-b889-af4f4657a861";
+            };
+            readonly handle: {
+                readonly universalIdentifier: "20202020-8692-4580-8210-9e09cbd031a7";
+            };
+            readonly displayName: {
+                readonly universalIdentifier: "20202020-ee1e-4f9f-8ac1-5c0b2f69691e";
+            };
+            readonly isOrganizer: {
+                readonly universalIdentifier: "20202020-66e7-4e00-9e06-d06c92650580";
+            };
+            readonly responseStatus: {
+                readonly universalIdentifier: "20202020-cec0-4be8-8fba-c366abc23147";
+            };
+            readonly person: {
+                readonly universalIdentifier: "20202020-5761-4842-8186-e1898ef93966";
+            };
+            readonly workspaceMember: {
+                readonly universalIdentifier: "20202020-20e4-4591-93ed-aeb17a4dcbd2";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "9e9ec14d-b889-448e-afe5-40e407be11d1";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "a2c6efda-06bf-418e-808a-dac9fd64ab58";
+            };
+            readonly position: {
+                readonly universalIdentifier: "fcfa672c-ce6d-4fc1-b978-db58a4cc14f4";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "c9dccf32-64ea-433e-a9a7-09993343bae0";
+            };
+        };
+        readonly indexes: {
+            readonly calendarEventIdIndex: {
+                readonly universalIdentifier: "c458ad97-8b95-43de-9003-88eb68576049";
+            };
+            readonly personIdIndex: {
+                readonly universalIdentifier: "30e9b75a-881f-4a85-aaf1-f2d2464be1cf";
+            };
+            readonly workspaceMemberIdIndex: {
+                readonly universalIdentifier: "898aa202-428f-4a7a-a3b3-8f0a17a6658e";
+            };
+        };
+        readonly views: {
+            readonly allCalendarEventParticipants: {
+                readonly universalIdentifier: "5228d634-6b69-4a43-be5c-e778fa6fe779";
+                readonly viewFields: {
+                    readonly calendarEvent: {
+                        readonly universalIdentifier: "d9c2f346-b83b-48ae-98d0-e344f97248cd";
+                    };
+                    readonly handle: {
+                        readonly universalIdentifier: "4140bd68-55e8-475c-8724-7f9f97634a9f";
+                    };
+                    readonly displayName: {
+                        readonly universalIdentifier: "3cadc470-9231-4027-9bbe-60e934edb483";
+                    };
+                    readonly isOrganizer: {
+                        readonly universalIdentifier: "684972f9-c5fe-4fff-bdec-2fc5511c938c";
+                    };
+                    readonly responseStatus: {
+                        readonly universalIdentifier: "dd0ab0bd-7f33-48fa-9461-fb5d085a2f9f";
+                    };
+                    readonly person: {
+                        readonly universalIdentifier: "86546244-9e3d-40e4-87cd-cbc82a353d2e";
+                    };
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "542141b0-ac85-4c43-867b-8d7f559b07ae";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "63d9d40d-e40c-410c-a14c-2f36c64c3e69";
+                    };
+                };
+            };
+            readonly calendarEventParticipantRecordPageFields: {
+                readonly universalIdentifier: "e01ebdb3-8fb8-46d2-8230-82242d593f7a";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "3d842777-436e-467d-90ae-9e1fa0aa7e9c";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "098836d8-15c1-44c1-a58e-2ff7fd6a05f9";
+                    };
+                };
+                readonly viewFields: {
+                    readonly calendarEvent: {
+                        readonly universalIdentifier: "865a1278-c356-4b99-a5e9-1ca3d33c7665";
+                    };
+                    readonly handle: {
+                        readonly universalIdentifier: "eb09af9c-b3f4-403c-8cb2-172243f83958";
+                    };
+                    readonly displayName: {
+                        readonly universalIdentifier: "23b97527-6ad3-4f07-bf68-559b97321673";
+                    };
+                    readonly isOrganizer: {
+                        readonly universalIdentifier: "3c126f3c-bd01-4029-b58a-724513fa5fff";
+                    };
+                    readonly responseStatus: {
+                        readonly universalIdentifier: "cd02fc91-8fa4-4fa3-b0e3-1a1fc891e6ee";
+                    };
+                    readonly person: {
+                        readonly universalIdentifier: "46be729d-091c-4012-aeca-16a743008513";
+                    };
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "c38c1111-f6e0-4698-9b36-db59f8d97de3";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "1447c7fa-fe2b-4ff7-8036-8de682537e23";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "6d7dff75-0230-45bd-8db9-dc25ef007e6e";
+                    };
+                };
+            };
+        };
+    };
+    readonly calendarEvent: {
+        readonly universalIdentifier: "20202020-8f1d-4eef-9f85-0d1965e27221";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-c04a-4051-8a51-9cadbe0f1e2d";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-c04b-4052-9b52-adbecf1f2e3e";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-c04c-4053-8c53-becf0f2f3e4f";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-c04d-4054-9d54-cd0f1f3f4e5f";
+            };
+            readonly title: {
+                readonly universalIdentifier: "20202020-080e-49d1-b21d-9702a7e2525c";
+            };
+            readonly isCanceled: {
+                readonly universalIdentifier: "20202020-335b-4e04-b470-43b84b64863c";
+            };
+            readonly isFullDay: {
+                readonly universalIdentifier: "20202020-551c-402c-bb6d-dfe9efe86bcb";
+            };
+            readonly startsAt: {
+                readonly universalIdentifier: "20202020-2c57-4c75-93c5-2ac950a6ed67";
+            };
+            readonly endsAt: {
+                readonly universalIdentifier: "20202020-2554-4ee1-a617-17907f6bab21";
+            };
+            readonly externalCreatedAt: {
+                readonly universalIdentifier: "20202020-9f03-4058-a898-346c62181599";
+            };
+            readonly externalUpdatedAt: {
+                readonly universalIdentifier: "20202020-b355-4c18-8825-ef42c8a5a755";
+            };
+            readonly description: {
+                readonly universalIdentifier: "20202020-52c4-4266-a98f-e90af0b4d271";
+            };
+            readonly location: {
+                readonly universalIdentifier: "20202020-641a-4ffe-960d-c3c186d95b17";
+            };
+            readonly iCalUid: {
+                readonly universalIdentifier: "20202020-f24b-45f4-b6a3-d2f9fcb98714";
+            };
+            readonly conferenceSolution: {
+                readonly universalIdentifier: "20202020-1c3f-4b5a-b526-5411a82179eb";
+            };
+            readonly conferenceLink: {
+                readonly universalIdentifier: "20202020-35da-43ef-9ca0-e936e9dc237b";
+            };
+            readonly calendarChannelEventAssociations: {
+                readonly universalIdentifier: "20202020-bdf8-4572-a2cc-ecbb6bcc3a02";
+            };
+            readonly calendarEventParticipants: {
+                readonly universalIdentifier: "20202020-e07e-4ccb-88f5-6f3d00458eec";
+            };
+            readonly recordingPreference: {
+                readonly universalIdentifier: "1d231e7e-9bbe-410b-8007-ea7678a83e58";
+            };
+            readonly callRecordings: {
+                readonly universalIdentifier: "48d6d151-18e2-4111-b405-d85fb9d860d8";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "664a9500-2641-4caa-8d95-069807bb2eb4";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "1081c196-d675-4801-b9e1-7d8637b48eab";
+            };
+            readonly position: {
+                readonly universalIdentifier: "e9488e9a-0abe-4500-8c1d-bfbd6b8cffad";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "b9e7825c-d491-4414-b904-910c00b5b93b";
+            };
+        };
+        readonly indexes: {};
+        readonly views: {
+            readonly allCalendarEvents: {
+                readonly universalIdentifier: "20202020-c001-4c01-8c01-ca1ebe0ca001";
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf01";
+                    };
+                    readonly startsAt: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf02";
+                    };
+                    readonly endsAt: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf03";
+                    };
+                    readonly isFullDay: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf04";
+                    };
+                    readonly location: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf05";
+                    };
+                    readonly conferenceLink: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf06";
+                    };
+                    readonly isCanceled: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf07";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-cf01-4c01-8c01-ca1ebe0caf08";
+                    };
+                };
+            };
+        };
+    };
+    readonly callRecording: {
+        readonly universalIdentifier: "ce19efb9-710f-45b2-b141-473abbeea60b";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "9767180b-76c2-47d5-b7b9-5dc60f14391d";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "d1adb2a9-9da3-4656-93b7-db79780b77eb";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "5db0a477-5715-4ffd-bdbe-854dfaccfe22";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "cf22a652-390a-4f55-b3a0-615c8fd8c7ed";
+            };
+            readonly title: {
+                readonly universalIdentifier: "4cff8863-a1d1-45fd-a370-4eb6aa1f2a5b";
+            };
+            readonly status: {
+                readonly universalIdentifier: "3e617680-d93e-4309-a54f-90f69528bfd7";
+            };
+            readonly applicationId: {
+                readonly universalIdentifier: "24ec1239-1240-42cb-8a2d-302632378e09";
+            };
+            readonly externalBotId: {
+                readonly universalIdentifier: "0a2da128-9bcc-488b-bc31-65318c41bdf9";
+            };
+            readonly externalRecordingId: {
+                readonly universalIdentifier: "6d17fb71-324b-4625-a5be-b3580607e2c7";
+            };
+            readonly startedAt: {
+                readonly universalIdentifier: "6c56c23f-1987-410a-860a-df3b2b3f9a33";
+            };
+            readonly endedAt: {
+                readonly universalIdentifier: "7a38a9cf-8424-4d6e-b80a-6883d3c662ef";
+            };
+            readonly video: {
+                readonly universalIdentifier: "bb9523d3-457e-4f4b-8c79-27a77afb87da";
+            };
+            readonly audio: {
+                readonly universalIdentifier: "2eafc2d0-8fec-430c-a939-65ca5fbc0f08";
+            };
+            readonly transcript: {
+                readonly universalIdentifier: "27b86d68-57d1-4607-aca0-191896b1ad43";
+            };
+            readonly summary: {
+                readonly universalIdentifier: "adb0f472-756b-4d3f-b21e-ea32bf73a5e4";
+            };
+            readonly calendarEvent: {
+                readonly universalIdentifier: "49e64b28-bd98-4775-80ea-4781bdd45e35";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "cb84ce87-ccd4-4901-9b9e-25e3cbfce3ba";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "02309262-b6dc-4cbd-936b-d851a7deec79";
+            };
+            readonly position: {
+                readonly universalIdentifier: "eeae3145-3696-41ae-b0ed-1370ad35b33c";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "d6fd4ad0-4aec-4969-bdb5-945fda0fcf45";
+            };
+        };
+        readonly indexes: {
+            readonly calendarEventIdIndex: {
+                readonly universalIdentifier: "8be3cc47-9352-4a1b-ad19-bb186bc0865d";
+            };
+        };
+        readonly views: {
+            readonly allCallRecordings: {
+                readonly universalIdentifier: "c395b55e-88f0-4d5b-a1fb-0d38b50e0b19";
+                readonly viewFields: {
+                    readonly status: {
+                        readonly universalIdentifier: "6c4a81a2-d9c1-4f82-984c-f97e083ca710";
+                    };
+                    readonly title: {
+                        readonly universalIdentifier: "b1d5051b-071d-4514-93cf-704724cdc8f6";
+                    };
+                    readonly startedAt: {
+                        readonly universalIdentifier: "3b96351f-66ed-4fa6-acb6-698647573af7";
+                    };
+                };
+            };
+            readonly callRecordingRecordPageFields: {
+                readonly universalIdentifier: "99fa8b47-3b11-4f9b-8fbc-e67a9e1da682";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "068426eb-dd20-49b0-ae9c-68727f3be2fb";
+                    };
+                };
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "6308d574-8579-4cf2-a020-c208df97cf3e";
+                    };
+                    readonly status: {
+                        readonly universalIdentifier: "93483569-fcd2-46cf-b576-9f0318ad2b3b";
+                    };
+                    readonly startedAt: {
+                        readonly universalIdentifier: "3fd00fbb-c153-45e3-b6e6-43d18d34052a";
+                    };
+                    readonly endedAt: {
+                        readonly universalIdentifier: "ba8c8d41-c112-4173-b927-5b5c5a5c047b";
+                    };
+                    readonly video: {
+                        readonly universalIdentifier: "acc54ade-cd26-4be2-9391-a42715ad1523";
+                    };
+                    readonly audio: {
+                        readonly universalIdentifier: "9445a547-1d1e-4da3-916b-2c2269c951c9";
+                    };
+                    readonly transcript: {
+                        readonly universalIdentifier: "782c97f6-e6b1-472b-8992-bbb60d25791b";
+                    };
+                    readonly summary: {
+                        readonly universalIdentifier: "a0ace064-cc72-4631-ade3-07cdded86b0e";
+                    };
+                };
+            };
+        };
+    };
+    readonly company: {
+        readonly universalIdentifier: "20202020-b374-4779-a561-80086cb2e17f";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-c05a-4061-8a61-1e2f3a4b5c6d";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-c05b-4062-9b62-2f3a4b5c6d7e";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-c05c-4063-8c63-3a4b5c6d7e8f";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-c05d-4064-9d64-4b5c6d7e8f9a";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-4d99-4e2e-a84c-4a27837b1ece";
+            };
+            readonly domainName: {
+                readonly universalIdentifier: "20202020-0c28-43d8-8ba5-3659924d3489";
+            };
+            readonly address: {
+                readonly universalIdentifier: "20202020-c5ce-4adc-b7b6-9c0979fc55e7";
+            };
+            readonly linkedinLink: {
+                readonly universalIdentifier: "20202020-ebeb-4beb-b9ad-6848036fb451";
+            };
+            readonly annualRevenue: {
+                readonly universalIdentifier: "60f533b7-2166-4071-a767-ceb0286822fd";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-9b4e-462b-991d-a0ee33326454";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-fabc-451d-ab7d-412170916baa";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "7444022e-b38f-4d4f-801b-cd664abc4834";
+            };
+            readonly people: {
+                readonly universalIdentifier: "20202020-3213-4ddf-9494-6422bcff8d7c";
+            };
+            readonly accountOwner: {
+                readonly universalIdentifier: "20202020-95b8-4e10-9881-edb5d4765f9d";
+            };
+            readonly taskTargets: {
+                readonly universalIdentifier: "20202020-cb17-4a61-8f8f-3be6730480de";
+            };
+            readonly noteTargets: {
+                readonly universalIdentifier: "20202020-bae0-4556-a74a-a9c686f77a88";
+            };
+            readonly opportunities: {
+                readonly universalIdentifier: "20202020-add3-4658-8e23-d70dccb6d0ec";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-c1b5-4120-b0f0-987ca401ed53";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-0414-4daf-9c0d-64fe7b27f89f";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "85c71601-72f9-4b7b-b343-d46100b2c74d";
+            };
+        };
+        readonly indexes: {
+            readonly accountOwnerIdIndex: {
+                readonly universalIdentifier: "ec2ebfc9-0c9b-4597-a87d-aa295e2d8bfe";
+            };
+            readonly domainNameUniqueIndex: {
+                readonly universalIdentifier: "dd300c61-f422-467a-91f4-de4f83c4175b";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "c3eb62df-2cc1-4cc3-b7aa-e96a4d65c633";
+            };
+        };
+        readonly views: {
+            readonly allCompanies: {
+                readonly universalIdentifier: "20202020-a001-4a01-8a01-c0aba11c0001";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf001";
+                    };
+                    readonly domainName: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf002";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf003";
+                    };
+                    readonly accountOwner: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf004";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf005";
+                    };
+                    readonly linkedinLink: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf007";
+                    };
+                    readonly address: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11cf008";
+                    };
+                };
+            };
+            readonly companyRecordPageFields: {
+                readonly universalIdentifier: "20202020-a001-4a01-8a01-c0aba11c1001";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "20202020-a001-4a01-8a01-c0aba11c1101";
+                    };
+                    readonly business: {
+                        readonly universalIdentifier: "20202020-a001-4a01-8a01-c0aba11c1102";
+                    };
+                    readonly contact: {
+                        readonly universalIdentifier: "20202020-a001-4a01-8a01-c0aba11c1103";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a001-4a01-8a01-c0aba11c1104";
+                    };
+                };
+                readonly viewFields: {
+                    readonly domainName: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1201";
+                    };
+                    readonly accountOwner: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1202";
+                    };
+                    readonly annualRevenue: {
+                        readonly universalIdentifier: "2a35f734-dea2-4de9-8395-acbce8df0f97";
+                    };
+                    readonly linkedinLink: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1206";
+                    };
+                    readonly address: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1208";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1209";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1210";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1212";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1213";
+                    };
+                    readonly people: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1214";
+                    };
+                    readonly taskTargets: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1215";
+                    };
+                    readonly noteTargets: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1216";
+                    };
+                    readonly opportunities: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1217";
+                    };
+                    readonly attachments: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c1219";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af01-4a01-8a01-c0aba11c121a";
+                    };
+                };
+            };
+        };
+    };
+    readonly dashboard: {
+        readonly universalIdentifier: "20202020-3840-4b6d-9425-0c5188b05ca8";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-da1a-41d1-8ad1-abcdefabcdef";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-da1b-41d2-9bd2-bcdefabcdefa";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-da1c-41d3-8cd3-cdefabcdefab";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-da1d-41d4-9dd4-defabcdefabc";
+            };
+            readonly title: {
+                readonly universalIdentifier: "20202020-20ee-4091-95dc-44b57eda3a89";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-38af-409b-95f0-7f08aa5f420f";
+            };
+            readonly pageLayoutId: {
+                readonly universalIdentifier: "20202020-bb53-4648-aa36-1d9d54e6f7f2";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-ff32-4fa1-b7ad-407cc6aa0734";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "53ee42e7-f157-42b5-b278-a5fa9b378307";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "99c330c0-5b7d-4276-a764-aed84499dfb5";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-bf6f-4220-8c55-2764f1175870";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-0bcc-47a4-8360-2e35a7133f7a";
+            };
+        };
+        readonly indexes: {
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "e69f71aa-de0f-4b70-845f-7a8369c47928";
+            };
+        };
+        readonly views: {
+            readonly allDashboards: {
+                readonly universalIdentifier: "20202020-a012-4a12-8a12-da5ab0b0a001";
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "20202020-af12-4a12-8a12-da5ab0b0af01";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af12-4a12-8a12-da5ab0b0af02";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af12-4a12-8a12-da5ab0b0af03";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af12-4a12-8a12-da5ab0b0af04";
+                    };
+                };
+            };
+        };
+    };
+    readonly messageChannelMessageAssociation: {
+        readonly universalIdentifier: "20202020-ad1e-4127-bccb-d83ae04d2ccb";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-b01a-40b1-8ab1-5a6b7c8d9eaf";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-b01b-40b2-9bb2-6b7c8d9eafba";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-b01c-40b3-8cb3-7c8d9eafbacb";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-b01d-40b4-9db4-8d9eafbacbdc";
+            };
+            readonly messageChannelId: {
+                readonly universalIdentifier: "20202020-b658-408f-bd46-3bd2d15d7e52";
+            };
+            readonly message: {
+                readonly universalIdentifier: "20202020-da5d-4ac5-8743-342ab0a0336b";
+            };
+            readonly messageExternalId: {
+                readonly universalIdentifier: "20202020-37d6-438f-b6fd-6503596c8f34";
+            };
+            readonly messageThread: {
+                readonly universalIdentifier: "20202020-fac8-42a8-94dd-44dbc920ae16";
+            };
+            readonly messageThreadExternalId: {
+                readonly universalIdentifier: "20202020-35fb-421e-afa0-0b8e8f7f9018";
+            };
+            readonly direction: {
+                readonly universalIdentifier: "75c9b0f7-9e76-44d4-a2f9-47051e61eec7";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "ce7dc96f-dd33-4bce-9505-cbd381440cec";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "334d2ad6-4bc4-4b51-9c92-8ad57652475e";
+            };
+            readonly position: {
+                readonly universalIdentifier: "45d1e083-90d6-4507-b68a-454a9dc3a540";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "edddd409-d9f0-4b93-8e3f-37faef6a3387";
+            };
+            readonly messageFolders: {
+                readonly universalIdentifier: "9bfc9da7-ae2d-44fd-9563-ede90c5d6222";
+            };
+        };
+        readonly indexes: {
+            readonly messageChannelIdIndex: {
+                readonly universalIdentifier: "9894f9a3-0225-4e7b-9f6a-23d4e2576784";
+            };
+            readonly messageIdIndex: {
+                readonly universalIdentifier: "9bb24d40-60dd-4beb-8c64-a74e8c67f9ee";
+            };
+            readonly messageChannelIdMessageIdUniqueIndex: {
+                readonly universalIdentifier: "1b86ece8-7ce3-4df3-8771-fd4b5d45b2f2";
+            };
+        };
+        readonly views: {
+            readonly allMessageChannelMessageAssociations: {
+                readonly universalIdentifier: "a4f465ac-d5cb-4f24-93ac-7a24bafd398e";
+                readonly viewFields: {
+                    readonly messageChannelId: {
+                        readonly universalIdentifier: "b86e652b-04ce-4089-9f71-e190eaf5b798";
+                    };
+                    readonly message: {
+                        readonly universalIdentifier: "f9f2de0d-3db5-402b-a733-53be6a4667c8";
+                    };
+                    readonly messageExternalId: {
+                        readonly universalIdentifier: "7fb9801d-ca3d-4b2d-8d55-c922fcf7fefd";
+                    };
+                    readonly direction: {
+                        readonly universalIdentifier: "ca38195e-985c-4880-85e0-26fa143c1ec7";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "af239abd-2c55-4108-a9d8-b5a67f6ca2e2";
+                    };
+                };
+            };
+            readonly messageChannelMessageAssociationRecordPageFields: {
+                readonly universalIdentifier: "680b43e2-5d50-49d8-bbdd-2d208e7b7071";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "86d7066c-ba38-4f6a-996f-77345bedd549";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "6044c58c-a63c-4f3f-a283-b8803553628f";
+                    };
+                };
+                readonly viewFields: {
+                    readonly messageChannelId: {
+                        readonly universalIdentifier: "376c7685-9ebe-4c95-b820-424b1c2f264f";
+                    };
+                    readonly message: {
+                        readonly universalIdentifier: "166aa5a0-d825-40dc-be6d-e94b87edd56d";
+                    };
+                    readonly messageExternalId: {
+                        readonly universalIdentifier: "1910bd21-2472-4a83-b8cd-7de51bdd2675";
+                    };
+                    readonly direction: {
+                        readonly universalIdentifier: "9edfbd44-4624-4cf8-b81c-8e169b4e8281";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "8651c5c4-db87-427c-8a57-6a9f75c74976";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "af4adf31-f698-4aad-9f29-71908924fc9a";
+                    };
+                };
+            };
+        };
+    };
+    readonly messageChannelMessageAssociationMessageFolder: {
+        readonly universalIdentifier: "20202020-a1b0-40b0-8ab0-5b6c7d8e9f0a";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-a1b2-40b1-8ab1-6b7c8d9e0f1a";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-a1b3-40b2-9bb2-7c8d9e0f1a2b";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-a1b4-40b3-8cb3-8d9e0f1a2b3c";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-a1b5-40b4-9db4-9e0f1a2b3c4d";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "f882a070-3393-4197-8140-b5858c6f7284";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "107d13dc-a8ff-493c-8d04-72688c68f8c1";
+            };
+            readonly position: {
+                readonly universalIdentifier: "76fcf020-482a-4d6c-b7b1-ccd6410299fc";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "38633a97-0e88-44de-9903-b8c9e0f59a36";
+            };
+            readonly messageChannelMessageAssociation: {
+                readonly universalIdentifier: "7411cfa3-4fd9-4b90-a636-940015fd7243";
+            };
+            readonly messageFolderId: {
+                readonly universalIdentifier: "b3369d31-3856-4a7a-b007-ee353918127c";
+            };
+        };
+        readonly indexes: {
+            readonly messageChannelMessageAssociationIdIndex: {
+                readonly universalIdentifier: "8e6038aa-1f79-4a84-87b5-f33caa172e98";
+            };
+            readonly messageFolderIdIndex: {
+                readonly universalIdentifier: "905299c3-ca81-435d-901c-f68b87562516";
+            };
+            readonly messageChannelMessageAssociationIdMessageFolderIdUniqueIndex: {
+                readonly universalIdentifier: "a3de1788-5dff-4849-ac5a-0dabe5fab216";
+            };
+        };
+        readonly views: {
+            readonly allMessageChannelMessageAssociationMessageFolders: {
+                readonly universalIdentifier: "775610fe-f1d1-4959-bdc3-0b437059cfeb";
+                readonly viewFields: {
+                    readonly messageChannelMessageAssociation: {
+                        readonly universalIdentifier: "1251e67a-e795-4bc2-a468-6cfc838b6a0a";
+                    };
+                    readonly messageFolderId: {
+                        readonly universalIdentifier: "aff2203d-6439-43b8-9cb4-55e8d78bba43";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "9da7637e-25c7-4101-8169-b5f6ff159690";
+                    };
+                };
+            };
+            readonly messageChannelMessageAssociationMessageFolderRecordPageFields: {
+                readonly universalIdentifier: "331ec548-07d2-4f9d-a0a2-ef91a9f96184";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "4928521b-ae24-4013-a69a-1392017d57af";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "b76cebb3-39b2-477a-9212-8bf1190227a4";
+                    };
+                };
+                readonly viewFields: {
+                    readonly messageChannelMessageAssociation: {
+                        readonly universalIdentifier: "d34ed53e-5156-4a18-a8df-572269496aac";
+                    };
+                    readonly messageFolderId: {
+                        readonly universalIdentifier: "04f14582-caf9-49ee-81ea-e5d4f977bfe1";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "39297559-a747-481e-a4c5-b80b8faf1aac";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "4692eb91-7fc6-4436-9175-87caa5f6b668";
+                    };
+                };
+            };
+        };
+    };
+    readonly messageParticipant: {
+        readonly universalIdentifier: "20202020-a433-4456-aa2d-fd9cb26b774a";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-b04a-40e1-8ae1-1a2b3c4d5e6f";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-b04b-40e2-9be2-2b3c4d5e6f7a";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-b04c-40e3-8ce3-3c4d5e6f7a8b";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-b04d-40e4-9de4-4d5e6f7a8b9c";
+            };
+            readonly message: {
+                readonly universalIdentifier: "20202020-985b-429a-9db9-9e55f4898a2a";
+            };
+            readonly role: {
+                readonly universalIdentifier: "20202020-65d1-42f4-8729-c9ec1f52aecd";
+            };
+            readonly handle: {
+                readonly universalIdentifier: "20202020-2456-464e-b422-b965a4db4a0b";
+            };
+            readonly displayName: {
+                readonly universalIdentifier: "20202020-36dd-4a4f-ac02-228425be9fac";
+            };
+            readonly person: {
+                readonly universalIdentifier: "20202020-249d-4e0f-82cd-1b9df5cd3da2";
+            };
+            readonly workspaceMember: {
+                readonly universalIdentifier: "20202020-77a7-4845-99ed-1bcbb478be6f";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "e0e6aa04-6ad5-4d12-8799-6febf00452c1";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "6c90fd49-22b8-4f91-b4eb-4b9af630e988";
+            };
+            readonly position: {
+                readonly universalIdentifier: "f49ca74e-dcdf-445d-a707-3c22869b4e6c";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "80fec74f-cda7-46bd-ae37-8998bd4f992b";
+            };
+        };
+        readonly indexes: {
+            readonly messageIdIndex: {
+                readonly universalIdentifier: "ab0863ba-f95e-493c-b86c-56e1bc7e5bc2";
+            };
+            readonly personIdIndex: {
+                readonly universalIdentifier: "df805c2e-3bfe-4d51-8309-75e5eb4052fe";
+            };
+            readonly workspaceMemberIdIndex: {
+                readonly universalIdentifier: "ce1e3a9e-afe9-439d-abb7-6cc98a6fa405";
+            };
+        };
+        readonly views: {
+            readonly allMessageParticipants: {
+                readonly universalIdentifier: "8b7fbe7d-dae0-4285-8bdc-ec078a4de870";
+                readonly viewFields: {
+                    readonly message: {
+                        readonly universalIdentifier: "ca491a31-8659-4202-9476-f0f72efc80b5";
+                    };
+                    readonly role: {
+                        readonly universalIdentifier: "55b74f7e-7c58-4fce-a44b-a8d9671ec541";
+                    };
+                    readonly handle: {
+                        readonly universalIdentifier: "abcbb5d9-b8c2-46bb-b3cc-ea035be8f3be";
+                    };
+                    readonly displayName: {
+                        readonly universalIdentifier: "8d0c8202-b57f-4450-a090-a7eb26aa2299";
+                    };
+                    readonly person: {
+                        readonly universalIdentifier: "26d0f3f1-43d3-425c-930c-81147451d0f8";
+                    };
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "df62dcbc-c22d-4d34-9fa5-6f70bae02161";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "636ff7b6-86b8-49fc-9442-39f4c24ff424";
+                    };
+                };
+            };
+            readonly messageParticipantRecordPageFields: {
+                readonly universalIdentifier: "209ab5c5-4a68-4d32-8255-515919a6c5f5";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "41c18430-34c3-430f-b86b-fc3963281277";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "add21830-a7c6-4cde-9eed-430afbcbf557";
+                    };
+                };
+                readonly viewFields: {
+                    readonly message: {
+                        readonly universalIdentifier: "dd8ccf4f-64d7-468c-bc0c-dc4e0efef08d";
+                    };
+                    readonly role: {
+                        readonly universalIdentifier: "5d1f9a65-85cc-41b2-a8bf-8e2c97aab4b3";
+                    };
+                    readonly displayName: {
+                        readonly universalIdentifier: "c50748fe-9f54-4e09-b572-111f076ec7db";
+                    };
+                    readonly person: {
+                        readonly universalIdentifier: "bf2e30dd-df03-4fb2-820a-166a93a2ce2c";
+                    };
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "00336686-0d63-43e2-b247-599f1227bd85";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "8d66ecb8-825d-4c6c-91c0-23a82c87ab46";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "17c3acfc-71f1-4b3c-820e-aea23871e850";
+                    };
+                };
+            };
+        };
+    };
+    readonly messageThread: {
+        readonly universalIdentifier: "20202020-849a-4c3e-84f5-a25a7d802271";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-b05a-40f1-8af1-5e6f7a8b9cad";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-b05b-40f2-9bf2-6f7a8b9cadbe";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-b05c-40f3-8cf3-7a8b9cadbecf";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-b05d-40f4-9df4-8b9cadbecfda";
+            };
+            readonly messages: {
+                readonly universalIdentifier: "20202020-3115-404f-aade-e1154b28e35a";
+            };
+            readonly messageChannelMessageAssociations: {
+                readonly universalIdentifier: "20202020-314e-40a4-906d-a5d5d6c285f6";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "b50ce369-9905-46d9-b95b-5e4034d252aa";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "20fbafd0-0a16-4785-b5a6-f1ef45ef304c";
+            };
+            readonly position: {
+                readonly universalIdentifier: "7490a440-7a62-466e-ba93-75a2f2edfb1e";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "c63e091f-6528-4657-ad2a-b0a158f9e483";
+            };
+            readonly subject: {
+                readonly universalIdentifier: "a8ddbf8c-1137-45d1-b89e-5ffbd83f67c8";
+            };
+        };
+        readonly indexes: {};
+        readonly views: {
+            readonly allMessageThreads: {
+                readonly universalIdentifier: "20202020-d002-4d02-8d02-ae55a9ba2002";
+                readonly viewFields: {
+                    readonly subject: {
+                        readonly universalIdentifier: "e5f0d32b-2b6a-47bc-b3bd-f32c96594ec1";
+                    };
+                    readonly messages: {
+                        readonly universalIdentifier: "20202020-df02-4d02-8d02-ae55a9ba2f01";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "af2c6ac9-7083-4609-8172-d518441f5e9e";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-df02-4d02-8d02-ae55a9ba2f02";
+                    };
+                };
+            };
+        };
+    };
+    readonly message: {
+        readonly universalIdentifier: "20202020-3f6b-4425-80ab-e468899ab4b2";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-b06a-4101-8a01-9cadbedfaeb1";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-b06b-4102-9b02-adbecfeafbc2";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-b06c-4103-8c03-becfdfabfcd3";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-b06d-4104-9d04-cfdfabecdde4";
+            };
+            readonly headerMessageId: {
+                readonly universalIdentifier: "20202020-72b5-416d-aed8-b55609067d01";
+            };
+            readonly messageThread: {
+                readonly universalIdentifier: "20202020-30f2-4ccd-9f5c-e41bb9d26214";
+            };
+            readonly subject: {
+                readonly universalIdentifier: "20202020-52d1-4036-b9ae-84bd722bb37a";
+            };
+            readonly text: {
+                readonly universalIdentifier: "20202020-d2ee-4e7e-89de-9a0a9044a143";
+            };
+            readonly receivedAt: {
+                readonly universalIdentifier: "20202020-140a-4a2a-9f86-f13b6a979afc";
+            };
+            readonly messageParticipants: {
+                readonly universalIdentifier: "20202020-7cff-4a74-b63c-73228448cbd9";
+            };
+            readonly messageChannelMessageAssociations: {
+                readonly universalIdentifier: "20202020-3cef-43a3-82c6-50e7cfbc9ae4";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "6e52bde4-ed41-4462-aa70-121e496270b4";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "7822dcc0-ee40-4af0-a6fe-f10a14e72b24";
+            };
+            readonly position: {
+                readonly universalIdentifier: "06c5052d-3369-4d6d-8eaa-f9780eddb1fd";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "529b6008-4a12-4d48-bbc3-26a3f199bafd";
+            };
+        };
+        readonly indexes: {
+            readonly messageThreadIdIndex: {
+                readonly universalIdentifier: "7a05b45e-7aa6-4a7e-9bbc-299cbed53c96";
+            };
+        };
+        readonly views: {
+            readonly allMessages: {
+                readonly universalIdentifier: "20202020-d001-4d01-8d01-ae55a9e5a001";
+                readonly viewFields: {
+                    readonly subject: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af01";
+                    };
+                    readonly messageThread: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af02";
+                    };
+                    readonly messageParticipants: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af03";
+                    };
+                    readonly receivedAt: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af04";
+                    };
+                    readonly headerMessageId: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af05";
+                    };
+                    readonly text: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af06";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-df01-4d01-8d01-ae55a9e5af07";
+                    };
+                };
+            };
+        };
+    };
+    readonly note: {
+        readonly universalIdentifier: "20202020-0b00-45cd-b6f6-6cd806fc6804";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-c01a-4111-8a11-dfabcddeef12";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-c01b-4112-9b12-fabcddefe123";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-c01c-4113-8c13-abcddeef1234";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-c01d-4114-9d14-bcddeef12345";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-368d-4dc2-943f-ed8a49c7fdfb";
+            };
+            readonly title: {
+                readonly universalIdentifier: "20202020-faeb-4c76-8ba6-ccbb0b4a965f";
+            };
+            readonly bodyV2: {
+                readonly universalIdentifier: "20202020-a7bb-4d94-be51-8f25181502c8";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-0d79-4e21-ab77-5a394eff97be";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "9b446e89-2484-4044-a3b5-420f6b578c0c";
+            };
+            readonly noteTargets: {
+                readonly universalIdentifier: "20202020-1f25-43fe-8b00-af212fdde823";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-4986-4c92-bf19-39934b149b16";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-7030-42f8-929c-1a57b25d6bce";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-7ea8-44d4-9d4c-51dd2a757950";
+            };
+        };
+        readonly indexes: {
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "8183c8d2-9114-4b6e-8c5d-12a3b14a5a13";
+            };
+        };
+        readonly views: {
+            readonly allNotes: {
+                readonly universalIdentifier: "20202020-a005-4a05-8a05-a0be5a11a000";
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a11af00";
+                    };
+                    readonly noteTargets: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a11af01";
+                    };
+                    readonly bodyV2: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a11af02";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a11af03";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a11af04";
+                    };
+                };
+            };
+            readonly noteRecordPageFields: {
+                readonly universalIdentifier: "20202020-a005-4a05-8a05-a0be5a115001";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "20202020-a005-4a05-8a05-a0be5a115101";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a005-4a05-8a05-a0be5a115103";
+                    };
+                };
+                readonly viewFields: {
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115202";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115203";
+                    };
+                    readonly noteTargets: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115204";
+                    };
+                    readonly bodyV2: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115205";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115206";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115207";
+                    };
+                    readonly attachments: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115208";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af05-4a05-8a05-a0be5a115209";
+                    };
+                };
+            };
+        };
+    };
+    readonly noteTarget: {
+        readonly universalIdentifier: "20202020-fff0-4b44-be82-bda313884400";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-c02a-4121-8a21-cddeef123456";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-c02b-4122-9b22-ddeef1234567";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-c02c-4123-8c23-eef12345678a";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-c02d-4124-9d24-ef123456789b";
+            };
+            readonly note: {
+                readonly universalIdentifier: "20202020-57f3-4f50-9599-fc0f671df003";
+            };
+            readonly targetPerson: {
+                readonly universalIdentifier: "20202020-38ca-4aab-92f5-8a605ca2e4c5";
+            };
+            readonly targetCompany: {
+                readonly universalIdentifier: "c500fbc0-d6f2-4982-a959-5a755431696c";
+            };
+            readonly targetOpportunity: {
+                readonly universalIdentifier: "20202020-4e42-417a-a705-76581c9ade79";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "820a3163-bb7d-41bc-93d9-81a464559c48";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "a48c2bae-fe78-4d9d-bc37-f56d1a462121";
+            };
+            readonly position: {
+                readonly universalIdentifier: "082f7c9e-5ccd-4056-8748-a428f65fa6f6";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "0cc32d0f-99ab-4fee-bf66-9e84bc8bce00";
+            };
+        };
+        readonly morphIds: {
+            readonly targetMorphId: {
+                readonly morphId: "20202020-f635-435d-ab8d-e1168b375c70";
+            };
+        };
+        readonly indexes: {
+            readonly noteIdIndex: {
+                readonly universalIdentifier: "9294d9e3-0225-4c7f-9d6e-23b4c25b6b24";
+            };
+            readonly personIdIndex: {
+                readonly universalIdentifier: "7c069dc0-e83b-4cd5-aaa2-cac7f3e00d80";
+            };
+            readonly companyIdIndex: {
+                readonly universalIdentifier: "2d83909a-a383-4e82-b00a-8b7739f3f906";
+            };
+            readonly opportunityIdIndex: {
+                readonly universalIdentifier: "0d1a59b4-cc87-4b7d-804a-656e8504f371";
+            };
+        };
+        readonly views: {
+            readonly allNoteTargets: {
+                readonly universalIdentifier: "d124d587-ef78-402b-9341-7673e6cea033";
+                readonly viewFields: {
+                    readonly id: {
+                        readonly universalIdentifier: "f2d912fe-7c6f-4a9c-b808-b7b5a18d2818";
+                    };
+                    readonly note: {
+                        readonly universalIdentifier: "9d4ac173-d32b-4a44-9dbd-8a47ab844f98";
+                    };
+                    readonly targetPerson: {
+                        readonly universalIdentifier: "b6f67de5-c5cf-4235-b740-a6a007c8eae3";
+                    };
+                    readonly targetCompany: {
+                        readonly universalIdentifier: "a9c7f370-4b22-4f29-8e3f-678e91a59576";
+                    };
+                    readonly targetOpportunity: {
+                        readonly universalIdentifier: "3efeb162-cd03-458b-9c7b-47032d045204";
+                    };
+                };
+            };
+        };
+    };
+    readonly opportunity: {
+        readonly universalIdentifier: "20202020-9549-49dd-b2b2-883999db8938";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-d01a-4131-8a31-f123456789ab";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-d01b-4132-9b32-123456789abc";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-d01c-4133-8c33-23456789abcd";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-d01d-4134-9d34-3456789abcde";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-8609-4f65-a2d9-44009eb422b5";
+            };
+            readonly amount: {
+                readonly universalIdentifier: "20202020-583e-4642-8533-db761d5fa82f";
+            };
+            readonly closeDate: {
+                readonly universalIdentifier: "20202020-527e-44d6-b1ac-c4158d307b97";
+            };
+            readonly stage: {
+                readonly universalIdentifier: "20202020-6f76-477d-8551-28cd65b2b4b9";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-806d-493a-bbc6-6313e62958e2";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-a63e-4a62-8e63-42a51828f831";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "3c8a6095-3f64-4e81-a59e-66c2bd181e11";
+            };
+            readonly pointOfContact: {
+                readonly universalIdentifier: "20202020-8dfb-42fc-92b6-01afb759ed16";
+            };
+            readonly company: {
+                readonly universalIdentifier: "20202020-cbac-457e-b565-adece5fc815f";
+            };
+            readonly owner: {
+                readonly universalIdentifier: "20202020-be7e-4d1e-8e19-3d5c7c4b9f2a";
+            };
+            readonly taskTargets: {
+                readonly universalIdentifier: "20202020-59c0-4179-a208-4a255f04a5be";
+            };
+            readonly noteTargets: {
+                readonly universalIdentifier: "20202020-dd3f-42d5-a382-db58aabf43d3";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-87c7-4118-83d6-2f4031005209";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-30e2-421f-96c7-19c69d1cf631";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "428a0da5-4b2e-4ce3-b695-89a8b384e6e3";
+            };
+        };
+        readonly indexes: {
+            readonly pointOfContactIdIndex: {
+                readonly universalIdentifier: "b8c2a673-a981-4357-a43d-313a358e4daa";
+            };
+            readonly companyIdIndex: {
+                readonly universalIdentifier: "e161072d-37b1-477a-b944-ef0d65289574";
+            };
+            readonly stageIndex: {
+                readonly universalIdentifier: "ae60d580-b562-44f2-a24d-7b8040063f83";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "f53fdd28-a26b-47ba-81b5-6813ad622720";
+            };
+        };
+        readonly views: {
+            readonly allOpportunities: {
+                readonly universalIdentifier: "20202020-a003-4a03-8a03-0aa0b1ca1ba0";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca1baf";
+                    };
+                    readonly amount: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca1bb0";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca1bb1";
+                    };
+                    readonly closeDate: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca1bb2";
+                    };
+                    readonly company: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca1bb3";
+                    };
+                    readonly pointOfContact: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca1bb4";
+                    };
+                };
+            };
+            readonly byStage: {
+                readonly universalIdentifier: "20202020-a004-4a04-8a04-0aa0b1ca1ba0";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af04-4a04-8a04-0aa0b2ca2baf";
+                    };
+                    readonly amount: {
+                        readonly universalIdentifier: "20202020-af04-4a04-8a04-0aa0b2ca2bb0";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af04-4a04-8a04-0aa0b2ca2bb1";
+                    };
+                    readonly closeDate: {
+                        readonly universalIdentifier: "20202020-af04-4a04-8a04-0aa0b2ca2bb2";
+                    };
+                    readonly company: {
+                        readonly universalIdentifier: "20202020-af04-4a04-8a04-0aa0b2ca2bb3";
+                    };
+                    readonly pointOfContact: {
+                        readonly universalIdentifier: "20202020-af04-4a04-8a04-0aa0b2ca2bb4";
+                    };
+                };
+                readonly viewGroups: {
+                    readonly new: {
+                        readonly universalIdentifier: "20202020-af14-4a04-8a04-0aa0b2ca2bf1";
+                    };
+                    readonly screening: {
+                        readonly universalIdentifier: "20202020-af14-4a04-8a04-0aa0b2ca2bf2";
+                    };
+                    readonly meeting: {
+                        readonly universalIdentifier: "20202020-af14-4a04-8a04-0aa0b2ca2bf3";
+                    };
+                    readonly proposal: {
+                        readonly universalIdentifier: "20202020-af14-4a04-8a04-0aa0b2ca2bf4";
+                    };
+                    readonly customer: {
+                        readonly universalIdentifier: "20202020-af14-4a04-8a04-0aa0b2ca2bf5";
+                    };
+                };
+            };
+            readonly opportunityRecordPageFields: {
+                readonly universalIdentifier: "20202020-a003-4a03-8a03-0aa0b1ca3001";
+                readonly viewFieldGroups: {
+                    readonly deal: {
+                        readonly universalIdentifier: "20202020-a003-4a03-8a03-0aa0b1ca3101";
+                    };
+                    readonly relations: {
+                        readonly universalIdentifier: "20202020-a003-4a03-8a03-0aa0b1ca3102";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a003-4a03-8a03-0aa0b1ca3103";
+                    };
+                };
+                readonly viewFields: {
+                    readonly amount: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3201";
+                    };
+                    readonly closeDate: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3202";
+                    };
+                    readonly stage: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3203";
+                    };
+                    readonly company: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3204";
+                    };
+                    readonly pointOfContact: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3205";
+                    };
+                    readonly owner: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3206";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3207";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3208";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca320a";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca320b";
+                    };
+                    readonly taskTargets: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca320d";
+                    };
+                    readonly noteTargets: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca320e";
+                    };
+                    readonly attachments: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca320f";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af03-4a03-8a03-0aa0b1ca3210";
+                    };
+                };
+            };
+        };
+    };
+    readonly person: {
+        readonly universalIdentifier: "20202020-e674-48e5-a542-72570eee7213";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-e01a-4141-8a41-456789abcdef";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-e01b-4142-9b42-56789abcdefa";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-e01c-4143-8c43-6789abcdefab";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-e01d-4144-9d44-789abcdefabc";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-3875-44d5-8c33-a6239011cab8";
+            };
+            readonly emails: {
+                readonly universalIdentifier: "20202020-3c51-43fa-8b6e-af39e29368ab";
+            };
+            readonly linkedinLink: {
+                readonly universalIdentifier: "20202020-f1af-48f7-893b-2007a73dd508";
+            };
+            readonly jobTitle: {
+                readonly universalIdentifier: "20202020-b0d0-415a-bef9-640a26dacd9b";
+            };
+            readonly phones: {
+                readonly universalIdentifier: "20202020-0638-448e-8825-439134618022";
+            };
+            readonly avatarUrl: {
+                readonly universalIdentifier: "20202020-b8a6-40df-961c-373dc5d2ec21";
+            };
+            readonly avatarFile: {
+                readonly universalIdentifier: "20202020-a7c9-4e3d-8f1b-2d5a6b7c8e9f";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-fcd5-4231-aff5-fff583eaa0b1";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-f6ab-4d98-af24-a3d5b664148a";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "e9e0dd35-184c-4742-84da-afadf45ce59a";
+            };
+            readonly company: {
+                readonly universalIdentifier: "20202020-e2f3-448e-b34c-2d625f0025fd";
+            };
+            readonly pointOfContactForOpportunities: {
+                readonly universalIdentifier: "20202020-911b-4a7d-b67b-918aa9a5b33a";
+            };
+            readonly taskTargets: {
+                readonly universalIdentifier: "20202020-584b-4d3e-88b6-53ab1fa03c3a";
+            };
+            readonly noteTargets: {
+                readonly universalIdentifier: "20202020-c8fc-4258-8250-15905d3fcfec";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-cd97-451f-87fa-bcb789bdbf3a";
+            };
+            readonly messageParticipants: {
+                readonly universalIdentifier: "20202020-498e-4c61-8158-fa04f0638334";
+            };
+            readonly calendarEventParticipants: {
+                readonly universalIdentifier: "20202020-52ee-45e9-a702-b64b3753e3a9";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-a43e-4873-9c23-e522de906ce5";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "57d1d7ad-fa10-44fc-82f3-ad0959ec2534";
+            };
+        };
+        readonly indexes: {
+            readonly companyIdIndex: {
+                readonly universalIdentifier: "8a265a5c-d3ae-47dc-bdf9-b42cfa2ba639";
+            };
+            readonly emailsUniqueIndex: {
+                readonly universalIdentifier: "8183a8b2-9114-4f6c-8a5b-12e3f14e5e13";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "9294b9c3-0225-4a7d-9b6c-23f4a25f6f24";
+            };
+        };
+        readonly views: {
+            readonly allPeople: {
+                readonly universalIdentifier: "20202020-a002-4a02-8a02-ae0a1ea11a00";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af0";
+                    };
+                    readonly emails: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af1";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af2";
+                    };
+                    readonly company: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af3";
+                    };
+                    readonly phones: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af4";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af5";
+                    };
+                    readonly jobTitle: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af7";
+                    };
+                    readonly linkedinLink: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea11af8";
+                    };
+                };
+            };
+            readonly personRecordPageFields: {
+                readonly universalIdentifier: "20202020-a002-4a02-8a02-ae0a1ea12001";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "20202020-a002-4a02-8a02-ae0a1ea12101";
+                    };
+                    readonly work: {
+                        readonly universalIdentifier: "20202020-a002-4a02-8a02-ae0a1ea12102";
+                    };
+                    readonly social: {
+                        readonly universalIdentifier: "20202020-a002-4a02-8a02-ae0a1ea12103";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a002-4a02-8a02-ae0a1ea12104";
+                    };
+                };
+                readonly viewFields: {
+                    readonly emails: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12201";
+                    };
+                    readonly phones: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12202";
+                    };
+                    readonly company: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12203";
+                    };
+                    readonly jobTitle: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12204";
+                    };
+                    readonly linkedinLink: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12205";
+                    };
+                    readonly avatarUrl: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12208";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12209";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12210";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12212";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12213";
+                    };
+                    readonly avatarFile: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12214";
+                    };
+                    readonly pointOfContactForOpportunities: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12215";
+                    };
+                    readonly taskTargets: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12216";
+                    };
+                    readonly noteTargets: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12217";
+                    };
+                    readonly attachments: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea12219";
+                    };
+                    readonly messageParticipants: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea1221a";
+                    };
+                    readonly calendarEventParticipants: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea1221b";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af02-4a02-8a02-ae0a1ea1221c";
+                    };
+                };
+            };
+        };
+    };
+    readonly task: {
+        readonly universalIdentifier: "20202020-1ba1-48ba-bc83-ef7e5990ed10";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-a02a-4151-8a51-89abcdefabcd";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-a02b-4152-9b52-9abcdefabcde";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-a02c-4153-8c53-abcdefabcdef";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-a02d-4154-9d54-bcdefabcdefa";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-7d47-4690-8a98-98b9a0c05dd8";
+            };
+            readonly title: {
+                readonly universalIdentifier: "20202020-b386-4cb7-aa5a-08d4a4d92680";
+            };
+            readonly bodyV2: {
+                readonly universalIdentifier: "20202020-4aa0-4ae8-898d-7df0afd47ab1";
+            };
+            readonly dueAt: {
+                readonly universalIdentifier: "20202020-fd99-40da-951b-4cb9a352fce3";
+            };
+            readonly status: {
+                readonly universalIdentifier: "20202020-70bc-48f9-89c5-6aa730b151e0";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-1a04-48ab-a567-576965ae5387";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "9e8bf518-f4ab-433e-9674-efb75fba2802";
+            };
+            readonly taskTargets: {
+                readonly universalIdentifier: "20202020-de9c-4d0e-a452-713d4a3e5fc7";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-794d-4783-a8ff-cecdb15be139";
+            };
+            readonly assignee: {
+                readonly universalIdentifier: "20202020-065a-4f42-a906-e20422c1753f";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-c778-4278-99ee-23a2837aee64";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-4746-4e2f-870c-52b02c67c90d";
+            };
+        };
+        readonly indexes: {
+            readonly assigneeIdIndex: {
+                readonly universalIdentifier: "f48fa3b1-0cec-44da-a9e5-f8a5e766637e";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "a86b32b3-01d3-4302-a152-8b7f247db7b4";
+            };
+        };
+        readonly views: {
+            readonly allTasks: {
+                readonly universalIdentifier: "20202020-a006-4a06-8a06-ba5ca11a1ea0";
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eaf";
+                    };
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb0";
+                    };
+                    readonly taskTargets: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb1";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb2";
+                    };
+                    readonly dueAt: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb3";
+                    };
+                    readonly assignee: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb4";
+                    };
+                    readonly bodyV2: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb5";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a1eb6";
+                    };
+                };
+            };
+            readonly assignedToMe: {
+                readonly universalIdentifier: "20202020-a007-4a07-8a07-ba5ca551aaed";
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaed";
+                    };
+                    readonly taskTargets: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaee";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaef";
+                    };
+                    readonly dueAt: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaf0";
+                    };
+                    readonly assignee: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaf1";
+                    };
+                    readonly bodyV2: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaf2";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af07-4a07-8a07-ba5ca551aaf3";
+                    };
+                };
+                readonly viewFilters: {
+                    readonly assigneeIsMe: {
+                        readonly universalIdentifier: "20202020-af17-4a07-8a07-ba5ca551abf1";
+                    };
+                };
+                readonly viewGroups: {
+                    readonly todo: {
+                        readonly universalIdentifier: "20202020-af17-4a07-8a07-ba5ca551abf2";
+                    };
+                    readonly inProgress: {
+                        readonly universalIdentifier: "20202020-af17-4a07-8a07-ba5ca551abf3";
+                    };
+                    readonly done: {
+                        readonly universalIdentifier: "20202020-af17-4a07-8a07-ba5ca551abf4";
+                    };
+                    readonly empty: {
+                        readonly universalIdentifier: "20202020-af17-4a07-8a07-ba5ca551abf5";
+                    };
+                };
+            };
+            readonly byStatus: {
+                readonly universalIdentifier: "20202020-a008-4a08-8a08-ba5cba51aba5";
+                readonly viewFields: {
+                    readonly title: {
+                        readonly universalIdentifier: "20202020-af08-4a08-8a08-ba5cba5babf0";
+                    };
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af08-4a08-8a08-ba5cba5babf1";
+                    };
+                    readonly dueAt: {
+                        readonly universalIdentifier: "20202020-af08-4a08-8a08-ba5cba5babf2";
+                    };
+                    readonly assignee: {
+                        readonly universalIdentifier: "20202020-af08-4a08-8a08-ba5cba5babf3";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af08-4a08-8a08-ba5cba5babf4";
+                    };
+                };
+                readonly viewGroups: {
+                    readonly todo: {
+                        readonly universalIdentifier: "20202020-af18-4a08-8a08-ba5cba5bbf01";
+                    };
+                    readonly inProgress: {
+                        readonly universalIdentifier: "20202020-af18-4a08-8a08-ba5cba5bbf02";
+                    };
+                    readonly done: {
+                        readonly universalIdentifier: "20202020-af18-4a08-8a08-ba5cba5bbf03";
+                    };
+                };
+            };
+            readonly taskRecordPageFields: {
+                readonly universalIdentifier: "20202020-a006-4a06-8a06-ba5ca11a6001";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "20202020-a006-4a06-8a06-ba5ca11a6101";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a006-4a06-8a06-ba5ca11a6103";
+                    };
+                };
+                readonly viewFields: {
+                    readonly dueAt: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6202";
+                    };
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6203";
+                    };
+                    readonly assignee: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6204";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6205";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6206";
+                    };
+                    readonly taskTargets: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6207";
+                    };
+                    readonly bodyV2: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6208";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a6209";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a620a";
+                    };
+                    readonly attachments: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a620b";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af06-4a06-8a06-ba5ca11a620c";
+                    };
+                };
+            };
+        };
+    };
+    readonly taskTarget: {
+        readonly universalIdentifier: "20202020-5a9a-44e8-95df-771cd06d0fb1";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-a03a-4161-8a61-cdefabcdefab";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-a03b-4162-9b62-defabcdefabc";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-a03c-4163-8c63-efabcdefabcd";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-a03d-4164-9d64-fabcdefabcde";
+            };
+            readonly task: {
+                readonly universalIdentifier: "20202020-e881-457a-8758-74aaef4ae78a";
+            };
+            readonly targetPerson: {
+                readonly universalIdentifier: "20202020-c8a0-4e85-a016-87e2349cfbec";
+            };
+            readonly targetCompany: {
+                readonly universalIdentifier: "20202020-4703-4a4e-948c-487b0c60a92c";
+            };
+            readonly targetOpportunity: {
+                readonly universalIdentifier: "20202020-6cb2-4c01-a9a5-aca3dbc11d41";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "65fe2a53-45e4-4225-9711-b827f55e51cc";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "bea3734f-aff2-49ed-9dc9-d4666a2e2178";
+            };
+            readonly position: {
+                readonly universalIdentifier: "4216c06a-498b-4111-9577-d9bcbccdda39";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "8768a9c0-37c0-4465-b86d-c4c7f466ec23";
+            };
+        };
+        readonly morphIds: {
+            readonly targetMorphId: {
+                readonly morphId: "20202020-f636-435d-ab8d-e1168b375c71";
+            };
+        };
+        readonly indexes: {
+            readonly taskIdIndex: {
+                readonly universalIdentifier: "c882f7a4-b025-4d32-aa26-5ef2595bdbf9";
+            };
+            readonly personIdIndex: {
+                readonly universalIdentifier: "b7d305d1-6fae-4ed6-9bdc-354fe9032c0e";
+            };
+            readonly companyIdIndex: {
+                readonly universalIdentifier: "c0af54c7-751b-4bb2-b102-677cc4e47402";
+            };
+            readonly opportunityIdIndex: {
+                readonly universalIdentifier: "6942e0ba-90f6-4c33-bf40-7f00b1ec35ab";
+            };
+        };
+        readonly views: {
+            readonly allTaskTargets: {
+                readonly universalIdentifier: "1dbf1d24-6cca-4f55-ae2f-e3d1b425a495";
+                readonly viewFields: {
+                    readonly id: {
+                        readonly universalIdentifier: "a49287c9-8aa6-4fca-9ec5-08d643f7239f";
+                    };
+                    readonly task: {
+                        readonly universalIdentifier: "1f79839e-42f6-4a69-839a-369e21a7497d";
+                    };
+                    readonly targetPerson: {
+                        readonly universalIdentifier: "cadc7a33-1527-4ef8-ac00-7ed0b54d1bae";
+                    };
+                    readonly targetCompany: {
+                        readonly universalIdentifier: "e9fa1305-4ba2-41c5-9198-fdc622b69f90";
+                    };
+                    readonly targetOpportunity: {
+                        readonly universalIdentifier: "526f3354-34d6-4e7e-a870-5f99c28353c2";
+                    };
+                };
+            };
+        };
+    };
+    readonly timelineActivity: {
+        readonly universalIdentifier: "20202020-6736-4337-b5c4-8b39fae325a5";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-a01a-4081-8a81-9aabbccddeff";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-a01b-4082-9b82-aabbccddeeff";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-a01c-4083-8c83-bbccddeeffaa";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-a01d-4084-9d84-ccddeeffaabb";
+            };
+            readonly happensAt: {
+                readonly universalIdentifier: "20202020-9526-4993-b339-c4318c4d39f0";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-7207-46e8-9dab-849505ae8497";
+            };
+            readonly properties: {
+                readonly universalIdentifier: "20202020-f142-4b04-b91b-6a2b4af3bf11";
+            };
+            readonly workspaceMember: {
+                readonly universalIdentifier: "20202020-af23-4479-9a30-868edc474b36";
+            };
+            readonly targetPerson: {
+                readonly universalIdentifier: "20202020-c414-45b9-a60a-ac27aa96229f";
+            };
+            readonly targetCompany: {
+                readonly universalIdentifier: "20202020-04ad-4221-a744-7a8278a5ce21";
+            };
+            readonly targetOpportunity: {
+                readonly universalIdentifier: "20202020-7664-4a35-a3df-580d389fd527";
+            };
+            readonly targetTask: {
+                readonly universalIdentifier: "20202020-b2f5-415c-9135-a31dfe49501b";
+            };
+            readonly targetNote: {
+                readonly universalIdentifier: "20202020-ec55-4135-8da5-3a20badc0156";
+            };
+            readonly targetWorkflow: {
+                readonly universalIdentifier: "20202020-616c-4ad3-a2e9-c477c341e295";
+            };
+            readonly targetWorkflowVersion: {
+                readonly universalIdentifier: "20202020-74f1-4711-a129-e14ca0ecd744";
+            };
+            readonly targetWorkflowRun: {
+                readonly universalIdentifier: "20202020-96f0-401b-9186-a3a0759225ac";
+            };
+            readonly targetDashboard: {
+                readonly universalIdentifier: "20202020-7864-48f5-af7c-9e4b60140948";
+            };
+            readonly linkedRecordCachedName: {
+                readonly universalIdentifier: "20202020-cfdb-4bef-bbce-a29f41230934";
+            };
+            readonly linkedRecordId: {
+                readonly universalIdentifier: "20202020-2e0e-48c0-b445-ee6c1e61687d";
+            };
+            readonly linkedObjectMetadataId: {
+                readonly universalIdentifier: "20202020-c595-449d-9f89-562758c9ee69";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "8f66191f-927d-4a6d-a15f-d0ff8cfc5a6d";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "81dc29fc-c872-4efd-bf31-d07872cd260e";
+            };
+            readonly position: {
+                readonly universalIdentifier: "e245d799-3e4b-4c69-ab9a-6b7c91d71195";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "bc1d1b67-903a-4354-8272-4a6efc4cbe63";
+            };
+        };
+        readonly morphIds: {
+            readonly targetMorphId: {
+                readonly morphId: "20202020-9a2b-4c3d-a4e5-f6a7b8c9d0e1";
+            };
+        };
+        readonly indexes: {
+            readonly workspaceMemberIdIndex: {
+                readonly universalIdentifier: "5e0b2391-85ca-4a66-aef4-52d74245bec2";
+            };
+            readonly personIdIndex: {
+                readonly universalIdentifier: "3e89a914-7bec-47bd-9cf9-743c6b83d001";
+            };
+            readonly companyIdIndex: {
+                readonly universalIdentifier: "8183e8f2-9114-4d6a-8e5f-12c3d14c5c13";
+            };
+            readonly opportunityIdIndex: {
+                readonly universalIdentifier: "9294f9a3-0225-4e7b-9f6a-23d4e25d6d24";
+            };
+            readonly noteIdIndex: {
+                readonly universalIdentifier: "995db1d8-0d3e-40f7-b0eb-5e6897bc9966";
+            };
+            readonly taskIdIndex: {
+                readonly universalIdentifier: "609cf622-86ef-48d1-812b-e1cab610a46c";
+            };
+            readonly workflowIdIndex: {
+                readonly universalIdentifier: "d6059ec2-92b0-4cfc-9fd8-78050f03108f";
+            };
+            readonly workflowVersionIdIndex: {
+                readonly universalIdentifier: "d94329b3-5dc8-4141-ae28-31afe28f7135";
+            };
+            readonly workflowRunIdIndex: {
+                readonly universalIdentifier: "1a2bd046-7c23-4e0a-9f8a-c3ca3a16d3b9";
+            };
+            readonly dashboardIdIndex: {
+                readonly universalIdentifier: "e8821da9-728d-470a-bf5b-5a981fff7880";
+            };
+        };
+        readonly views: {
+            readonly allTimelineActivities: {
+                readonly universalIdentifier: "20202020-b101-4b01-8b01-ba5cc01aa001";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-bf01-4b01-8b01-ba5cc01aa011";
+                    };
+                    readonly happensAt: {
+                        readonly universalIdentifier: "20202020-bf01-4b01-8b01-ba5cc01aa012";
+                    };
+                    readonly properties: {
+                        readonly universalIdentifier: "20202020-bf01-4b01-8b01-ba5cc01aa019";
+                    };
+                    readonly workspaceMember: {
+                        readonly universalIdentifier: "20202020-bf01-4b01-8b01-ba5cc01aa013";
+                    };
+                    readonly linkedRecordCachedName: {
+                        readonly universalIdentifier: "20202020-bf01-4b01-8b01-ba5cc01aa017";
+                    };
+                    readonly targetPerson: {
+                        readonly universalIdentifier: "37b38a8b-abd7-4f72-92d2-ad82bbef0296";
+                    };
+                    readonly targetCompany: {
+                        readonly universalIdentifier: "2015825f-0786-4b0d-88a7-dfce1b4b1c1a";
+                    };
+                    readonly targetOpportunity: {
+                        readonly universalIdentifier: "f7b5ced9-eba6-4454-8849-7a92d27c11ca";
+                    };
+                    readonly targetTask: {
+                        readonly universalIdentifier: "3899138d-e6fa-414c-9432-214c9b797ebb";
+                    };
+                    readonly targetNote: {
+                        readonly universalIdentifier: "ab74ed52-0195-4b65-987a-8367c07ee222";
+                    };
+                    readonly targetWorkflow: {
+                        readonly universalIdentifier: "d2c3ddc3-afad-40b9-a2cb-d2765f2f5691";
+                    };
+                    readonly targetWorkflowVersion: {
+                        readonly universalIdentifier: "4a7e3213-afd5-4691-8bba-0a10e8697afb";
+                    };
+                    readonly targetWorkflowRun: {
+                        readonly universalIdentifier: "97910946-04f0-4634-804e-880bc0019225";
+                    };
+                    readonly targetDashboard: {
+                        readonly universalIdentifier: "538847e8-ab09-407c-a433-505f6d7be7a1";
+                    };
+                };
+            };
+        };
+    };
+    readonly workflow: {
+        readonly universalIdentifier: "20202020-62be-406c-b9ca-8caa50d51392";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-f02a-4181-8a81-efabcdefabcd";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-f02b-4182-9b82-fabcdefabcde";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-f02c-4183-8c83-abcdefabcdef";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-f02d-4184-9d84-bcdefabcdefa";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-b3d3-478f-acc0-5d901e725b20";
+            };
+            readonly lastPublishedVersionId: {
+                readonly universalIdentifier: "20202020-326a-4fba-8639-3456c0a169e8";
+            };
+            readonly statuses: {
+                readonly universalIdentifier: "20202020-357c-4432-8c50-8c31b4a552d9";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-39b0-4d8c-8c5f-33c2326deb5f";
+            };
+            readonly versions: {
+                readonly universalIdentifier: "20202020-9432-416e-8f3c-27ee3153d099";
+            };
+            readonly runs: {
+                readonly universalIdentifier: "20202020-759b-4340-b58b-e73595c4df4f";
+            };
+            readonly automatedTriggers: {
+                readonly universalIdentifier: "20202020-3319-4234-a34c-117ecad2b8a9";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-906e-486a-a798-131a5f081faf";
+            };
+            readonly attachments: {
+                readonly universalIdentifier: "20202020-4a8c-4e2d-9b1c-7e5f3a2b4c6d";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-6007-401a-8aa5-e6f48581a6f3";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "3559831e-caf2-4eb5-9db1-b47bf968c774";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-535d-4ffa-b7f3-4fa0d5da1b7a";
+            };
+        };
+        readonly indexes: {
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "c7e64c55-eb0c-4b93-b076-5cfcf2e2e042";
+            };
+        };
+        readonly views: {
+            readonly allWorkflows: {
+                readonly universalIdentifier: "20202020-a009-4a09-8a09-a0bcf10aa11a";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af09-4a09-8a09-a0bcf10aa11a";
+                    };
+                    readonly statuses: {
+                        readonly universalIdentifier: "20202020-af09-4a09-8a09-a0bcf10aa11b";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af09-4a09-8a09-a0bcf10aa11c";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af09-4a09-8a09-a0bcf10aa11d";
+                    };
+                    readonly versions: {
+                        readonly universalIdentifier: "20202020-af09-4a09-8a09-a0bcf10aa11e";
+                    };
+                    readonly runs: {
+                        readonly universalIdentifier: "20202020-af09-4a09-8a09-a0bcf10aa11f";
+                    };
+                };
+            };
+        };
+    };
+    readonly workflowAutomatedTrigger: {
+        readonly universalIdentifier: "20202020-3319-4234-a34c-7f3b9d2e4d1f";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-f01a-4171-8a71-abcdefabcdef";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-f01b-4172-9b72-bcdefabcdefa";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-f01c-4173-8c73-cdefabcdefab";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-f01d-4174-9d74-defabcdefabc";
+            };
+            readonly type: {
+                readonly universalIdentifier: "20202020-3319-4234-a34c-3f92c1ab56e7";
+            };
+            readonly settings: {
+                readonly universalIdentifier: "20202020-3319-4234-a34c-bac8f903de12";
+            };
+            readonly workflow: {
+                readonly universalIdentifier: "20202020-3319-4234-a34c-8e1a4d2f7c03";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "5cea2f46-3779-4782-9fce-3062652e2dfd";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "017d3587-98bd-43ad-b5a6-cb8125105641";
+            };
+            readonly position: {
+                readonly universalIdentifier: "f4c5eb0a-8a86-49a2-a775-941eaad98fc9";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "dae934ca-bfca-4101-8211-8eae6e2b5513";
+            };
+        };
+        readonly indexes: {
+            readonly workflowIdIndex: {
+                readonly universalIdentifier: "7331ff89-a3f9-4ac0-9fa9-0de5663ae7b2";
+            };
+        };
+        readonly views: {
+            readonly allWorkflowAutomatedTriggers: {
+                readonly universalIdentifier: "a0a9ef79-3d42-417a-8555-3ee54c18ea51";
+                readonly viewFields: {
+                    readonly type: {
+                        readonly universalIdentifier: "689b4749-aa40-489a-bf0b-475a197ca2e6";
+                    };
+                    readonly workflow: {
+                        readonly universalIdentifier: "e5a46195-06fe-4f47-8844-128e35151d37";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "bb35e66a-2a1e-416b-8105-5749d91ab65f";
+                    };
+                };
+            };
+            readonly workflowAutomatedTriggerRecordPageFields: {
+                readonly universalIdentifier: "10aff295-f7ac-475d-8528-661eb9aa9759";
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "c5261eae-f2fe-416e-8ef9-eda5d377f8ca";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "e6da0410-7f63-41b7-b977-421fc37d67f5";
+                    };
+                };
+                readonly viewFields: {
+                    readonly type: {
+                        readonly universalIdentifier: "3b3a0cf7-f171-4ad8-9aad-aed84eca0250";
+                    };
+                    readonly workflow: {
+                        readonly universalIdentifier: "ddc5a9f6-f577-4e4b-a258-3d656c32babc";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "98ef45e8-c6bf-42e6-96f6-e94cd17911bc";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "d3933427-de7f-4fa1-b80c-47302273d848";
+                    };
+                };
+            };
+        };
+    };
+    readonly workflowRun: {
+        readonly universalIdentifier: "20202020-4e28-4e95-a9d7-6c00874f843c";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-f03a-4191-8a91-cdefabcdefab";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-f03b-4192-9b92-defabcdefabc";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-f03c-4193-8c93-efabcdefabcd";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-f03d-4194-9d94-fabcdefabcde";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-b840-4253-aef9-4e5013694587";
+            };
+            readonly workflowVersion: {
+                readonly universalIdentifier: "20202020-2f52-4ba8-8dc4-d0d6adb9578d";
+            };
+            readonly workflow: {
+                readonly universalIdentifier: "20202020-8c57-4e7f-84f5-f373f68e1b82";
+            };
+            readonly enqueuedAt: {
+                readonly universalIdentifier: "20202020-f1e3-4de1-a461-b5c4fdbc861d";
+            };
+            readonly startedAt: {
+                readonly universalIdentifier: "20202020-a234-4e2d-bd15-85bcea6bb183";
+            };
+            readonly endedAt: {
+                readonly universalIdentifier: "20202020-e1c1-4b6b-bbbd-b2beaf2e159e";
+            };
+            readonly status: {
+                readonly universalIdentifier: "20202020-6b3e-4f9c-8c2b-2e5b8e6d6f3b";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-7802-4c40-ae89-1f506fe3365c";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "20202020-6007-401a-8aa5-e6f38581a6f3";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "730dc1c9-34f5-4c22-84a6-bcb55b7604e2";
+            };
+            readonly state: {
+                readonly universalIdentifier: "20202020-611f-45f3-9cde-d64927e8ec57";
+            };
+            readonly stepLogs: {
+                readonly universalIdentifier: "20202020-7c4e-4e1a-8fc1-1e3a55d6c2a1";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-af4d-4eb0-babc-eb960a45b356";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-0b91-4ded-b1ac-cbd5efa58cb9";
+            };
+        };
+        readonly indexes: {
+            readonly workflowVersionIdIndex: {
+                readonly universalIdentifier: "8183c8d2-9114-4b6e-8c5d-12a3b14a5a14";
+            };
+            readonly workflowIdIndex: {
+                readonly universalIdentifier: "9294d9e3-0225-4c7f-9d6e-23b4c25b6b25";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "e0ac5ad2-d0c8-4f72-b710-8e53b9dc18d9";
+            };
+        };
+        readonly views: {
+            readonly allWorkflowRuns: {
+                readonly universalIdentifier: "20202020-a011-4a11-8a11-a0bcf10abca5";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcaf";
+                    };
+                    readonly workflow: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcb0";
+                    };
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcb1";
+                    };
+                    readonly startedAt: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcb2";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcb3";
+                    };
+                    readonly workflowVersion: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcb4";
+                    };
+                };
+            };
+            readonly workflowRunRecordPageFields: {
+                readonly universalIdentifier: "20202020-a011-4a11-8a11-a0bcf10abcf1";
+                readonly viewFields: {
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcf6";
+                    };
+                    readonly workflow: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcf7";
+                    };
+                    readonly workflowVersion: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcf8";
+                    };
+                    readonly startedAt: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcf9";
+                    };
+                    readonly endedAt: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcfa";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcfb";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcfc";
+                    };
+                    readonly enqueuedAt: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abcfd";
+                    };
+                    readonly state: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abd01";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abd02";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abd03";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af11-4a11-8a11-a0bcf10abd05";
+                    };
+                };
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "20202020-a011-4a11-8a11-a0bcf10abcf2";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a011-4a11-8a11-a0bcf10abcf4";
+                    };
+                };
+            };
+        };
+    };
+    readonly workflowVersion: {
+        readonly universalIdentifier: "20202020-d65d-4ab9-9344-d77bfb376a3d";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-f04a-41a1-8aa1-abcdefabcdef";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-f04b-41a2-9ba2-bcdefabcdefa";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-f04c-41a3-8ca3-cdefabcdefab";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-f04d-41a4-9da4-defabcdefabc";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-a12f-4cca-9937-a2e40cc65509";
+            };
+            readonly workflow: {
+                readonly universalIdentifier: "20202020-afa3-46c3-91b0-0631ca6aa1c8";
+            };
+            readonly trigger: {
+                readonly universalIdentifier: "20202020-4eae-43e7-86e0-212b41a30b48";
+            };
+            readonly status: {
+                readonly universalIdentifier: "20202020-5a34-440e-8a25-39d8c3d1d4cf";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-791d-4950-ab28-0e704767ae1c";
+            };
+            readonly runs: {
+                readonly universalIdentifier: "20202020-1d08-46df-901a-85045f18099a";
+            };
+            readonly steps: {
+                readonly universalIdentifier: "20202020-5988-4a64-b94a-1f9b7b989039";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-fcb0-4695-b17e-3b43a421c633";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-3f17-44ef-b8c1-b282ae8469b2";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "34f592a7-5c13-4c8b-8473-7bef00848b4e";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "4f8777e6-c5eb-40c6-bb4c-ed9dcf0d81e9";
+            };
+        };
+        readonly indexes: {
+            readonly workflowIdIndex: {
+                readonly universalIdentifier: "8138c3b3-0b14-4ee1-be0e-debdde6b3219";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "6f3a65eb-2aee-4108-b8a0-c62da419d1dc";
+            };
+        };
+        readonly views: {
+            readonly allWorkflowVersions: {
+                readonly universalIdentifier: "20202020-a010-4a10-8a10-a0bcf10aae15";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaeaf";
+                    };
+                    readonly workflow: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaeb0";
+                    };
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaeb1";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaeb2";
+                    };
+                    readonly runs: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaeb3";
+                    };
+                };
+            };
+            readonly workflowVersionRecordPageFields: {
+                readonly universalIdentifier: "20202020-a010-4a10-8a10-a0bcf10aaef1";
+                readonly viewFields: {
+                    readonly status: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaef6";
+                    };
+                    readonly workflow: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaef7";
+                    };
+                    readonly trigger: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaef8";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaef9";
+                    };
+                    readonly steps: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaefa";
+                    };
+                    readonly createdBy: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaefb";
+                    };
+                    readonly updatedAt: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaefc";
+                    };
+                    readonly updatedBy: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaefd";
+                    };
+                    readonly runs: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaefe";
+                    };
+                    readonly timelineActivities: {
+                        readonly universalIdentifier: "20202020-af10-4a10-8a10-a0bcf10aaf01";
+                    };
+                };
+                readonly viewFieldGroups: {
+                    readonly general: {
+                        readonly universalIdentifier: "20202020-a010-4a10-8a10-a0bcf10aaef2";
+                    };
+                    readonly system: {
+                        readonly universalIdentifier: "20202020-a010-4a10-8a10-a0bcf10aaef4";
+                    };
+                };
+            };
+        };
+    };
+    readonly workspaceMember: {
+        readonly universalIdentifier: "20202020-3319-4234-a34c-82d5c0e881a6";
+        readonly fields: {
+            readonly id: {
+                readonly universalIdentifier: "20202020-fb1a-41b1-8ab1-efabcdefabcd";
+            };
+            readonly createdAt: {
+                readonly universalIdentifier: "20202020-fb1b-41b2-9bb2-fabcdefabcde";
+            };
+            readonly updatedAt: {
+                readonly universalIdentifier: "20202020-fb1c-41b3-8cb3-abcdefabcdef";
+            };
+            readonly deletedAt: {
+                readonly universalIdentifier: "20202020-fb1d-41b4-9db4-bcdefabcdefa";
+            };
+            readonly position: {
+                readonly universalIdentifier: "20202020-1810-4591-a93c-d0df97dca843";
+            };
+            readonly name: {
+                readonly universalIdentifier: "20202020-e914-43a6-9c26-3603c59065f4";
+            };
+            readonly colorScheme: {
+                readonly universalIdentifier: "20202020-66bc-47f2-adac-f2ef7c598b63";
+            };
+            readonly locale: {
+                readonly universalIdentifier: "20202020-402e-4695-b169-794fa015afbe";
+            };
+            readonly avatarUrl: {
+                readonly universalIdentifier: "20202020-0ced-4c4f-a376-c98a966af3f6";
+            };
+            readonly userEmail: {
+                readonly universalIdentifier: "20202020-4c5f-4e09-bebc-9e624e21ecf4";
+            };
+            readonly userId: {
+                readonly universalIdentifier: "20202020-75a9-4dfc-bf25-2e4b43e89820";
+            };
+            readonly assignedTasks: {
+                readonly universalIdentifier: "20202020-61dc-4a1c-99e8-38ebf8d2bbeb";
+            };
+            readonly ownedOpportunities: {
+                readonly universalIdentifier: "20202020-9e4d-4b3a-8c1f-6d7e8f9a0b1c";
+            };
+            readonly accountOwnerForCompanies: {
+                readonly universalIdentifier: "20202020-dc29-4bd4-a3c1-29eafa324bee";
+            };
+            readonly messageParticipants: {
+                readonly universalIdentifier: "20202020-8f99-48bc-a5eb-edd33dd54188";
+            };
+            readonly blocklist: {
+                readonly universalIdentifier: "20202020-6cb2-4161-9f29-a4b7f1283859";
+            };
+            readonly calendarEventParticipants: {
+                readonly universalIdentifier: "20202020-0dbc-4841-9ce1-3e793b5b3512";
+            };
+            readonly timelineActivities: {
+                readonly universalIdentifier: "20202020-e15b-47b8-94fe-8200e3c66615";
+            };
+            readonly timeZone: {
+                readonly universalIdentifier: "20202020-2d33-4c21-a86e-5943b050dd54";
+            };
+            readonly dateFormat: {
+                readonly universalIdentifier: "20202020-af13-4e11-b1e7-b8cf5ea13dc0";
+            };
+            readonly timeFormat: {
+                readonly universalIdentifier: "20202020-8acb-4cf8-a851-a6ed443c8d81";
+            };
+            readonly searchVector: {
+                readonly universalIdentifier: "20202020-46d0-4e7f-bc26-74c0edaeb619";
+            };
+            readonly calendarStartDay: {
+                readonly universalIdentifier: "20202020-1ecc-4562-84c9-ff3a2f6cce85";
+            };
+            readonly numberFormat: {
+                readonly universalIdentifier: "20202020-7f40-4e7f-b126-11c0eda6b141";
+            };
+            readonly createdBy: {
+                readonly universalIdentifier: "4a3f26d1-033e-4d84-b23a-9adc2fd0c2a8";
+            };
+            readonly updatedBy: {
+                readonly universalIdentifier: "29f84ad0-509f-4aef-9f9c-2691dd60cd87";
+            };
+        };
+        readonly indexes: {
+            readonly userEmailUniqueIndex: {
+                readonly universalIdentifier: "76da5f27-523c-44b6-ad06-12954f6b949f";
+            };
+            readonly searchVectorGinIndex: {
+                readonly universalIdentifier: "8678dde9-a804-4a9e-80e3-9af35e471ec5";
+            };
+        };
+        readonly views: {
+            readonly allWorkspaceMembers: {
+                readonly universalIdentifier: "20202020-e001-4e01-8e01-a0bcaeabe100";
+                readonly viewFields: {
+                    readonly name: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f0";
+                    };
+                    readonly userEmail: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f1";
+                    };
+                    readonly avatarUrl: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f2";
+                    };
+                    readonly colorScheme: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f3";
+                    };
+                    readonly locale: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f4";
+                    };
+                    readonly timeZone: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f5";
+                    };
+                    readonly dateFormat: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f6";
+                    };
+                    readonly timeFormat: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f7";
+                    };
+                    readonly createdAt: {
+                        readonly universalIdentifier: "20202020-ef01-4e01-8e01-a0bcaeabe1f8";
+                    };
+                    readonly ownedOpportunities: {
+                        readonly universalIdentifier: "8a0503f3-ba61-453e-86dc-6c79f7bc235b";
+                    };
+                    readonly assignedTasks: {
+                        readonly universalIdentifier: "af16226e-6375-4676-8bd9-9d1a57076fc4";
+                    };
+                };
+            };
+        };
+    };
+};
+//# sourceMappingURL=standard-object.constant.d.ts.map

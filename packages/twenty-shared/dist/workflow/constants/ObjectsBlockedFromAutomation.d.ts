@@ -1,0 +1,2 @@
+export declare const OBJECTS_BLOCKED_FROM_AUTOMATION: readonly ["workflow", "workflowVersion", "workflowRun", "workflowAutomatedTrigger", "workspaceMember", "dashboard", "message", "messageThread", "messageChannelMessageAssociation", "messageParticipant", "calendarEvent", "calendarEventParticipant", "calendarChannelEventAssociation"];
+//# sourceMappingURL=ObjectsBlockedFromAutomation.d.ts.map

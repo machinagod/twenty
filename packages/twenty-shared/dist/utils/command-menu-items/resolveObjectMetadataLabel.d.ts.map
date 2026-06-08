@@ -1,0 +1,1 @@
+{"version":3,"file":"resolveObjectMetadataLabel.d.ts","sourceRoot":"","sources":["../../../src/utils/command-menu-items/resolveObjectMetadataLabel.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,0BAA0B,GAAI,kDAGxC;IACD,kBAAkB,EAAE;QAAE,aAAa,EAAE,MAAM,CAAC;QAAC,WAAW,EAAE,MAAM,CAAA;KAAE,CAAC;IACnE,uBAAuB,EAAE,MAAM,CAAC;CACjC,KAAG,MAIH,CAAC"}

@@ -1,0 +1,2 @@
+export declare const DEFAULT_APP_ACCESS_TOKEN_NAME = "TWENTY_APP_ACCESS_TOKEN";
+//# sourceMappingURL=DefaultAppAccessTokenName.d.ts.map

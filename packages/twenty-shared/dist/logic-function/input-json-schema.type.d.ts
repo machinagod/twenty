@@ -1,0 +1,14 @@
+export type InputJsonSchema = {
+    type?: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'integer' | 'null';
+    description?: string;
+    enum?: unknown[];
+    items?: InputJsonSchema;
+    properties?: Record<string, InputJsonSchema>;
+    required?: string[];
+    additionalProperties?: boolean | InputJsonSchema;
+    minimum?: number;
+    maximum?: number;
+    multiline?: boolean;
+    label?: string;
+};
+//# sourceMappingURL=input-json-schema.type.d.ts.map

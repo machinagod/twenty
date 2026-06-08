@@ -1,0 +1,4 @@
+var _ = /* @__PURE__ */ ((E) => (E.DAY = "DAY", E.MONTH = "MONTH", E.QUARTER = "QUARTER", E.YEAR = "YEAR", E.WEEK = "WEEK", E.DAY_OF_THE_WEEK = "DAY_OF_THE_WEEK", E.MONTH_OF_THE_YEAR = "MONTH_OF_THE_YEAR", E.QUARTER_OF_THE_YEAR = "QUARTER_OF_THE_YEAR", E.NONE = "NONE", E))(_ || {});
+export {
+  _ as O
+};

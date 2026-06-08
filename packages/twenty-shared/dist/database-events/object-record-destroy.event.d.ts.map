@@ -1,0 +1,1 @@
+{"version":3,"file":"object-record-destroy.event.d.ts","sourceRoot":"","sources":["../../src/database-events/object-record-destroy.event.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,MAAM,4CAA4C,CAAC;AAEnF,qBAAa,wBAAwB,CACnC,CAAC,GAAG,MAAM,CACV,SAAQ,qBAAqB,CAAC,CAAC,CAAC;IACxB,UAAU,EAAE;QAClB,MAAM,EAAE,CAAC,CAAC;KACX,CAAC;CACH"}

@@ -1,0 +1,2 @@
+export declare const FIELD_FOR_TOTAL_COUNT_AGGREGATE_OPERATION = "id";
+//# sourceMappingURL=FieldForTotalCountAggregateOperation.d.ts.map

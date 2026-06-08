@@ -1,0 +1,42 @@
+import { z } from 'zod';
+export declare const workflowSendEmailActionSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    valid: z.ZodBoolean;
+    nextStepIds: z.ZodNullable<z.ZodOptional<z.ZodArray<z.ZodString>>>;
+    position: z.ZodNullable<z.ZodOptional<z.ZodObject<{
+        x: z.ZodNumber;
+        y: z.ZodNumber;
+    }, z.core.$strip>>>;
+    type: z.ZodLiteral<"SEND_EMAIL">;
+    settings: z.ZodObject<{
+        outputSchema: z.ZodObject<{}, z.core.$loose>;
+        errorHandlingOptions: z.ZodObject<{
+            retryOnFailure: z.ZodObject<{
+                value: z.ZodBoolean;
+            }, z.core.$strip>;
+            continueOnFailure: z.ZodObject<{
+                value: z.ZodBoolean;
+            }, z.core.$strip>;
+        }, z.core.$strip>;
+        input: z.ZodObject<{
+            connectedAccountId: z.ZodString;
+            recipients: z.ZodObject<{
+                to: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+                cc: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+                bcc: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+            }, z.core.$strip>;
+            subject: z.ZodOptional<z.ZodString>;
+            body: z.ZodOptional<z.ZodString>;
+            files: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodString;
+                size: z.ZodNumber;
+                type: z.ZodString;
+                createdAt: z.ZodString;
+            }, z.core.$strip>>>>;
+            inReplyTo: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+//# sourceMappingURL=send-email-action-schema.d.ts.map

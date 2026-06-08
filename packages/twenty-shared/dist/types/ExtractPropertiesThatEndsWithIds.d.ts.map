@@ -1,0 +1,1 @@
+{"version":3,"file":"ExtractPropertiesThatEndsWithIds.d.ts","sourceRoot":"","sources":["../../src/types/ExtractPropertiesThatEndsWithIds.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,gCAAgC,CAAC,CAAC,IAAI;KAC/C,CAAC,IAAI,MAAM,CAAC,GAAG,CAAC,SAAS,GAAG,MAAM,CAAC,KAAK,GACrC,CAAC,CAAC,CAAC,CAAC,SAAS,MAAM,EAAE,GACnB,CAAC,GACD,KAAK,GACP,KAAK;CACV,CAAC,MAAM,CAAC,CAAC,CAAC"}

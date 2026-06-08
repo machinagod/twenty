@@ -1,0 +1,8 @@
+export declare enum CalendarChannelSyncStatus {
+    NOT_SYNCED = "NOT_SYNCED",
+    ONGOING = "ONGOING",
+    ACTIVE = "ACTIVE",
+    FAILED_INSUFFICIENT_PERMISSIONS = "FAILED_INSUFFICIENT_PERMISSIONS",
+    FAILED_UNKNOWN = "FAILED_UNKNOWN"
+}
+//# sourceMappingURL=CalendarChannelSyncStatus.d.ts.map

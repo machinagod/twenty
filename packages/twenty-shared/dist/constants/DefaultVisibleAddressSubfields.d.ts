@@ -1,0 +1,2 @@
+export declare const DEFAULT_VISIBLE_ADDRESS_SUBFIELDS: readonly ["addressStreet1", "addressStreet2", "addressCity", "addressState", "addressPostcode", "addressCountry"];
+//# sourceMappingURL=DefaultVisibleAddressSubfields.d.ts.map

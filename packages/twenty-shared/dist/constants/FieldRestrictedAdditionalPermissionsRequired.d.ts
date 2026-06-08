@@ -1,0 +1,2 @@
+export declare const FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED = "FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED";
+//# sourceMappingURL=FieldRestrictedAdditionalPermissionsRequired.d.ts.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"server-variables.type.d.ts","sourceRoot":"","sources":["../../src/application/server-variables.type.ts"],"names":[],"mappings":"AAAA,KAAK,oBAAoB,GAAG;IAC1B,WAAW,CAAC,EAAE,MAAM,CAAC;IACrB,QAAQ,CAAC,EAAE,OAAO,CAAC;IACnB,UAAU,CAAC,EAAE,OAAO,CAAC;CACtB,CAAC;AAEF,MAAM,MAAM,eAAe,GAAG,MAAM,CAAC,MAAM,EAAE,oBAAoB,CAAC,CAAC"}

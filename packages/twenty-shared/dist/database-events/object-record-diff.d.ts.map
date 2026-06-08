@@ -1,0 +1,1 @@
+{"version":3,"file":"object-record-diff.d.ts","sourceRoot":"","sources":["../../src/database-events/object-record-diff.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,gBAAgB,CAAC,CAAC,IAAI;KAC/B,CAAC,IAAI,MAAM,CAAC,GAAG;QAAE,MAAM,EAAE,CAAC,CAAC,CAAC,CAAC,CAAC;QAAC,KAAK,EAAE,CAAC,CAAC,CAAC,CAAC,CAAA;KAAE;CAC9C,CAAC"}

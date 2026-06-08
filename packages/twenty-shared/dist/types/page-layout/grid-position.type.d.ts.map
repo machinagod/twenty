@@ -1,0 +1,1 @@
+{"version":3,"file":"grid-position.type.d.ts","sourceRoot":"","sources":["../../../src/types/page-layout/grid-position.type.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,YAAY,GAAG;IACzB,GAAG,EAAE,MAAM,CAAC;IACZ,MAAM,EAAE,MAAM,CAAC;IACf,OAAO,EAAE,MAAM,CAAC;IAChB,UAAU,EAAE,MAAM,CAAC;CACpB,CAAC"}

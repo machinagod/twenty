@@ -1,0 +1,1 @@
+{"version":3,"file":"getWorkflowRunContext.d.ts","sourceRoot":"","sources":["../../../src/workflow/utils/getWorkflowRunContext.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,KAAK,oBAAoB,EAAE,MAAM,4CAA4C,CAAC;AAEvF,eAAO,MAAM,qBAAqB,GAChC,WAAW,oBAAoB,KAC9B,MAAM,CAAC,MAAM,EAAE,OAAO,CAMxB,CAAC"}

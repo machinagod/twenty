@@ -1,0 +1,1 @@
+{"version":3,"file":"extractFolderPathFilenameAndTypeOrThrow.util.d.ts","sourceRoot":"","sources":["../../../src/utils/files/extractFolderPathFilenameAndTypeOrThrow.util.ts"],"names":[],"mappings":"AAEA,eAAO,MAAM,uCAAuC,GAClD,UAAU,MAAM,KACf;IACD,UAAU,EAAE,MAAM,CAAC;IACnB,QAAQ,EAAE,MAAM,CAAC;IACjB,IAAI,EAAE,MAAM,CAAC;CAad,CAAC"}

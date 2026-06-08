@@ -1,0 +1,2 @@
+export declare const STANDARD_OBJECT_RECORDS_UNDER_OBJECT_RECORDS_PERMISSIONS: string[];
+//# sourceMappingURL=StandardObjectRecordsUnderObjectRecordsPermissions.d.ts.map

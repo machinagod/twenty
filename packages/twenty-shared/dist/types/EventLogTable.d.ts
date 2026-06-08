@@ -1,0 +1,8 @@
+export declare enum EventLogTable {
+    WORKSPACE_EVENT = "WORKSPACE_EVENT",
+    PAGEVIEW = "PAGEVIEW",
+    OBJECT_EVENT = "OBJECT_EVENT",
+    USAGE_EVENT = "USAGE_EVENT",
+    APPLICATION_LOG = "APPLICATION_LOG"
+}
+//# sourceMappingURL=EventLogTable.d.ts.map

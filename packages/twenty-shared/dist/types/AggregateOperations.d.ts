@@ -1,0 +1,15 @@
+export declare enum AggregateOperations {
+    MIN = "MIN",
+    MAX = "MAX",
+    AVG = "AVG",
+    SUM = "SUM",
+    COUNT = "COUNT",
+    COUNT_UNIQUE_VALUES = "COUNT_UNIQUE_VALUES",
+    COUNT_EMPTY = "COUNT_EMPTY",
+    COUNT_NOT_EMPTY = "COUNT_NOT_EMPTY",
+    COUNT_TRUE = "COUNT_TRUE",
+    COUNT_FALSE = "COUNT_FALSE",
+    PERCENTAGE_EMPTY = "PERCENTAGE_EMPTY",
+    PERCENTAGE_NOT_EMPTY = "PERCENTAGE_NOT_EMPTY"
+}
+//# sourceMappingURL=AggregateOperations.d.ts.map

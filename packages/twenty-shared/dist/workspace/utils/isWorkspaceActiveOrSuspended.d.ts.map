@@ -1,0 +1,1 @@
+{"version":3,"file":"isWorkspaceActiveOrSuspended.d.ts","sourceRoot":"","sources":["../../../src/workspace/utils/isWorkspaceActiveOrSuspended.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,yBAAyB,EAAE,MAAM,6CAA6C,CAAC;AAExF,eAAO,MAAM,4BAA4B,GACvC,YAAY;IACV,gBAAgB,EAAE,yBAAyB,CAAC;CAC7C,GAAG,IAAI,KACP,OAKF,CAAC"}

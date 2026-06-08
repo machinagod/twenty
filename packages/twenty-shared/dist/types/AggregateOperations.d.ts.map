@@ -1,0 +1,1 @@
+{"version":3,"file":"AggregateOperations.d.ts","sourceRoot":"","sources":["../../src/types/AggregateOperations.ts"],"names":[],"mappings":"AAAA,oBAAY,mBAAmB;IAC7B,GAAG,QAAQ;IACX,GAAG,QAAQ;IACX,GAAG,QAAQ;IACX,GAAG,QAAQ;IACX,KAAK,UAAU;IACf,mBAAmB,wBAAwB;IAC3C,WAAW,gBAAgB;IAC3B,eAAe,oBAAoB;IACnC,UAAU,eAAe;IACzB,WAAW,gBAAgB;IAC3B,gBAAgB,qBAAqB;IACrC,oBAAoB,yBAAyB;CAC9C"}
