@@ -19,18 +19,18 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VITE="$ROOT/node_modules/.bin/vite"
 TSC="$ROOT/node_modules/.bin/tsc"
 
-if [ ! -x "$VITE" ] || [ ! -x "$TSC" ]; then
-  echo "node_modules/.bin/{vite,tsc} missing — run bash deno-spike/prepare-deno-deps.sh first" >&2
-  exit 1
-fi
-
-# If the pre-built frontend bundle is already committed (deploy branches do this
-# to fit under Deno Deploy's 5-min build cap), skip the entire vite chain.
-# Override with FORCE_FRONTEND_REBUILD=1 to rebuild anyway.
+# Short-circuit BEFORE the vite/tsc check — Deploy installs without devDeps,
+# so vite/tsc binaries aren't available there. The pre-built bundle is what
+# Deploy uses; this script's only job there is to not run.
 if [ -f "$ROOT/packages/twenty-server/src/front/index.html" ] && [ "${FORCE_FRONTEND_REBUILD:-0}" != "1" ]; then
   echo "==> twenty-server/src/front already populated — skipping frontend rebuild"
   echo "    (set FORCE_FRONTEND_REBUILD=1 to rebuild)"
   exit 0
+fi
+
+if [ ! -x "$VITE" ] || [ ! -x "$TSC" ]; then
+  echo "node_modules/.bin/{vite,tsc} missing — run bash deno-spike/prepare-deno-deps.sh first" >&2
+  exit 1
 fi
 
 echo "==> twenty-shared .d.ts (tsc declaration-only, --noCheck)"
