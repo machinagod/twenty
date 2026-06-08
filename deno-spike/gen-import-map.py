@@ -89,6 +89,13 @@ json.dump(root, open('deno.json', 'w'), indent=2)
 
 builtins = ['assert','assert/strict','buffer','child_process','cluster','console','constants','crypto','dgram','diagnostics_channel','dns','dns/promises','domain','events','fs','fs/promises','http','http2','https','inspector','inspector/promises','module','net','os','path','path/posix','path/win32','perf_hooks','process','punycode','querystring','readline','readline/promises','repl','stream','stream/consumers','stream/promises','stream/web','string_decoder','sys','timers','timers/promises','tls','trace_events','tty','url','util','util/types','v8','vm','wasi','worker_threads','zlib','async_hooks']
 member = {'compilerOptions': {'experimentalDecorators': True, 'emitDecoratorMetadata': True},
+          # sloppy-imports: twenty-server's source uses extensionless ts imports
+          # like `from 'src/app.module'` everywhere; on the local CLI we pass
+          # --sloppy-imports, but Deno Deploy runs the entrypoint without it.
+          # Declaring it here applies it to every run of the member workspace.
+          # cron: required by Deno.cron in boot-serve.ts under local dev
+          # (Deploy v2 has cron stable, but declaring it is harmless).
+          'unstable': ['sloppy-imports', 'cron'],
           'imports': {'src/': './src/', **{b: f'node:{b}' for b in builtins}}}
 json.dump(member, open('packages/twenty-server/deno.json', 'w'), indent=2)
 print(f"wrote deno.json (root: {len(imports)} imports incl {len(deep_map)} deep) + member")
