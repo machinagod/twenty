@@ -12,6 +12,14 @@
 // `--unstable-cron` is only needed for local Deno; Deploy v2 has Deno.cron
 // built in.
 
+// Deno Deploy's Prisma database integration injects DATABASE_URL (the
+// connection string) + PG_* env vars at runtime. Twenty's TypeORM
+// datasources + TwentyConfigService read PG_DATABASE_URL specifically.
+// Bridge before anything else loads — datasource modules read env eagerly.
+if (!process.env.PG_DATABASE_URL && process.env.DATABASE_URL) {
+  process.env.PG_DATABASE_URL = process.env.DATABASE_URL;
+}
+
 import 'reflect-metadata';
 
 import { NestFactory } from '@nestjs/core';
