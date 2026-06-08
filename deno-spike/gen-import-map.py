@@ -76,12 +76,15 @@ tasks = {
   # The unified API + Deno.cron entrypoint.
   'serve': 'cd packages/twenty-server && deno run -A --unstable-cron --sloppy-imports boot-serve.ts',
 }
+# Workspace list matches prepare-deno-deps.sh's SERVER_WORKSPACES. Frontend
+# packages are runtime-unused (pre-built bundle ships in twenty-server/src/front)
+# and skipping them speeds up `deno install` + Deploy's module materialization.
+_ws = ['./packages/twenty-server','./packages/twenty-shared','./packages/twenty-emails','./packages/twenty-client-sdk']
+if os.environ.get('DEPLOY_INCLUDE_FRONTEND') == '1':
+    _ws += ['./packages/twenty-front','./packages/twenty-ui','./packages/twenty-front-component-renderer']
 root = {
   'nodeModulesDir': 'auto',
-  'workspace': ['./packages/twenty-server', './packages/twenty-shared',
-                './packages/twenty-emails', './packages/twenty-client-sdk',
-                './packages/twenty-front', './packages/twenty-ui',
-                './packages/twenty-front-component-renderer'],
+  'workspace': _ws,
   # sloppy-imports applies to every entrypoint Deno resolves under this project.
   # Member deno.json may only narrow flags, not introduce ones the root rejects,
   # so the runtime needs them declared here too.
