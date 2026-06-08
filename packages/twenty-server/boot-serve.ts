@@ -168,16 +168,15 @@ const bootstrap = async (): Promise<NestExpressApplication> => {
   return app;
 };
 
-if (typeof Deno !== 'undefined' && process.env.DENO_DEPLOYMENT_ID) {
-  // On Deno Deploy: kick bootstrap() off but don't await it at top level.
-  // That keeps the warmup phase short (the entrypoint module just registers
-  // the promise) — actual NestJS DI + TypeORM init runs in the background.
-  // Any error inside the promise surfaces via Deploy's logs.
-  bootstrap().catch((err) => {
-    console.error('[boot] bootstrap failed:', err);
-    throw err;
-  });
-} else {
-  // Local: await so Ctrl-C / process.exit semantics are predictable.
-  await bootstrap();
-}
+// Await bootstrap at top level. import defer still does its job during the
+// pre-bootstrap module-eval phase — Deno's static graph parses every deferred
+// module but skips top-level evaluation until `bootstrap()` runs. That gets us
+// past Deploy's warmup module-init budget (previous deploy attempts emitted
+// ~1100 `Initialize <pkg>` lines and silently aborted; with defer they drop
+// to a handful). The actual materialization of the dep graph happens during
+// `bootstrap()`, after Deploy considers the entrypoint warm.
+//
+// Top-level-await is REQUIRED on Deno Deploy — without it the entrypoint
+// returns immediately and the runtime exits before NestJS's express listener
+// binds the port, which Deploy reports as "failed (error)".
+await bootstrap();
