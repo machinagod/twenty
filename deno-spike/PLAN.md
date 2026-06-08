@@ -339,6 +339,22 @@ Honest landing zone for the next session:
 2. **Resume the bundle** with a focused MetadataScanner identity dump (instrument `@nestjs/core/discovery/discovery.module` + grep the bundle for duplicate class definitions) — 1-3 hours.
 3. **Local + GitHub-source ↔ Yarn workflow** continues to work unchanged.
 
+Deno 2.8 `import defer` experiment (slice 3.17) — ✅ TECHNIQUE PROVED, BLOCKED BY DEPLOY RUNTIME. Per the Deno 2.8 release notes (`https://deno.com/blog/v2.8#import-defer`), the TC39 import defer proposal lets a module parse into the static graph but skip top-level evaluation until something touches its namespace. Hypothesis: Deploy's deploying-phase materialization should also honor it.
+
+Measured on `machinagod/twenty-deno`:
+
+| Approach | `deploying` log lines | Outcome |
+|---|---|---|
+| Eager `import { ... } from ...` (original) | ~1102 `Initialize <pkg>` | Silent abort around module 1100 — the wall |
+| `import defer * as ns from ...` (TC39 syntax) | **5** | Deploy's graph walker honors defer (wall vanishes). Revision still failed with `EVENT_ITERATOR_VALIDATION_FAILED` because Deploy's runtime is pre-2.8 and can't parse the syntax. |
+| `await import(...)` with literal specifier | ~1082 | No help — Deno resolves literal-string dynamic imports statically; same wall |
+
+So `import defer` is exactly the right hammer for this nail. The only thing left is Deploy's runtime shipping Deno 2.8. Per https://docs.deno.com/deploy/reference/runtime/ Deploy is on 2.5.0 (one recent build showed 2.7.8, so docs may lag; either way pre-2.8). No CLI/`deno.json` flag exposes a runtime version pin.
+
+`boot-serve.ts` currently uses dynamic `await import()` inside an awaited `bootstrap()`. That's a no-op on Deploy's graph walker but is a one-line swap to `import defer` the moment Deploy's runtime catches up — keep the structure as-is so the upgrade is trivial. Local boot (Deno 2.8.2) runs cleanly either way.
+
+`deno pack` (slice 3.18) — DEFERRED. Replacing the `tsc --noCheck` + `vite build` chain for the workspace dists with `deno pack` would require a layout change: `pack` emits a `.tgz` (npm-publishable), the dists are read from `packages/<pkg>/dist/` trees. Worth it once we're past the materialization wall and can iterate. The committed dists on the deploy branch already work as-is.
+
 ### Reproduce the boot (local session handoff)
 1. Install Deno; clone the branch `claude/wire-pg-driver-twenty-nj6xy`.
 2. `bash deno-spike/prepare-deno-deps.sh` (scopes workspaces, de-patches, deno install, dedups variants, builds twenty-shared/emails/client-sdk, generates deno.json). NOTE: this MUTATES root + twenty-server package.json (revert with `git checkout` to return to Yarn mode).
