@@ -102,7 +102,15 @@ print('initial deno.json: workspace =', ws)
 "
 
 echo "running deno install ..."
-deno install
+# --prod skips devDependencies on Deploy where jest/eslint/etc. would
+# otherwise be materialized into the read-only filesystem and burn the
+# 5-min build cap. Local dev rebuilds (FORCE_FRONTEND_REBUILD=1) need
+# vite + tsc — keep dev deps with DEPLOY_INCLUDE_FRONTEND=1.
+if [ "${DEPLOY_INCLUDE_FRONTEND:-0}" = "1" ]; then
+  deno install
+else
+  deno install --prod
+fi
 
 # Node-style workspace symlinks. Deno's node_modules layout resolves workspace members
 # its own way, but Node-based build tools (vite) need real node_modules/<pkg> symlinks
