@@ -1,7 +1,7 @@
 # Twenty → Pure Deno Deploy (PG-only) — Migration Plan
 
-> **Status:** Phase 1 ✅. Phase 2 ✅. Phase 3 ✅ (entrypoint + vite-built frontend served by Deno + DB migrated + Chrome E2E auth flow). Jest suite ✅ (5601/5610 passing). Phase 3.14 in progress: deploying from GitHub source to `machinagod/twenty-deno` (Deno Deploy CLI has no `--branch`, so deploys follow the default branch; main = our deno-spike tip).
-> **Last updated:** 2026-06-07
+> **Status:** Phase 1 ✅. Phase 2 ✅. Phase 3 ✅ locally (entrypoint + vite-built frontend served by Deno + DB migrated + Chrome E2E auth flow + jest 5601/5610). **Production Deno Deploy is plan-blocked** (slices 3.14–3.16): the 3541-package npm graph exceeds the free-tier deployment-phase materialization (~1100 modules), and the esbuild-bundle workaround hits a NestJS DI reflection wall before reaching HTTP serving. Local stack remains fully functional.
+> **Last updated:** 2026-06-08
 > **Scope owner:** Ricardo A
 > **Home of this initiative:** `deno-spike/` (spike + this plan). The real port
 > will eventually live in the main packages; this folder is the scratch/proof + planning hub.
@@ -310,6 +310,34 @@ Paths forward (any one unblocks):
 1. **Plan upgrade** — 30-min build timeout + larger upload limit. The minimum viable for Twenty on this CLI flow.
 2. **`--source github`** — push the prepared branch, let Deploy clone server-side; bypasses the local-upload cap (build cap still applies, so plan upgrade likely still needed).
 3. **Server bundle** — esbuild/deno_emit twenty-server into one file (drops file count to ~10) AND pre-build everything locally → Deploy needs only ~50 MB and a `:` install/build. Violates the "PURE DENO — Deno runs the TS source directly" §1 constraint, so only as a last resort.
+
+GitHub-source deploy (slice 3.15) — ✅ ATTEMPTED. New org `machinagod` (free token from higitotal/.env), app `twenty-deno` (id `a91de349-87da-49ba-951f-f166350abfa0`), `--source github --owner machinagod --repo twenty`. Deploy follows the repo's default branch — pushed our spike commits to `main` (fast-forward from `186d5b8faa`). API for log inspection: `GET /v2/apps/<id>/revisions` + `GET /v2/revisions/<id>/build_logs` + `.../progress` with `Authorization: Bearer ddo_…`. Iteratively fixed:
+- `tsc --noCheck` on twenty-shared `.d.ts` emit — Deploy's tsc env hit a `number|null|undefined` narrowing case (class-validator's `isDefined` has no type predicate) that locally narrowed correctly.
+- Order bug in `build-frontend.sh` — the vite/tsc-binary check ran BEFORE the pre-built-bundle short-circuit, so it errored on Deploy where dev-deps aren't installed.
+- Stripped devDependencies before `deno install` (no `--prod` flag on Deploy's Deno version): jest, eslint, swc/cli, lingui/cli, etc. drop their transitive trees. Cuts install + `deploying`-phase enumeration substantially.
+- Committed `twenty-shared/dist`, `twenty-emails/dist`, `twenty-client-sdk/dist`, and the **pre-built `packages/twenty-server/src/front/`** to the deploy branch (overrode each package's `dist`-only `.gitignore`). With dev-deps stripped, vite isn't available on Deploy — these dists are what twenty-server imports at runtime.
+- Added `unstable: ["sloppy-imports", "cron"]` to the ROOT `deno.json` (member-level is rejected with a warning) so the bare `from 'src/app.module'` imports resolve.
+- Added the **DATABASE_URL → PG_DATABASE_URL bridge** at the top of `boot-serve.ts` (Deploy's Prisma assignment injects `DATABASE_URL`; Twenty reads `PG_DATABASE_URL`).
+- Provisioned + assigned a Prisma Postgres database (`twenty-pg`) to the app. Env vars set: `MESSAGE_QUEUE_DRIVER_TYPE=pg`, `CACHE_STORAGE_TYPE=memory`, `SESSION_STORAGE_TYPE=memory`, `PUB_SUB_DRIVER_TYPE=postgres`, `NODE_ENV=production`, plus `APP_SECRET` (secret).
+
+Result: install + build cleared every blocker we hit. `deploying` step then materializes the resolved npm graph — and **fails silently around module ~1100 of 3541** (every Twenty deploy attempt died at this same point; a 1-file `Deno.serve` hello-world over the same setup uploads + serves cleanly, confirming it's payload-specific). Free Deploy plan's per-deployment dependency-graph budget is the hard wall.
+
+Server bundle attempt (slice 3.16) — ⚠️ HIT NESTJS DI WALL. `deno-spike/bundle-server.mjs` (esbuild) collapses 3541 packages → one 103.5 MB `.mjs`. Bundle loads through `AppModule dependencies initialized` and fails on `Nest can't resolve dependencies of the ResolversExplorerService (MetadataScanner at index [1])`. Bundle-level fixes that DID land:
+- `@swc/core` plugin with `legacyDecorator: true` + `decoratorMetadata: true` (esbuild's built-in TS transform drops the type info before the decorator-metadata pass; TypeORM's `ColumnTypeUndefinedError` is the classic symptom).
+- Node-builtins-as-`node:` plugin (Deno rejects bare `import 'buffer'` with `Import "buffer" not a dependency`).
+- `globalThis.require = createRequire(import.meta.url)` + `__dirname` / `__filename` ESM bridges in the banner so dynamic `require("node:stream")` calls in bundled CJS (NestJS, TypeORM) work.
+- `@lingui/{core,react}/macro` rewritten to the runtime shim (esbuild's `alias` field is bypassed when a package's `exports` field redirects the subpath — caught both bare specifier and resolved file path via `onResolve`).
+- Deep extension-less npm subpaths (`typeorm/error/EntityNotFoundError`, `graphql/lang/…`) resolved by walking `node_modules` manually.
+- `bcrypt` → `bcryptjs` alias (native `.node` binding can't be bundled).
+- `sdk-client-package-dirname` shimmed to a static built-mode constant (dev branch uses `require.resolve('twenty-client-sdk/core')` which fails in the bundle's runtime).
+- `jsdom`, `listr`/`any-observable`/`@samverschueren/stream-to-observable`, `@genql/cli`, `@graphql-codegen/*`, `bullmq`, `ioredis`, optional NestJS adapters (`@nestjs/microservices`/`websockets`/`mongoose`), `@apollo/subgraph`, `@mikro-orm/core`, `@fastify/static` stubbed via a non-throwing Proxy (deno-mode doesn't execute them, but the throwing variant broke DI which constructs them anyway).
+
+Remaining bundle blocker is the standard esbuild + NestJS reflection split — DiscoveryModule's `MetadataScanner` provider isn't reachable from `@nestjs/graphql`'s `ResolversExplorerService` after bundling. Likely class-identity divergence between two `@nestjs/core` paths in the bundle, or a missing dynamic provider. Bounded fix, not attempted in this slice.
+
+Honest landing zone for the next session:
+1. **Plan upgrade** clears slice 3.15's wall directly and keeps the §1 "pure-Deno-source" architecture.
+2. **Resume the bundle** with a focused MetadataScanner identity dump (instrument `@nestjs/core/discovery/discovery.module` + grep the bundle for duplicate class definitions) — 1-3 hours.
+3. **Local + GitHub-source ↔ Yarn workflow** continues to work unchanged.
 
 ### Reproduce the boot (local session handoff)
 1. Install Deno; clone the branch `claude/wire-pg-driver-twenty-nj6xy`.
