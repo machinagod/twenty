@@ -101,16 +101,31 @@ open('/tmp/ws-list','w').write(' '.join(p.split('/')[-1] for p in ws if p != 'pa
 print('initial deno.json: workspace =', ws)
 "
 
-echo "running deno install ..."
-# --prod skips devDependencies on Deploy where jest/eslint/etc. would
-# otherwise be materialized into the read-only filesystem and burn the
-# 5-min build cap. Local dev rebuilds (FORCE_FRONTEND_REBUILD=1) need
-# vite + tsc — keep dev deps with DEPLOY_INCLUDE_FRONTEND=1.
-if [ "${DEPLOY_INCLUDE_FRONTEND:-0}" = "1" ]; then
-  deno install
-else
-  deno install --prod
+# Production-only mode on Deno Deploy: strip devDependencies from every
+# scoped package.json before `deno install`. jest/eslint/swc-cli/lingui-cli
+# etc. aren't imported at runtime and their transitive trees would burn
+# Deploy's 5-min build cap during the `deploying` step. `deno install --prod`
+# isn't available on Deploy's Deno version, so we mutate manifests instead.
+# Local rebuilds (DEPLOY_INCLUDE_FRONTEND=1) skip this so vite/tsc stay.
+if [ "${DEPLOY_INCLUDE_FRONTEND:-0}" != "1" ]; then
+  python3 - <<'PY'
+import json
+for p in ['package.json','packages/twenty-server/package.json',
+          'packages/twenty-shared/package.json','packages/twenty-emails/package.json',
+          'packages/twenty-client-sdk/package.json']:
+  try:
+    j = json.load(open(p))
+  except FileNotFoundError:
+    continue
+  if 'devDependencies' in j:
+    n = len(j['devDependencies']); del j['devDependencies']
+    json.dump(j, open(p,'w'), indent=2)
+    print(f'  stripped {n} devDeps from {p}')
+PY
 fi
+
+echo "running deno install ..."
+deno install
 
 # Node-style workspace symlinks. Deno's node_modules layout resolves workspace members
 # its own way, but Node-based build tools (vite) need real node_modules/<pkg> symlinks
