@@ -355,6 +355,33 @@ So `import defer` is exactly the right hammer for this nail. The only thing left
 
 `deno pack` (slice 3.18) — DEFERRED. Replacing the `tsc --noCheck` + `vite build` chain for the workspace dists with `deno pack` would require a layout change: `pack` emits a `.tgz` (npm-publishable), the dists are read from `packages/<pkg>/dist/` trees. Worth it once we're past the materialization wall and can iterate. The committed dists on the deploy branch already work as-is.
 
+Split-entrypoint trick (slice 3.19) — ✅ DEPLOYING-PHASE WALL CLEARED. Insight: Deno Deploy's deploying phase pre-compiles every module statically reachable from the entrypoint, but it can only follow LITERAL-STRING dynamic-import specifiers. Move all heavy NestJS / TypeORM / GraphQL imports into a separate `boot-handler.ts`, and load it from `boot-serve.ts` via a runtime-computed specifier:
+```ts
+// boot-serve.ts (statically tiny — only node:buffer/stream + the Express bridge)
+const HANDLER_PATH = (() => {
+  const parts = [Deno.env.get('TWENTY_HANDLER_PREFIX') ?? './boot-', 'handler', '.ts'];
+  return parts.join('');
+})();
+let bootPromise: Promise<{ express: ExpressApp }> | null = null;
+const ensureBoot = () => bootPromise ??= (async () => {
+  const mod = await import(HANDLER_PATH);
+  return mod.bootHandler();
+})();
+Deno.serve(async (req) => bridgeRequest((await ensureBoot()).express, req));
+```
+The deploy-phase graph walker can't statically resolve `parts.join('')`, so the entire NestJS subtree is invisible to it. First HTTP request triggers the dynamic import + NestJS bootstrap + Express handler bridge through `Deno.serve`. The Web Request → Express handler bridge is inline at the bottom of `boot-serve.ts` (Express is just a `(req, res, next)` function; we synthesize node http req/res from the Web Request).
+
+Result: `https://twenty-deno.machinagod.deno.net/` resolves. Build succeeded (rev `3f745jh9kmzx`). Deno.serve is bound at top level so warmup completes immediately — exactly the optimization the user pointed at.
+
+**New wall: runtime isolate memory.** Once Deno.serve receives a request and dynamically loads `boot-handler.ts`, NestJS DI starts walking its 952-package graph. The isolate dies with `Isolate terminated: memory limit exceeded` part-way through. Twenty's hot graph genuinely exceeds the free-tier isolate memory cap (~512MB). The fix is a plan upgrade — `paid` tiers raise the memory limit. No CLI/`deno.json` flag exposes a per-app memory override on free.
+
+So the structural-mismatch picture is now precise:
+- ✅ Module count / deployment-phase materialization: solved via split entrypoint + runtime-computed import path (slice 3.19).
+- ✅ Build-timeout cap (5 min): solved via committed pre-built dists + dev-deps stripped (slice 3.15).
+- ⚠️ Runtime isolate memory (~512 MB free tier): blocking. Twenty's eager DI graph at module-init time exceeds it. Plan upgrade is the unblock.
+
+For the next session: the deploy app, all build infra, and the live URL are all wired. A higher-tier paid Deploy plan should turn this green end-to-end.
+
 ### Reproduce the boot (local session handoff)
 1. Install Deno; clone the branch `claude/wire-pg-driver-twenty-nj6xy`.
 2. `bash deno-spike/prepare-deno-deps.sh` (scopes workspaces, de-patches, deno install, dedups variants, builds twenty-shared/emails/client-sdk, generates deno.json). NOTE: this MUTATES root + twenty-server package.json (revert with `git checkout` to return to Yarn mode).
