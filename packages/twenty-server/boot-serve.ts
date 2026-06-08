@@ -2,13 +2,18 @@
 // (Node-compat) + Deno.cron heartbeats (queue drain + schedule eval + retention
 // cleanup). Replaces main.ts + queue-worker.ts in the "deno mode" target.
 //
-// Deno 2.8 `import defer` (https://deno.com/blog/v2.8#import-defer):
-// every heavy npm/source module is loaded with `import defer * as ns from …`.
-// Deno parses each one into the static graph but skips top-level evaluation
-// until something touches the namespace. The actual touches happen inside
-// `bootstrap()`, which on Deno Deploy is kicked off asynchronously after the
-// entrypoint's top-level code returns (so it runs past the warmup window),
-// or awaited immediately when run from a local terminal.
+// Lazy-loading every heavy module via dynamic `await import(…)` inside
+// `bootstrap()` keeps Deno Deploy's warmup phase short. The previous eager-
+// imports version had Deploy evaluating ~1100 npm packages during the
+// `deploying` step before silently aborting; with dynamic imports the
+// deploying step does ~5 log lines (pre-deploy + entrypoint module ready)
+// and the heavy materialization runs after the platform considers the
+// entrypoint warm.
+//
+// Used dynamic `import()` rather than TC39 `import defer` because Deploy's
+// runtime (Deno 2.7.x as of this writing) doesn't yet parse the `import
+// defer` syntax — locally on Deno 2.8 it worked; on Deploy it produced an
+// `EVENT_ITERATOR_VALIDATION_FAILED` internal error with no useful log.
 //
 // Local:
 //   env NODE_ENV=development APP_SECRET=… PG_DATABASE_URL=… \
@@ -16,11 +21,6 @@
 //     SESSION_STORAGE_TYPE=memory PUB_SUB_DRIVER_TYPE=postgres \
 //     NODE_PORT=3000 \
 //     deno run -A --unstable-cron --sloppy-imports boot-serve.ts
-//
-// Deno Deploy: detected via DENO_DEPLOYMENT_ID. NestJS owns its own listener
-// via `app.listen(PORT)`; Deploy's platform wires the externally-bound port
-// to that. We DO NOT call Deno.serve from here (it would race the Express
-// listener).
 
 // Deno Deploy's Prisma integration injects DATABASE_URL; Twenty reads
 // PG_DATABASE_URL. Bridge before ANYTHING else loads — datasource modules
@@ -34,35 +34,49 @@ if (!process.env.PG_DATABASE_URL && process.env.DATABASE_URL) {
 // decorator under the AppModule tree expects to exist at decoration time.
 import 'reflect-metadata';
 
-// Deferred imports. None of these get evaluated until `bootstrap()` is called.
-// Warmup walks past these without instantiating the NestJS DI container,
-// TypeORM data sources, or the rest of the heavy dependency graph.
-import defer * as nestCore from '@nestjs/core';
-import defer * as classValidator from 'class-validator';
-import defer * as expressSessionNs from 'express-session';
-import defer * as nodePathDefer from 'node:path';
-import defer * as nodeFsDefer from 'node:fs';
-import defer * as nodeUrlDefer from 'node:url';
-
-import defer * as appModuleNs from 'src/app.module';
-import defer * as loggerNs from 'src/engine/core-modules/logger/logger.service';
-import defer * as queueConstantsNs from 'src/engine/core-modules/message-queue/message-queue.constants';
-import defer * as queueOptionsNs from 'src/engine/core-modules/message-queue/interfaces/message-queue-module-options.interface';
-import defer * as pgDriverNs from 'src/engine/core-modules/message-queue/drivers/pg.driver';
-import defer * as sessionFactoryNs from 'src/engine/core-modules/session-storage/session-storage.module-factory';
-import defer * as configServiceNs from 'src/engine/core-modules/twenty-config/twenty-config.service';
-import defer * as configTransformersNs from 'src/engine/core-modules/twenty-config/utils/config-transformers.util';
-import defer * as filterNs from 'src/filters/unhandled-exception.filter';
-
 import type { NestExpressApplication } from '@nestjs/platform-express';
 
 const bootstrap = async (): Promise<NestExpressApplication> => {
-  // Each `.X` access on a deferred namespace triggers evaluation of that
-  // module + its dep subtree. Keeping the touches inside this function is
-  // what keeps warmup quiet on Deno Deploy.
-  const { NestFactory } = nestCore;
-  const { useContainer } = classValidator;
-  const session = expressSessionNs.default;
+  // Resolve every heavy dep dynamically. The promise list runs in parallel so
+  // module download + parse latency stacks, not sums. Each await blocks only
+  // on its own subtree.
+  const [
+    nestCoreNs,
+    classValidatorNs,
+    expressSessionNs,
+    nodePath,
+    nodeFs,
+    nodeUrl,
+    appModuleNs,
+    loggerNs,
+    queueConstantsNs,
+    queueOptionsNs,
+    pgDriverNs,
+    sessionFactoryNs,
+    configServiceNs,
+    configTransformersNs,
+    filterNs,
+  ] = await Promise.all([
+    import('@nestjs/core'),
+    import('class-validator'),
+    import('express-session'),
+    import('node:path'),
+    import('node:fs'),
+    import('node:url'),
+    import('src/app.module'),
+    import('src/engine/core-modules/logger/logger.service'),
+    import('src/engine/core-modules/message-queue/message-queue.constants'),
+    import('src/engine/core-modules/message-queue/interfaces/message-queue-module-options.interface'),
+    import('src/engine/core-modules/message-queue/drivers/pg.driver'),
+    import('src/engine/core-modules/session-storage/session-storage.module-factory'),
+    import('src/engine/core-modules/twenty-config/twenty-config.service'),
+    import('src/engine/core-modules/twenty-config/utils/config-transformers.util'),
+    import('src/filters/unhandled-exception.filter'),
+  ]);
+
+  const { NestFactory } = nestCoreNs;
+  const { useContainer } = classValidatorNs;
+  const session = (expressSessionNs as { default: typeof import('express-session') }).default;
   const { AppModule } = appModuleNs;
   const { LoggerService } = loggerNs;
   const { QUEUE_DRIVER } = queueConstantsNs;
@@ -98,13 +112,13 @@ const bootstrap = async (): Promise<NestExpressApplication> => {
   // SPA fallback — register Express middleware BEFORE listen so it sits ahead
   // of Nest's catch-all NotFoundException. Read the file once at boot and
   // send the bytes directly (Deno's node-compat res.sendFile is flaky).
-  const dir = nodePathDefer.resolve(
-    nodePathDefer.dirname(nodeUrlDefer.fileURLToPath(import.meta.url)),
+  const dir = nodePath.resolve(
+    nodePath.dirname(nodeUrl.fileURLToPath(import.meta.url)),
     'src/front',
   );
-  const idx = nodePathDefer.join(dir, 'index.html');
-  if (nodeFsDefer.existsSync(idx)) {
-    const body = nodeFsDefer.readFileSync(idx, 'utf8');
+  const idx = nodePath.join(dir, 'index.html');
+  if (nodeFs.existsSync(idx)) {
+    const body = nodeFs.readFileSync(idx, 'utf8');
     const apiPrefixes = [
       '/graphql', '/metadata', '/admin-panel',
       '/rest', '/mcp', '/auth', '/oauth', '/api', '/webhooks',
@@ -168,15 +182,7 @@ const bootstrap = async (): Promise<NestExpressApplication> => {
   return app;
 };
 
-// Await bootstrap at top level. import defer still does its job during the
-// pre-bootstrap module-eval phase — Deno's static graph parses every deferred
-// module but skips top-level evaluation until `bootstrap()` runs. That gets us
-// past Deploy's warmup module-init budget (previous deploy attempts emitted
-// ~1100 `Initialize <pkg>` lines and silently aborted; with defer they drop
-// to a handful). The actual materialization of the dep graph happens during
-// `bootstrap()`, after Deploy considers the entrypoint warm.
-//
-// Top-level-await is REQUIRED on Deno Deploy — without it the entrypoint
-// returns immediately and the runtime exits before NestJS's express listener
-// binds the port, which Deploy reports as "failed (error)".
+// Top-level-await keeps the entrypoint alive while NestJS's express listener
+// binds the port. import-defer / dynamic-import only delays evaluation — it
+// doesn't change what bootstrap() ultimately materializes.
 await bootstrap();
