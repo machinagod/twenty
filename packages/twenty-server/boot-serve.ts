@@ -2,117 +2,109 @@
 // (Node-compat) + Deno.cron heartbeats (queue drain + schedule eval + retention
 // cleanup). Replaces main.ts + queue-worker.ts in the "deno mode" target.
 //
-// Run from packages/twenty-server/:
+// Deno 2.8 `import defer` (https://deno.com/blog/v2.8#import-defer):
+// every heavy npm/source module is loaded with `import defer * as ns from …`.
+// Deno parses each one into the static graph but skips top-level evaluation
+// until something touches the namespace. The actual touches happen inside
+// `bootstrap()`, which on Deno Deploy is kicked off asynchronously after the
+// entrypoint's top-level code returns (so it runs past the warmup window),
+// or awaited immediately when run from a local terminal.
+//
+// Local:
 //   env NODE_ENV=development APP_SECRET=… PG_DATABASE_URL=… \
 //     MESSAGE_QUEUE_DRIVER_TYPE=pg CACHE_STORAGE_TYPE=memory \
 //     SESSION_STORAGE_TYPE=memory PUB_SUB_DRIVER_TYPE=postgres \
 //     NODE_PORT=3000 \
 //     deno run -A --unstable-cron --sloppy-imports boot-serve.ts
 //
-// `--unstable-cron` is only needed for local Deno; Deploy v2 has Deno.cron
-// built in.
+// Deno Deploy: detected via DENO_DEPLOYMENT_ID. NestJS owns its own listener
+// via `app.listen(PORT)`; Deploy's platform wires the externally-bound port
+// to that. We DO NOT call Deno.serve from here (it would race the Express
+// listener).
 
-// Deno Deploy's Prisma database integration injects DATABASE_URL (the
-// connection string) + PG_* env vars at runtime. Twenty's TypeORM
-// datasources + TwentyConfigService read PG_DATABASE_URL specifically.
-// Bridge before anything else loads — datasource modules read env eagerly.
+// Deno Deploy's Prisma integration injects DATABASE_URL; Twenty reads
+// PG_DATABASE_URL. Bridge before ANYTHING else loads — datasource modules
+// read the env eagerly at module-load time.
 if (!process.env.PG_DATABASE_URL && process.env.DATABASE_URL) {
   process.env.PG_DATABASE_URL = process.env.DATABASE_URL;
 }
 
+// reflect-metadata HAS to load eagerly — it installs `Reflect.metadata` and
+// the related polyfills as a side-effect that every NestJS / TypeORM
+// decorator under the AppModule tree expects to exist at decoration time.
 import 'reflect-metadata';
 
-import { NestFactory } from '@nestjs/core';
-import { type NestExpressApplication } from '@nestjs/platform-express';
-import { useContainer } from 'class-validator';
-import session from 'express-session';
+// Deferred imports. None of these get evaluated until `bootstrap()` is called.
+// Warmup walks past these without instantiating the NestJS DI container,
+// TypeORM data sources, or the rest of the heavy dependency graph.
+import defer * as nestCore from '@nestjs/core';
+import defer * as classValidator from 'class-validator';
+import defer * as expressSessionNs from 'express-session';
+import defer * as nodePathDefer from 'node:path';
+import defer * as nodeFsDefer from 'node:fs';
+import defer * as nodeUrlDefer from 'node:url';
 
-import { AppModule } from 'src/app.module';
-import { LoggerService } from 'src/engine/core-modules/logger/logger.service';
-import { QUEUE_DRIVER } from 'src/engine/core-modules/message-queue/message-queue.constants';
-import { MessageQueueDriverType } from 'src/engine/core-modules/message-queue/interfaces/message-queue-module-options.interface';
-import { PgDriver } from 'src/engine/core-modules/message-queue/drivers/pg.driver';
-import { getSessionStorageOptions } from 'src/engine/core-modules/session-storage/session-storage.module-factory';
-import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
-import { configTransformers } from 'src/engine/core-modules/twenty-config/utils/config-transformers.util';
-import { UnhandledExceptionFilter } from 'src/filters/unhandled-exception.filter';
+import defer * as appModuleNs from 'src/app.module';
+import defer * as loggerNs from 'src/engine/core-modules/logger/logger.service';
+import defer * as queueConstantsNs from 'src/engine/core-modules/message-queue/message-queue.constants';
+import defer * as queueOptionsNs from 'src/engine/core-modules/message-queue/interfaces/message-queue-module-options.interface';
+import defer * as pgDriverNs from 'src/engine/core-modules/message-queue/drivers/pg.driver';
+import defer * as sessionFactoryNs from 'src/engine/core-modules/session-storage/session-storage.module-factory';
+import defer * as configServiceNs from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import defer * as configTransformersNs from 'src/engine/core-modules/twenty-config/utils/config-transformers.util';
+import defer * as filterNs from 'src/filters/unhandled-exception.filter';
 
-const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-  cors: { exposedHeaders: ['WWW-Authenticate'] },
-  rawBody: true,
-});
+import type { NestExpressApplication } from '@nestjs/platform-express';
 
-const logger = app.get(LoggerService);
-const config = app.get(TwentyConfigService);
+const bootstrap = async (): Promise<NestExpressApplication> => {
+  // Each `.X` access on a deferred namespace triggers evaluation of that
+  // module + its dep subtree. Keeping the touches inside this function is
+  // what keeps warmup quiet on Deno Deploy.
+  const { NestFactory } = nestCore;
+  const { useContainer } = classValidator;
+  const session = expressSessionNs.default;
+  const { AppModule } = appModuleNs;
+  const { LoggerService } = loggerNs;
+  const { QUEUE_DRIVER } = queueConstantsNs;
+  const { MessageQueueDriverType } = queueOptionsNs;
+  const { PgDriver } = pgDriverNs;
+  const { getSessionStorageOptions } = sessionFactoryNs;
+  const { TwentyConfigService } = configServiceNs;
+  const { configTransformers } = configTransformersNs;
+  const { UnhandledExceptionFilter } = filterNs;
 
-const trustProxyRaw = config.get('TRUST_PROXY');
-const trustProxy = /^\d+$/.test(trustProxyRaw)
-  ? Number(trustProxyRaw)
-  : (configTransformers.boolean(trustProxyRaw) ?? trustProxyRaw);
-app.set('trust proxy', trustProxy);
-
-app.use(session(getSessionStorageOptions(config)));
-useContainer(app.select(AppModule), { fallbackOnErrors: true });
-app.useLogger(logger);
-app.useGlobalFilters(new UnhandledExceptionFilter());
-app.useBodyParser('json', { limit: '20mb' });
-app.useBodyParser('urlencoded', { limit: '20mb', extended: true });
-app.useBodyParser('text', { type: 'text/plain', limit: '1024kb' });
-
-// --- Deno.cron heartbeats (PG driver only) ---------------------------------
-const driverType = config.get('MESSAGE_QUEUE_DRIVER_TYPE');
-if (driverType === MessageQueueDriverType.Pg && typeof Deno?.cron === 'function') {
-  const driver = app.get(QUEUE_DRIVER) as PgDriver;
-
-  Deno.cron('twenty-drain', '* * * * *', async () => {
-    try {
-      const n = await driver.drainAll();
-      if (n > 0) logger.log(`[cron] drained ${n} job(s)`, 'DenoCron');
-    } catch (err) {
-      logger.error(`[cron] drain failed: ${(err as Error).message}`, undefined, 'DenoCron');
-    }
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: { exposedHeaders: ['WWW-Authenticate'] },
+    rawBody: true,
   });
 
-  Deno.cron('twenty-schedule', '* * * * *', async () => {
-    try {
-      const n = await driver.runDueSchedules();
-      if (n > 0) logger.log(`[cron] enqueued ${n} scheduled job(s)`, 'DenoCron');
-    } catch (err) {
-      logger.error(`[cron] schedule failed: ${(err as Error).message}`, undefined, 'DenoCron');
-    }
-  });
+  const logger = app.get(LoggerService);
+  const config = app.get(TwentyConfigService);
 
-  // Hourly retention sweep keeps the table bounded.
-  Deno.cron('twenty-cleanup', '0 * * * *', async () => {
-    try {
-      const n = await driver.cleanup();
-      if (n > 0) logger.log(`[cron] retention removed ${n} job(s)`, 'DenoCron');
-    } catch (err) {
-      logger.error(`[cron] cleanup failed: ${(err as Error).message}`, undefined, 'DenoCron');
-    }
-  });
+  const trustProxyRaw = config.get('TRUST_PROXY');
+  const trustProxy = /^\d+$/.test(trustProxyRaw)
+    ? Number(trustProxyRaw)
+    : (configTransformers.boolean(trustProxyRaw) ?? trustProxyRaw);
+  app.set('trust proxy', trustProxy);
 
-  logger.log('PG driver + Deno.cron heartbeats registered (drain/schedule/cleanup)', 'Bootstrap');
-}
+  app.use(session(getSessionStorageOptions(config)));
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  app.useLogger(logger);
+  app.useGlobalFilters(new UnhandledExceptionFilter());
+  app.useBodyParser('json', { limit: '20mb' });
+  app.useBodyParser('urlencoded', { limit: '20mb', extended: true });
+  app.useBodyParser('text', { type: 'text/plain', limit: '1024kb' });
 
-// SPA fallback — register Express middleware BEFORE listen so it sits ahead of
-// Nest's catch-all NotFoundException. sendFile() can be flaky under Deno's
-// node-compat (path resolution, callback shape), so read the file once at
-// boot and send the bytes directly. Static assets under /assets, /images, /etc
-// are still served by ServeStaticModule which Nest mounts during init.
-{
-  const nodePath = await import('node:path');
-  const fs = await import('node:fs');
-  const url = await import('node:url');
-  const frontDir = nodePath.resolve(
-    nodePath.dirname(url.fileURLToPath(import.meta.url)),
+  // SPA fallback — register Express middleware BEFORE listen so it sits ahead
+  // of Nest's catch-all NotFoundException. Read the file once at boot and
+  // send the bytes directly (Deno's node-compat res.sendFile is flaky).
+  const dir = nodePathDefer.resolve(
+    nodePathDefer.dirname(nodeUrlDefer.fileURLToPath(import.meta.url)),
     'src/front',
   );
-  const frontIndex = nodePath.join(frontDir, 'index.html');
-  if (fs.existsSync(frontIndex)) {
-    const html = fs.readFileSync(frontIndex, 'utf8');
-    // Anything under these prefixes is API/asset territory — pass to Nest.
-    // Everything else is an SPA route → serve index.html.
+  const idx = nodePathDefer.join(dir, 'index.html');
+  if (nodeFsDefer.existsSync(idx)) {
+    const body = nodeFsDefer.readFileSync(idx, 'utf8');
     const apiPrefixes = [
       '/graphql', '/metadata', '/admin-panel',
       '/rest', '/mcp', '/auth', '/oauth', '/api', '/webhooks',
@@ -130,12 +122,62 @@ if (driverType === MessageQueueDriverType.Pg && typeof Deno?.cron === 'function'
       }
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.status(200);
-      res.send(html);
+      res.send(body);
     }) as never);
-    logger.log(`SPA fallback wired (serving ${frontIndex}, ${html.length} bytes)`, 'Bootstrap');
+    logger.log(`SPA fallback wired (serving ${idx}, ${body.length} bytes)`, 'Bootstrap');
   }
-}
 
-const port = config.get('NODE_PORT') ?? 3000;
-await app.listen(port);
-logger.log(`Listening on http://localhost:${port}`, 'Bootstrap');
+  // --- Deno.cron heartbeats (PG driver only) -------------------------------
+  const driverType = config.get('MESSAGE_QUEUE_DRIVER_TYPE');
+  if (driverType === MessageQueueDriverType.Pg && typeof Deno?.cron === 'function') {
+    const driver = app.get(QUEUE_DRIVER) as InstanceType<typeof PgDriver>;
+
+    Deno.cron('twenty-drain', '* * * * *', async () => {
+      try {
+        const n = await driver.drainAll();
+        if (n > 0) logger.log(`[cron] drained ${n} job(s)`, 'DenoCron');
+      } catch (err) {
+        logger.error(`[cron] drain failed: ${(err as Error).message}`, undefined, 'DenoCron');
+      }
+    });
+
+    Deno.cron('twenty-schedule', '* * * * *', async () => {
+      try {
+        const n = await driver.runDueSchedules();
+        if (n > 0) logger.log(`[cron] enqueued ${n} scheduled job(s)`, 'DenoCron');
+      } catch (err) {
+        logger.error(`[cron] schedule failed: ${(err as Error).message}`, undefined, 'DenoCron');
+      }
+    });
+
+    Deno.cron('twenty-cleanup', '0 * * * *', async () => {
+      try {
+        const n = await driver.cleanup();
+        if (n > 0) logger.log(`[cron] retention removed ${n} job(s)`, 'DenoCron');
+      } catch (err) {
+        logger.error(`[cron] cleanup failed: ${(err as Error).message}`, undefined, 'DenoCron');
+      }
+    });
+
+    logger.log('PG driver + Deno.cron heartbeats registered (drain/schedule/cleanup)', 'Bootstrap');
+  }
+
+  const port = Number(process.env.PORT ?? config.get('NODE_PORT') ?? 3000);
+  await app.listen(port);
+  logger.log(`Listening on http://localhost:${port}`, 'Bootstrap');
+  return app;
+};
+
+if (typeof Deno !== 'undefined' && process.env.DENO_DEPLOYMENT_ID) {
+  // On Deno Deploy: kick bootstrap() off but don't await it at top level.
+  // That keeps the warmup phase short (the entrypoint module just registers
+  // the promise) — actual NestJS DI + TypeORM init runs in the background.
+  // Any error inside the promise surfaces via Deploy's logs.
+  bootstrap().catch((err) => {
+    console.error('[boot] bootstrap failed:', err);
+    throw err;
+  });
+} else {
+  // Local: await so Ctrl-C / process.exit semantics are predictable.
+  await bootstrap();
+}
