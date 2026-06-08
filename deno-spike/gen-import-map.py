@@ -82,6 +82,10 @@ root = {
                 './packages/twenty-emails', './packages/twenty-client-sdk',
                 './packages/twenty-front', './packages/twenty-ui',
                 './packages/twenty-front-component-renderer'],
+  # sloppy-imports applies to every entrypoint Deno resolves under this project.
+  # Member deno.json may only narrow flags, not introduce ones the root rejects,
+  # so the runtime needs them declared here too.
+  'unstable': ['sloppy-imports', 'cron'],
   'tasks': tasks,
   'imports': imports,
 }
