@@ -103,7 +103,9 @@ const isScopingScalar = (
   return isScopingScalarPrimitive(value);
 };
 
-const isScopingScalarPrimitive = (value: unknown): value is RecordScopingScalar =>
+const isScopingScalarPrimitive = (
+  value: unknown,
+): value is RecordScopingScalar =>
   typeof value === 'string' ||
   typeof value === 'number' ||
   typeof value === 'boolean';
