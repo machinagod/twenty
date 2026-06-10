@@ -24,6 +24,7 @@ import { validateQueryIsPermittedOrThrow } from 'src/engine/twenty-orm/repositor
 import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-select-query-builder';
 import { type WorkspaceSoftDeleteQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-soft-delete-query-builder';
 import { type WorkspaceUpdateQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-update-query-builder';
+import { applyRecordScoping } from 'src/engine/twenty-orm/record-scoping/utils/apply-record-scoping.util';
 import { applyRowLevelPermissionPredicates } from 'src/engine/twenty-orm/utils/apply-row-level-permission-predicates.util';
 import { applyTableAliasOnWhereCondition } from 'src/engine/twenty-orm/utils/apply-table-alias-on-where-condition';
 import { computeEventSelectQueryBuilder } from 'src/engine/twenty-orm/utils/compute-event-select-query-builder.util';
@@ -74,6 +75,7 @@ export class WorkspaceDeleteQueryBuilder<
   override async execute(): Promise<DeleteResult & { generatedMaps: T[] }> {
     try {
       this.applyRowLevelPermissionPredicates();
+      this.applyRecordScoping();
       validateQueryIsPermittedOrThrow({
         expressionMap: this.expressionMap,
         objectsPermissions: this.objectRecordsPermissions,
@@ -185,6 +187,26 @@ export class WorkspaceDeleteQueryBuilder<
       internalContext: this.internalContext,
       authContext: this.authContext,
       featureFlagMap: this.featureFlagMap,
+    });
+  }
+
+  private applyRecordScoping(): void {
+    if (this.shouldBypassPermissionChecks) {
+      return;
+    }
+
+    const objectMetadata = getObjectMetadataFromEntityTarget(
+      this.getMainAliasTarget(),
+      this.internalContext,
+    );
+
+    applyRecordScoping({
+      queryBuilder: this as unknown as WorkspaceSelectQueryBuilder<T>,
+      objectNameSingular: objectMetadata.nameSingular,
+      recordScopingRulesByRoleId:
+        this.internalContext.recordScopingRulesByRoleId,
+      userWorkspaceRoleMap: this.internalContext.userWorkspaceRoleMap,
+      authContext: this.authContext,
     });
   }
 

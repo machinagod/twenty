@@ -14,6 +14,7 @@ import { EntitySchemaFactory } from 'src/engine/twenty-orm/factories/entity-sche
 import { GlobalWorkspaceDataSourceService } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-datasource.service';
 import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import { WorkspaceORMEntityMetadatasCacheService } from 'src/engine/twenty-orm/global-workspace-datasource/workspace-orm-entity-metadatas-cache.service';
+import { RecordScopingConfigService } from 'src/engine/twenty-orm/record-scoping/services/record-scoping-config.service';
 import { TwentyORMModule } from 'src/engine/twenty-orm/twenty-orm.module';
 import { WorkspaceCacheStorageModule } from 'src/engine/workspace-cache-storage/workspace-cache-storage.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
@@ -43,6 +44,7 @@ import { WorkspaceEventEmitterModule } from 'src/engine/workspace-event-emitter/
     EntitySchemaColumnFactory,
     EntitySchemaRelationFactory,
     WorkspaceORMEntityMetadatasCacheService,
+    RecordScopingConfigService,
   ],
   exports: [GlobalWorkspaceDataSourceService, GlobalWorkspaceOrmManager],
 })
