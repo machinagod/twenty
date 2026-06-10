@@ -35,8 +35,7 @@ const createQueryBuilderMock = ({
 const evaluateBrackets = (brackets: Brackets): Captured[] => {
   const captured: Captured[] = [];
   const record =
-    (kind: string) =>
-    (sql: string, parameters?: Record<string, unknown>) => {
+    (kind: string) => (sql: string, parameters?: Record<string, unknown>) => {
       captured.push({ sql: `[${kind}] ${sql}`, parameters });
 
       return web;
