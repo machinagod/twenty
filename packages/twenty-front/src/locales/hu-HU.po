@@ -101,12 +101,12 @@ msgid "(selected: {selectedIconKey})"
 msgstr "(kiválasztva: {selectedIconKey})"
 
 #. js-lingui-id: ZBGbuw
-#: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsToolCallRow.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
+#: src/modules/settings/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -189,6 +189,13 @@ msgstr ""
 #. placeholder {0}: recordPageLayoutObject.labelPlural
 #: src/modules/layout-customization/components/LayoutCustomizationBar.tsx
 msgid "{0} layout edition"
+msgstr ""
+
+#. js-lingui-id: FGOUAP
+#. placeholder {0}: displayedRecords.length
+#. placeholder {1}: totalCount + liveRecords.length
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
+msgid "{0} of {1}"
 msgstr ""
 
 #. js-lingui-id: peiknr
@@ -300,11 +307,6 @@ msgstr "{count, plural, one {Pl.: {0}{1} {count} tizedért} other {Pl.: {2}{3} {
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
 msgid "{credits} Credits - ${priceDisplay}"
 msgstr ""
-
-#. js-lingui-id: jsKQu8
-#: src/modules/object-record/record-show/hooks/useRecordShowPagePagination.ts
-msgid "{currentRank} of {totalCount} in {objectLabelPlural}"
-msgstr "{currentRank}/{totalCount} a(z) {objectLabelPlural} között"
 
 #. js-lingui-id: 0aO0VO
 #: src/pages/settings/admin-panel/SettingsAdminQueueDetail.tsx
@@ -446,11 +448,6 @@ msgstr "{num, selectordinal, one {{num}-ik} other {{num}-ik}}"
 msgid "{numberOfSelectedItems} workspace members"
 msgstr "{numberOfSelectedItems} munkaterületi tag"
 
-#. js-lingui-id: 7kYa/u
-#: src/modules/object-record/record-show/hooks/useRecordShowPagePagination.ts
-msgid "{objectLabelPlural} ({totalCount})"
-msgstr "{objectLabelPlural} ({totalCount})"
-
 #. js-lingui-id: FaQB54
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/hooks/useWorkflowAiAgentPermissionActions.ts
 msgid "{permissionLabel} permission removed"
@@ -465,11 +462,6 @@ msgstr ""
 #: src/modules/object-record/record-merge/components/MergeSettingsTab.tsx
 msgid "{positionLabel} record holds priority"
 msgstr "{positionLabel} rekord prioritást élvez"
-
-#. js-lingui-id: Sxx5Hr
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "{recordCount} of {totalCount} records"
-msgstr "{recordCount} a(z) {totalCount} rekordból"
 
 #. js-lingui-id: 5d0hY6
 #: src/modules/settings/admin-panel/health-status/hooks/useRetryJobs.ts
@@ -631,12 +623,6 @@ msgstr "1. Válasszon mezőtípust"
 msgid "1. Select an object"
 msgstr "1. Válasszon egy objektumot"
 
-#. js-lingui-id: SLjiTq
-#: src/modules/settings/data-model/components/SettingsDataModelNewFieldBreadcrumbDropDown.tsx
-#: src/modules/settings/data-model/components/SettingsDataModelNewFieldBreadcrumbDropDown.tsx
-msgid "1. Type"
-msgstr "1. Típus"
-
 #. js-lingui-id: rU05hS
 #: src/modules/settings/experience/components/DateTimeSettingsTimeFormatSelect.tsx
 msgid "12h"
@@ -651,12 +637,6 @@ msgstr "12 óra ({hour12Label})"
 #: src/modules/ai/constants/AgentChatThreadLastActivityFilterLabels.ts
 msgid "1d"
 msgstr ""
-
-#. js-lingui-id: yXvRMf
-#: src/modules/settings/data-model/components/SettingsDataModelNewFieldBreadcrumbDropDown.tsx
-#: src/modules/settings/data-model/components/SettingsDataModelNewFieldBreadcrumbDropDown.tsx
-msgid "2. Configure"
-msgstr "2. Konfigurálás"
 
 #. js-lingui-id: 0HAF12
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
@@ -839,11 +819,6 @@ msgstr "Hozzáférési kulcsazonosító"
 #. js-lingui-id: CrjDqe
 #: src/pages/auth/Authorize.tsx
 msgid "Access your workspace data"
-msgstr ""
-
-#. js-lingui-id: c2UA7k
-#: src/pages/settings/ai/components/SettingsAiMCP.tsx
-msgid "Access your workspace data from your favorite MCP client like Claude Desktop, Windsurf or Cursor."
 msgstr ""
 
 #. js-lingui-id: AeXO77
@@ -1374,6 +1349,12 @@ msgstr "Cím 2"
 msgid "Admin"
 msgstr ""
 
+#. js-lingui-id: SsHJsm
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Admin panel"
+msgstr ""
+
 #. js-lingui-id: g1in8j
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
@@ -1415,11 +1396,22 @@ msgstr ""
 msgid "Admin Panel - Health"
 msgstr ""
 
+#. js-lingui-id: Faptqt
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "Administrator"
+msgstr ""
+
+#. js-lingui-id: 3zE1mx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "Administrators"
+msgstr ""
+
 #. js-lingui-id: sxkWRg
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowObjectDropdownContent.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowObjectDropdownContent.tsx
+#: src/modules/navigation/components/SettingsNavigationDrawer.tsx
 msgid "Advanced"
 msgstr "Haladó"
 
@@ -1443,11 +1435,6 @@ msgstr "Haladó objektumok"
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "Advanced options"
 msgstr "Speciális beállítások"
-
-#. js-lingui-id: WsKDNF
-#: src/modules/navigation/components/SettingsNavigationDrawer.tsx
-msgid "Advanced:"
-msgstr "Haladó:"
 
 #. js-lingui-id: 1Cox/a
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
@@ -1735,7 +1722,7 @@ msgid "All lines"
 msgstr "Minden sor"
 
 #. js-lingui-id: c3lkKf
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "All Members"
 msgstr "Összes tag"
 
@@ -1750,8 +1737,8 @@ msgid "All objects"
 msgstr ""
 
 #. js-lingui-id: aFE/OW
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsTableHeader.tsx
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 #: src/modules/settings/developers/components/WebhookEntitySelect.tsx
 #: src/modules/settings/developers/components/WebhookEntitySelect.tsx
 msgid "All Objects"
@@ -1916,6 +1903,11 @@ msgstr "Hiba történt"
 msgid "An error occurred while checking user existence"
 msgstr "Hiba történt a felhasználó létezésének ellenőrzése közben"
 
+#. js-lingui-id: LfKkm6
+#: src/modules/page-layout/widgets/components/PageLayoutWidgetErrorDisplay.tsx
+msgid "An error occurred while loading this widget."
+msgstr ""
+
 #. js-lingui-id: I/scZd
 #: src/modules/ai/components/AiChatErrorMessage.tsx
 msgid "An error occurred while processing your message"
@@ -1984,11 +1976,6 @@ msgstr "Belső hiba történt a változtatások ellenőrzése során. Kérjük, 
 msgid "An object with this name already exists"
 msgstr "Már létezik ilyen nevű objektum"
 
-#. js-lingui-id: byKna+
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "An unexpected error occurred. Please try again."
-msgstr "Váratlan hiba történt. Kérjük, próbálja meg újra."
-
 #. js-lingui-id: HZFm5R
 #: src/utils/date-utils.ts
 #: src/modules/settings/roles/role-settings/components/SettingsRoleSettingsDeleteRoleConfirmationModalSubtitle.tsx
@@ -2042,7 +2029,6 @@ msgstr "API & Webhooks"
 #. js-lingui-id: yRnk5W
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
-#: src/pages/settings/ai/components/SettingsAiMCP.tsx
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
@@ -2185,12 +2171,12 @@ msgid "Application installed successfully."
 msgstr "Az alkalmazás sikeresen telepítve."
 
 #. js-lingui-id: LllWIc
-#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
+#: src/modules/settings/event-logs/components/EventLogTableSelector.tsx
 msgid "Application Logs"
 msgstr ""
 
 #. js-lingui-id: l/T809
-#: src/pages/settings/applications/components/SettingsApplicationDetailTitle.tsx
+#: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 msgid "Application not listed on the marketplace. It was shared via a direct link"
 msgstr ""
 
@@ -2544,20 +2530,10 @@ msgid "Audit logs"
 msgstr "Auditnaplók"
 
 #. js-lingui-id: EPEFrH
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
+#: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
 msgid "Audit Logs"
 msgstr "Audit Naplók"
-
-#. js-lingui-id: X0+U3u
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "Audit logs are available with an Enterprise subscription. Please upgrade to access this feature."
-msgstr "Az auditnaplók Enterprise előfizetéssel érhetők el. A funkció eléréséhez frissítsen."
-
-#. js-lingui-id: rNQ4RB
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "Audit logs require ClickHouse to be configured. Please contact your administrator to set up ClickHouse."
-msgstr "Az auditnaplók használatához a ClickHouse beállítása szükséges. A ClickHouse beállításához vegye fel a kapcsolatot a rendszergazdával."
 
 #. js-lingui-id: kIuOL4
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerWebhookForm.tsx
@@ -3507,7 +3483,6 @@ msgid "ClickHouse is required for audit logs. Contact your administrator."
 msgstr "Az auditnaplókhoz ClickHouse szükséges. Lépjen kapcsolatba a rendszergazdával."
 
 #. js-lingui-id: CTdw8/
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
 #: src/pages/settings/ai/components/SettingsAiUsageTab.tsx
 #: src/modules/settings/usage/components/SettingsUsageAnalyticsSection.tsx
 msgid "ClickHouse Not Configured"
@@ -3588,12 +3563,12 @@ msgid "Code your function"
 msgstr "Kódold a funkciódat"
 
 #. js-lingui-id: H86f9p
-#: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsToolCallRow.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
+#: src/modules/settings/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -3836,6 +3811,11 @@ msgstr "Dátum, idő, szám, időzóna és a naptár kezdőnapjának konfigurál
 msgid "Configure fallback login methods for users with SSO bypass permissions"
 msgstr "Helyettesítő bejelentkezési módszerek konfigurálása az SSO kikerülési jogosultságokkal rendelkező felhasználók számára"
 
+#. js-lingui-id: zXzR4W
+#: src/modules/settings/security/components/SettingsSecuritySettings.tsx
+msgid "Configure how long audit logs are retained"
+msgstr ""
+
 #. js-lingui-id: OLqG0t
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectSettings.tsx
 msgid "Configure how this object appears in search results"
@@ -3895,6 +3875,7 @@ msgstr "Beállítva"
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
 #: src/modules/ai/components/AIChatNoMoreBillingCreditsBanner.tsx
 msgid "Confirm"
 msgstr "Megerősítés"
@@ -5573,11 +5554,11 @@ msgid "Detail per workspace"
 msgstr ""
 
 #. js-lingui-id: URmyfc
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/pages/settings/layout/components/SettingsLayoutDetailScaffold.tsx
 #: src/pages/settings/applications/SettingsApplicationConnectionDetail.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationFrontComponentSettingsTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationCommandMenuItemSettingsTab.tsx
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 #: src/modules/ai/components/RoutingDebugDisplay.tsx
 msgid "Details"
 msgstr "Részletek"
@@ -5605,6 +5586,11 @@ msgstr "Fejlesztői hivatkozások"
 #. js-lingui-id: MRB7nI
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
 msgid "Direction"
+msgstr ""
+
+#. js-lingui-id: XDeNvP
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Disable impersonation"
 msgstr ""
 
 #. js-lingui-id: E/QGRL
@@ -6262,12 +6248,12 @@ msgid "Empty"
 msgstr "Üres"
 
 #. js-lingui-id: OMbipf
-#: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsToolCallRow.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
+#: src/modules/settings/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -6286,12 +6272,12 @@ msgid "Empty Inbox"
 msgstr "Üres Postafiók"
 
 #. js-lingui-id: 3hSGoJ
-#: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsToolCallRow.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
+#: src/modules/settings/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -6315,20 +6301,21 @@ msgstr ""
 msgid "Enable bypass options"
 msgstr "Kikerülési opciók engedélyezése"
 
+#. js-lingui-id: Tt0V8j
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Enable impersonation"
+msgstr ""
+
 #. js-lingui-id: gZo0V9
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "Model-specifikus funkciók engedélyezése"
 
 #. js-lingui-id: IrI9pg
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 #: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
 msgid "End date"
 msgstr ""
-
-#. js-lingui-id: VFv2ZC
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
-msgid "End Date"
-msgstr "Befejezés dátuma"
 
 #. js-lingui-id: Fqu/aC
 #: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
@@ -6577,6 +6564,11 @@ msgstr "Érték megadása"
 msgid "Enter values, comma-separated"
 msgstr "Adja meg az értékeket, vesszővel elválasztva"
 
+#. js-lingui-id: GDMzJS
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Enter your two-factor authentication code to confirm."
+msgstr ""
+
 #. js-lingui-id: GpB8YV
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -6595,11 +6587,6 @@ msgstr "Vállalati"
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Enterprise feature"
 msgstr ""
-
-#. js-lingui-id: Kjjkt3
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "Enterprise Feature"
-msgstr "Enterprise funkció"
 
 #. js-lingui-id: S5c4pl
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -6660,6 +6647,7 @@ msgstr "Lágyított adatok törlése"
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsCodeDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsCodeDetail.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
+#: src/modules/page-layout/widgets/components/PageLayoutWidgetErrorDisplay.tsx
 msgid "Error"
 msgstr "Hiba"
 
@@ -6697,11 +6685,6 @@ msgstr "Hiba az SSO identitásszolgáltató szerkesztése közben"
 #: src/modules/error-handler/components/AppRootErrorFallback.tsx
 msgid "Error illustration"
 msgstr "Hibaillusztráció"
-
-#. js-lingui-id: UJr0dl
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "Error Loading Audit Logs"
-msgstr "Hiba az auditnaplók betöltésekor"
 
 #. js-lingui-id: 9e/9KK
 #: src/modules/activities/timeline-activities/rows/calendar/components/EventCardCalendarEvent.tsx
@@ -6845,16 +6828,15 @@ msgid "Evaluations"
 msgstr ""
 
 #. js-lingui-id: 0pC/y6
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 #: src/modules/activities/calendar/components/CalendarEventDetails.tsx
 msgid "Event"
 msgstr "Esemény"
 
-#. js-lingui-id: ailPEn
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
-msgid "Event Type"
-msgstr "Esemény típusa"
+#. js-lingui-id: cW8SdW
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
+msgid "Event type"
+msgstr ""
 
 #. js-lingui-id: poC90w
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
@@ -6971,7 +6953,7 @@ msgid "Exclude the following people and domains from my email sync. Internal con
 msgstr "Zárja ki a következő embereket és domaineket az e-mail szinkronizálásomból. A belső beszélgetések nem lesznek importálva"
 
 #. js-lingui-id: B0clc7
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Execution ID"
 msgstr ""
 
@@ -7001,12 +6983,12 @@ msgid "Exit Settings"
 msgstr "Kilépés a beállításokból"
 
 #. js-lingui-id: 1A3EXy
-#: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsToolCallRow.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsDetail.tsx
+#: src/modules/settings/event-logs/components/EventLogJsonCell.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
@@ -7226,6 +7208,11 @@ msgstr "Nem sikerült telepíteni az alkalmazást."
 msgid "Failed to load front component: {errorMessage}"
 msgstr "Nem sikerült betölteni a Front-komponenst: {errorMessage}"
 
+#. js-lingui-id: VxZSi+
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "Failed to load server administrators."
+msgstr ""
+
 #. js-lingui-id: nKkohy
 #: src/modules/settings/developers/hooks/useWebhookForm.ts
 msgid "Failed to load webhook"
@@ -7352,6 +7339,11 @@ msgstr ""
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
 msgid "Failed to update role"
 msgstr "A szerepkör frissítése sikertelen"
+
+#. js-lingui-id: ahCOdw
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Failed to update server administrator access."
+msgstr ""
 
 #. js-lingui-id: 204Qo2
 #: src/modules/ai/components/AIChatNoMoreBillingCreditsBanner.tsx
@@ -7620,7 +7612,7 @@ msgid "Filter"
 msgstr "Szűrő"
 
 #. js-lingui-id: LjNPDA
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "Filter by event"
 msgstr "Szűrés esemény szerint"
 
@@ -7630,7 +7622,7 @@ msgid "Filter by object type"
 msgstr ""
 
 #. js-lingui-id: gVEHcL
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "Filter by record ID"
 msgstr "Szűrés rekordazonosító szerint"
 
@@ -7871,13 +7863,23 @@ msgstr "Front komponensek"
 msgid "Full access"
 msgstr "Teljes hozzáférés"
 
+#. js-lingui-id: aerYcp
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "full admin panel access"
+msgstr ""
+
+#. js-lingui-id: CU/Sq6
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "full server access"
+msgstr ""
+
 #. js-lingui-id: Ld0Tt4
 #: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 msgid "Full tab widget"
 msgstr ""
 
 #. js-lingui-id: YMZBxa
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Function"
 msgstr ""
 
@@ -7973,11 +7975,6 @@ msgstr ""
 msgid "Global search"
 msgstr ""
 
-#. js-lingui-id: sr0UJD
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "Go Back"
-msgstr "Vissza"
-
 #. js-lingui-id: Hb4Cgz
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -8013,10 +8010,25 @@ msgstr "Google"
 msgid "Google OIDC"
 msgstr "Google OIDC"
 
+#. js-lingui-id: P1Rw/Z
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Grant access"
+msgstr ""
+
 #. js-lingui-id: 6eo66Q
 #: src/modules/settings/workspace/components/ToggleImpersonate.tsx
 msgid "Grant access to your workspace so we can troubleshoot problems."
 msgstr "Engedélyezze a hozzáférést a munkaterületéhez, hogy elháríthassuk a problémákat."
+
+#. js-lingui-id: 3xMv4O
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Grant admin panel access"
+msgstr ""
+
+#. js-lingui-id: FdPN4f
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Grant full access"
+msgstr ""
 
 #. js-lingui-id: WUgtid
 #: src/modules/settings/roles/role-permissions/object-level-permissions/object-form/components/SettingsRolePermissionsObjectLevelObjectFormObjectLevelTableRow.tsx
@@ -8544,6 +8556,17 @@ msgstr "Megszemélyesítés"
 msgid "Impersonate workspace users"
 msgstr "Munkaterület felhasználóinak megszemélyesítése"
 
+#. js-lingui-id: 1ZMDWV
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "impersonation"
+msgstr ""
+
+#. js-lingui-id: gFoGWm
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Impersonation"
+msgstr ""
+
 #. js-lingui-id: yImXof
 #: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
 msgid "Impersonation is disabled for this workspace"
@@ -8825,10 +8848,10 @@ msgstr "Érvénytelen hitelesítési szolgáltató"
 msgid "Invalid Configuration"
 msgstr "Érvénytelen konfiguráció"
 
-#. js-lingui-id: fSwqXe
+#. js-lingui-id: SEpkD6
 #: src/modules/page-layout/widgets/components/PageLayoutWidgetInvalidConfigDisplay.tsx
-msgid "Invalid configuration. Click edit to configure this widget."
-msgstr "Érvénytelen konfiguráció. Kattintson a szerkesztésre a widget konfigurálásához."
+msgid "Invalid configuration: {errorMessage}"
+msgstr ""
 
 #. js-lingui-id: ER/0YT
 #: src/modules/workflow/workflow-trigger/utils/getTriggerScheduleDescription.ts
@@ -9526,7 +9549,7 @@ msgid "Less than or equal"
 msgstr "Kisebb vagy egyenlő"
 
 #. js-lingui-id: oCHfGC
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Level"
 msgstr ""
 
@@ -9701,8 +9724,8 @@ msgid "Loading metrics data..."
 msgstr "Metrikai adatok betöltése..."
 
 #. js-lingui-id: tVSmFT
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
 #: src/modules/ui/input/components/IconPicker.tsx
+#: src/modules/settings/event-logs/components/EventLogResultsTable.tsx
 #: src/modules/object-record/record-picker/multiple-record-picker/components/MultipleRecordPickerFetchMoreLoader.tsx
 #: src/modules/activities/components/CustomResolverFetchMoreLoader.tsx
 msgid "Loading more..."
@@ -9795,12 +9818,18 @@ msgid "Logout"
 msgstr "Kijelentkezés"
 
 #. js-lingui-id: w/bY7R
+#: src/pages/settings/general/SettingsGeneral.tsx
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/modules/side-panel/pages/workflow/step/view-run/components/SidePanelWorkflowRunViewStepContent.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable.tsx
 #: src/modules/logic-functions/components/LogicFunctionLogs.tsx
 msgid "Logs"
 msgstr "Napló"
+
+#. js-lingui-id: MspNoT
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
+msgid "Logs require ClickHouse to be configured. Please contact your administrator."
+msgstr ""
 
 #. js-lingui-id: FJBbw5
 #: src/modules/object-metadata/hooks/useSortSubFieldChoicesForField.ts
@@ -10011,14 +10040,8 @@ msgstr ""
 msgid "MCP config copied to clipboard"
 msgstr ""
 
-#. js-lingui-id: NvQoNb
-#: src/pages/settings/ai/components/SettingsAiMCP.tsx
-msgid "MCP Configuration copied to clipboard"
-msgstr "MCP konfiguráció vágólapra másolva"
-
 #. js-lingui-id: 8CWirf
 #: src/pages/settings/ai/components/SettingsAiOverviewTab.tsx
-#: src/pages/settings/ai/components/SettingsAiMCP.tsx
 msgid "MCP Server"
 msgstr "MCP szerver"
 
@@ -10092,7 +10115,7 @@ msgid "Merging..."
 msgstr "Egyesítés..."
 
 #. js-lingui-id: xDAtGP
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Message"
 msgstr ""
 
@@ -10620,10 +10643,15 @@ msgstr "Új Emailküldési Tartomány"
 msgid "New favorite"
 msgstr ""
 
+#. js-lingui-id: kV1LSq
+#: src/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect.tsx
+#: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
+msgid "New field"
+msgstr ""
+
 #. js-lingui-id: 8YPqRx
 #: src/pages/settings/data-model/SettingsObjectDetailPage.tsx
 #: src/modules/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberSettingsFormCard.tsx
-#: src/modules/settings/data-model/components/SettingsDataModelNewFieldBreadcrumbDropDown.tsx
 msgid "New Field"
 msgstr "Új mező"
 
@@ -10792,6 +10820,11 @@ msgstr "Nincs {label}"
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
 msgid "No {objectLabelSingular} found"
 msgstr "Nem található {objectLabelSingular}"
+
+#. js-lingui-id: oPoLg+
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "No access"
+msgstr ""
 
 #. js-lingui-id: glQp+P
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceBillingContent.tsx
@@ -11016,7 +11049,7 @@ msgid "No evaluations yet for this turn"
 msgstr ""
 
 #. js-lingui-id: SIR5Ix
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/modules/settings/event-logs/components/EventLogResultsTable.tsx
 msgid "No event logs found"
 msgstr "Nem találhatók eseménynaplók"
 
@@ -11041,7 +11074,7 @@ msgid "No field configured"
 msgstr "Nincs beállítva mező"
 
 #. js-lingui-id: /hvarH
-#: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionRelationFieldView.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionTargetObjectFieldsView.tsx
 msgid "No fields available"
 msgstr ""
 
@@ -11301,6 +11334,11 @@ msgstr "Nincsenek hibás sorok"
 msgid "No Select field"
 msgstr "Nincs Választó mező"
 
+#. js-lingui-id: JkPTT8
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "No server administrators found."
+msgstr ""
+
 #. js-lingui-id: RQ6tfU
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelSystemObjectPickerSubView.tsx
 msgid "No system objects available"
@@ -11310,6 +11348,11 @@ msgstr "Nem állnak rendelkezésre rendszerobjektumok"
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemViewSystemSubView.tsx
 msgid "No system objects with views found"
 msgstr "Nem találhatók nézettel rendelkező rendszerobjektumok"
+
+#. js-lingui-id: L4Miic
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionMorphRelationFieldView.tsx
+msgid "No targets available"
+msgstr ""
 
 #. js-lingui-id: t0t36i
 #: src/modules/workflow/workflow-run/observability/WorkflowRunStepLogsAiAgentDetail.tsx
@@ -11555,7 +11598,6 @@ msgstr ""
 #. js-lingui-id: b/j06W
 #: src/pages/settings/applications/SettingsApplicationRegistrationDetails.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationOAuthTab.tsx
-#: src/pages/settings/ai/components/SettingsAiMCP.tsx
 #: src/pages/settings/admin-panel/SettingsAdminApplicationRegistrationDetail.tsx
 msgid "OAuth"
 msgstr "OAuth"
@@ -11607,12 +11649,12 @@ msgid "Object destination"
 msgstr "Objektum cél"
 
 #. js-lingui-id: /clmEa
-#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
+#: src/modules/settings/event-logs/components/EventLogTableSelector.tsx
 msgid "Object Events"
 msgstr "Objektumesemények"
 
 #. js-lingui-id: 79D4Az
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Object ID"
 msgstr "Objektum azonosító"
 
@@ -11631,10 +11673,10 @@ msgstr "objektumjogosultság"
 msgid "Object permission options"
 msgstr "Objektumengedély opciói"
 
-#. js-lingui-id: UGhVPl
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
-msgid "Object Type"
-msgstr "Objektum típusa"
+#. js-lingui-id: gaqIMK
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
+msgid "Object type"
+msgstr ""
 
 #. js-lingui-id: rDycBw
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionUpsertRecord.tsx
@@ -11767,6 +11809,11 @@ msgstr "Mely objektum(ok)on legyen elérhető ez a kiváltó"
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelsGeneral.tsx
 msgid "Onboarding call"
 msgstr "Bevezető hívás"
+
+#. js-lingui-id: oFTo3P
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
+msgid "Only application logs are available on your current plan. Other log types require an Enterprise subscription."
+msgstr ""
 
 #. js-lingui-id: zii2Qj
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarVisibilitySettingsCard.tsx
@@ -12107,10 +12154,10 @@ msgstr "Oldalelrendezés widget"
 msgid "Page layouts"
 msgstr ""
 
-#. js-lingui-id: IVBjIH
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
-msgid "Page Name"
-msgstr "Oldal neve"
+#. js-lingui-id: zQF6Kb
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
+msgid "Page name"
+msgstr ""
 
 #. js-lingui-id: NRvxzv
 #: src/pages/not-found/NotFound.tsx
@@ -12118,7 +12165,7 @@ msgid "Page Not Found | Twenty"
 msgstr "Az oldal nem található | Twenty"
 
 #. js-lingui-id: sF+Xp9
-#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
+#: src/modules/settings/event-logs/components/EventLogTableSelector.tsx
 msgid "Page Views"
 msgstr "Oldalmegtekintések"
 
@@ -12196,6 +12243,11 @@ msgstr "Ide illessze be az Enterprise kulcsot"
 msgid "Path"
 msgstr "Útvonal"
 
+#. js-lingui-id: IgrLD/
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
+msgid "Pause"
+msgstr ""
+
 #. js-lingui-id: QmXBEc
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Payment issue"
@@ -12260,6 +12312,11 @@ msgstr "Százalék"
 #. js-lingui-id: /YAKmj
 #: src/modules/settings/members/components/MemberInfosTab.tsx
 msgid "Perform administrative actions or permanently delete this user"
+msgstr ""
+
+#. js-lingui-id: NtQvjo
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
+msgid "Period"
 msgstr ""
 
 #. js-lingui-id: wSpwGR
@@ -12658,8 +12715,7 @@ msgid "Prompt"
 msgstr ""
 
 #. js-lingui-id: l/UFPv
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Properties"
 msgstr "Tulajdonságok"
 
@@ -12974,8 +13030,8 @@ msgid "Record filter rule options"
 msgstr "Rekordszűrő szabály beállításai"
 
 #. js-lingui-id: xSAYIn
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "Record ID"
 msgstr "Rekordazonosító"
 
@@ -13053,11 +13109,6 @@ msgstr "Átirányítási URL vágólapra másolva"
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Redirection URI"
 msgstr "Átirányítási URI"
-
-#. js-lingui-id: lCF0wC
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
-msgid "Refresh"
-msgstr "Frissítés"
 
 #. js-lingui-id: pTGa/J
 #: src/pages/settings/admin-panel/SettingsAdminWorkspacesStatus.tsx
@@ -13417,7 +13468,7 @@ msgid "Resource credits updated."
 msgstr ""
 
 #. js-lingui-id: esl+Tv
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 msgid "Resource Type"
 msgstr "Erőforrás típusa"
 
@@ -13489,6 +13540,7 @@ msgstr "Találatok"
 
 #. js-lingui-id: v39wLo
 #: src/modules/workflow/workflow-steps/workflow-actions/delay-actions/components/WorkflowEditActionDelay.tsx
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
 msgid "Resume"
 msgstr "Összefoglaló"
 
@@ -13518,6 +13570,16 @@ msgstr "fordított betűrendben"
 #: src/modules/settings/admin-panel/signing-keys/components/SettingsAdminSigningKeysTable.tsx
 #: src/modules/settings/admin-panel/signing-keys/components/SettingsAdminRevokeSigningKeyConfirmationModal.tsx
 msgid "Revoke"
+msgstr ""
+
+#. js-lingui-id: cg+Poy
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Revoke access"
+msgstr ""
+
+#. js-lingui-id: iu5Egq
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Revoke admin panel access"
 msgstr ""
 
 #. js-lingui-id: rJrWw4
@@ -13716,6 +13778,7 @@ msgid "Saturday"
 msgstr "Szombat"
 
 #. js-lingui-id: tfDRzk
+#: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
 #: src/modules/settings/components/SaveAndCancelButtons/SaveButton.tsx
 msgid "Save"
 msgstr "Mentés"
@@ -13952,7 +14015,7 @@ msgstr "Pénznem keresése"
 #: src/modules/views/components/ViewBarFilterDropdownFieldSelectMenu.tsx
 #: src/modules/spreadsheet-import/components/MatchColumnSelectFieldSelectDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/FieldWidgetFieldDropdownContent.tsx
-#: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionRelationFieldView.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionTargetObjectFieldsView.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionDropdownContentBase.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartFieldSelectionForAggregateOperationDropdownContent.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableHeaderPlusButtonContent.tsx
@@ -14092,7 +14155,6 @@ msgstr "Titkos hozzáférési kulcs"
 
 #. js-lingui-id: a3LDKx
 #: src/pages/settings/security/SettingsSecuritySSOIdentifyProvider.tsx
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
 #: src/pages/settings/general/SettingsGeneral.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 msgid "Security"
@@ -14417,6 +14479,16 @@ msgstr "Elküldve és Fogadva"
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "Serbian (Cyrillic)"
 msgstr "Szerb (Cirill)"
+
+#. js-lingui-id: hjUUtd
+#: src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx
+msgid "Server access"
+msgstr ""
+
+#. js-lingui-id: 4Fpy78
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "Server administrator access updated."
+msgstr ""
 
 #. js-lingui-id: fHVf32
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationConfigTab.tsx
@@ -14897,6 +14969,11 @@ msgstr ""
 msgid "Something went wrong"
 msgstr "Valami hiba történt"
 
+#. js-lingui-id: teokEm
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
+msgid "Something went wrong while loading logs. Please try again."
+msgstr ""
+
 #. js-lingui-id: yHwG3y
 #: src/modules/ui/navigation/navigation-drawer/components/NavigationDrawerItem.tsx
 #: src/modules/settings/components/SettingsCard.tsx
@@ -15052,14 +15129,10 @@ msgid "Start a new enterprise subscription."
 msgstr "Indítson új Enterprise előfizetést."
 
 #. js-lingui-id: WAjFYI
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 #: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
 msgid "Start date"
 msgstr ""
-
-#. js-lingui-id: D3iCkb
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
-msgid "Start Date"
-msgstr "Kezdés dátuma"
 
 #. js-lingui-id: s+K73L
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
@@ -15494,12 +15567,12 @@ msgid "Tab Settings"
 msgstr "Fül beállítások"
 
 #. js-lingui-id: 4hJhzz
-#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
 #: src/modules/views/view-picker/constants/ViewPickerTypeSelectOptions.ts
 #: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/FieldWidgetLayoutDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
+#: src/modules/settings/event-logs/components/EventLogTableSelector.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
 #: src/modules/keyboard-shortcut-menu/components/KeyboardShortcutMenuOpenContent.tsx
 msgid "Table"
@@ -15976,6 +16049,11 @@ msgstr "Ez a szerepkör a következőkhöz van hozzárendelve: {roleTargetDispla
 msgid "This role is shared with other users or agents and cannot be edited here."
 msgstr ""
 
+#. js-lingui-id: w8O8Ja
+#: src/modules/side-panel/pages/page-layout/components/ChartFiltersDeletedFieldsWarning.tsx
+msgid "This rule filters on one or more deleted fields that should be removed."
+msgstr ""
+
 #. js-lingui-id: C/wr0z
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableHelpText.tsx
 msgid "This setting can only be configured through environment variables."
@@ -16045,6 +16123,12 @@ msgstr ""
 msgid "This will disconnect all models from this provider. Models will no longer be available until a new provider is configured."
 msgstr "Ez leválasztja az összes modellt erről a szolgáltatóról. A modellek addig nem lesznek elérhetők, amíg új szolgáltató nincs beállítva."
 
+#. js-lingui-id: XZWXeK
+#. placeholder {0}: pendingChange?.description ?? ''
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "This will grant {0} to {userLabel}."
+msgstr ""
+
 #. js-lingui-id: y8xx3L
 #: src/modules/object-record/record-update-multiple/components/UpdateMultipleRecordsContainer.tsx
 msgid "This will modify {contextStoreNumberOfSelectedRecords} records. This action cannot be undone."
@@ -16064,6 +16148,12 @@ msgstr "Ez véglegesen törli az objektumot és annak összes rekordját. A mege
 #: src/modules/settings/two-factor-authentication/components/DeleteTwoFactorAuthenticationMethod.tsx
 msgid "This will permanently delete your two factor authentication method.<0/>Since 2FA is mandatory in your workspace, you will be logged out after deletion and will be asked to configure it again upon login. <1/>Please type in your email to confirm."
 msgstr "Ez véglegesen törli a kétlépcsős hitelesítési módszerét.<0/>Mivel a 2FA kötelező az Ön munkaterületén, a törlés után kijelentkeztetjük, és bejelentkezéskor ismét kérni fogjuk a beállítását. <1/>A megerősítéshez írja be az e-mail címét."
+
+#. js-lingui-id: Dg+3bR
+#. placeholder {0}: pendingChange?.description ?? ''
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdminAccess.tsx
+msgid "This will revoke {0} for {userLabel}."
+msgstr ""
 
 #. js-lingui-id: f8HOUp
 #: src/modules/ai/components/ThinkingStepsDisplay.tsx
@@ -16105,10 +16195,7 @@ msgid "Timeout"
 msgstr "Időkorlát"
 
 #. js-lingui-id: 8TMaZI
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Timestamp"
 msgstr "Időbélyeg"
@@ -16864,6 +16951,7 @@ msgstr "Frissítve (meghatározott mezők esetén)"
 
 #. js-lingui-id: kwkhPe
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelSection.tsx
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
 #: src/modules/settings/billing/components/internal/ResourceCreditPriceSelector.tsx
 #: src/modules/ai/components/AIChatNoMoreBillingCreditsBanner.tsx
@@ -16919,6 +17007,11 @@ msgstr ""
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelSection.tsx
 msgid "Upgrade to access"
 msgstr "Frissíts a hozzáféréshez"
+
+#. js-lingui-id: bihQKI
+#: src/modules/settings/event-logs/components/SettingsLogs.tsx
+msgid "Upgrade to access audit logs"
+msgstr ""
 
 #. js-lingui-id: Wurpq2
 #: src/modules/settings/security/components/SettingsSecuritySettings.tsx
@@ -17054,7 +17147,7 @@ msgid "Usage by User"
 msgstr "Használat felhasználónként"
 
 #. js-lingui-id: CedRjP
-#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
+#: src/modules/settings/event-logs/components/EventLogTableSelector.tsx
 msgid "Usage Events"
 msgstr "Használati események"
 
@@ -17109,9 +17202,6 @@ msgid "Useful for pivot/junction tables"
 msgstr "Hasznos pivot/kapcsoló táblákhoz"
 
 #. js-lingui-id: 7PzzBU
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
-#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/pages/settings/profile/SettingsTwoFactorAuthenticationMethod.tsx
 #: src/pages/settings/profile/SettingsProfile.tsx
 #: src/pages/settings/profile/appearance/components/SettingsExperience.tsx
@@ -17124,6 +17214,7 @@ msgstr "Hasznos pivot/kapcsoló táblákhoz"
 #: src/pages/settings/accounts/SettingsAccountsCalendars.tsx
 #: src/pages/settings/accounts/SettingsAccounts.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
+#: src/modules/settings/event-logs/utils/getColumnsForEventLogTable.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsNewImapSmtpCaldavConnection.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsEditImapSmtpCaldavConnection.tsx
 msgid "User"
@@ -17163,6 +17254,11 @@ msgstr "Felhasználó használati adatai"
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
 msgid "Users"
 msgstr "Felhasználók"
+
+#. js-lingui-id: zCO0/Y
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+msgid "Users with server-level access. Open a user to grant or revoke access; use the search below to find anyone."
+msgstr ""
 
 #. js-lingui-id: UIOjSC
 #: src/modules/settings/admin-panel/signing-keys/components/SettingsAdminSigningKeysTable.tsx
@@ -17327,11 +17423,6 @@ msgstr ""
 msgid "View all evaluations"
 msgstr ""
 
-#. js-lingui-id: XVf/G7
-#: src/modules/settings/security/components/SettingsSecuritySettings.tsx
-msgid "View and filter events, page views, object changes"
-msgstr "Események, oldalmegtekintések és objektummódosítások megtekintése és szűrése"
-
 #. js-lingui-id: KANz0G
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -17389,11 +17480,6 @@ msgstr "Számlák megtekintése"
 msgid "View Jobs"
 msgstr "Állások megtekintése"
 
-#. js-lingui-id: 923YyC
-#: src/modules/settings/security/components/SettingsSecuritySettings.tsx
-msgid "View Logs"
-msgstr "Naplók megtekintése"
-
 #. js-lingui-id: sAPirx
 #: src/modules/object-record/record-index/components/RecordIndexEmptyStateNotShared.tsx
 msgid "View not shared"
@@ -17428,11 +17514,6 @@ msgstr "Nézet típus"
 #: src/modules/settings/billing/components/SettingsBillingCreditsSection.tsx
 msgid "View usage"
 msgstr "Használat megtekintése"
-
-#. js-lingui-id: rWiqJF
-#: src/modules/settings/security/components/SettingsSecuritySettings.tsx
-msgid "View workspace activity logs"
-msgstr "Munkaterület aktivitási naplóinak megtekintése"
 
 #. js-lingui-id: 1I6UoR
 #: src/pages/settings/layout/SettingsLayoutViewDetail.tsx
@@ -17841,7 +17922,6 @@ msgstr "Munkafolyamatok"
 #. js-lingui-id: pmUArF
 #: src/pages/settings/security/SettingsSecuritySSOIdentifyProvider.tsx
 #: src/pages/settings/security/SettingsSecurityApprovedAccessDomain.tsx
-#: src/pages/settings/security/event-logs/SettingsEventLogs.tsx
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
 #: src/pages/settings/members/roles/SettingsRoleAddObjectLevel.tsx
@@ -17933,8 +18013,7 @@ msgid "Workspace Domain"
 msgstr "Munkaterületi Domain"
 
 #. js-lingui-id: J2q6WC
-#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
-#: src/modules/settings/security/components/SettingsSecuritySettings.tsx
+#: src/modules/settings/event-logs/components/EventLogTableSelector.tsx
 msgid "Workspace Events"
 msgstr "Munkaterület eseményei"
 
@@ -17959,13 +18038,9 @@ msgstr ""
 msgid "Workspace logo"
 msgstr "Munkaterület logó"
 
-#. js-lingui-id: qc38qR
-#: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
-msgid "Workspace Member"
-msgstr "Munkaterület tagja"
-
 #. js-lingui-id: wtxjAY
 #: src/pages/settings/admin-panel/SettingsAdminWorkspaceDetail.tsx
+#: src/modules/settings/event-logs/components/EventLogFilters.tsx
 msgid "Workspace members"
 msgstr ""
 
@@ -18103,6 +18178,8 @@ msgstr "igen"
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationGeneralInfo.tsx
 #: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceBillingContent.tsx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
+#: src/modules/settings/admin-panel/components/SettingsAdminServerAdmins.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Yes"
