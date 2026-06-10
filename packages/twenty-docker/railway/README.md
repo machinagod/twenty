@@ -1,13 +1,15 @@
 # Deploying our Twenty branch on Railway
 
-This is our fork's deployment (record-level locking + telemetry off by default).
+This is our fork's deployment (record-level locking + telemetry disabled via env).
 It covers a production topology: **server + worker + managed Postgres + managed
 Redis**.
 
 ## What's different from upstream on this branch
 
-- **Telemetry is off by default** (`TELEMETRY_ENABLED` now defaults to `false`),
-  so no signup events go to `twenty-telemetry.com`. No license key, no phone-home.
+- **Telemetry disabled via configuration** — set `TELEMETRY_ENABLED=false` (the
+  upstream default is `true`). With it off, no signup events go to
+  `twenty-telemetry.com`. No license key, no phone-home. We keep this as env rather
+  than a code default to avoid friction when syncing from upstream.
 - **Record-level locking** via `RECORD_SCOPING_RULES`
   (see `packages/twenty-server/docs/RECORD_SCOPING.md`).
 
@@ -64,8 +66,8 @@ trial but **not** recommended for production — override `NODE_ENV`, set a real
 
 Copy `twenty.env.example` into each service. The minimum required (shared between
 server and worker): `PG_DATABASE_URL`, `REDIS_URL`, `SERVER_URL`, `APP_SECRET`,
-`STORAGE_TYPE`. `TELEMETRY_ENABLED=false` is the branch default but worth setting
-explicitly. Set `RECORD_SCOPING_RULES` to turn on the lock.
+`STORAGE_TYPE`. Set `TELEMETRY_ENABLED=false` to keep telemetry off (upstream
+defaults it to `true`). Set `RECORD_SCOPING_RULES` to turn on the lock.
 
 ## First deploy
 
