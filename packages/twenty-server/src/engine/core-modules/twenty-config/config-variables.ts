@@ -825,9 +825,7 @@ export class ConfigVariables {
     type: ConfigVariableType.BOOLEAN,
   })
   @IsOptional()
-  // Disabled by default on this deployment: no signup events are sent to
-  // twenty-telemetry.com unless explicitly re-enabled via env.
-  TELEMETRY_ENABLED = false;
+  TELEMETRY_ENABLED = true;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.LOGGING,
