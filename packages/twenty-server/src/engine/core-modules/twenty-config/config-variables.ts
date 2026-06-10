@@ -56,6 +56,21 @@ import {
 export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Clean-room record-level locking. JSON array of rules, each scoping which ' +
+      'records of an object a role may read/write by ANDing a WHERE on direct ' +
+      'columns. Authored by role label, e.g. ' +
+      '[{"roleLabel":"Member","objectNameSingular":"opportunity",' +
+      '"logicalOperator":"AND","conditions":[{"column":"assigneeId",' +
+      '"operator":"eq","currentWorkspaceMemberField":"id"}]}]. ' +
+      'Empty disables the feature. See docs/RECORD_SCOPING.md.',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  RECORD_SCOPING_RULES = '';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
     description: 'Enable or disable password authentication for users',
     type: ConfigVariableType.BOOLEAN,
   })
