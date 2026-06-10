@@ -25,9 +25,15 @@ describe('parseRecordScopingRules', () => {
   });
 
   it('should default logicalOperator to AND when omitted', () => {
-    const { logicalOperator, ...withoutOperator } = validRule;
-
-    const rules = parseRecordScopingRules(JSON.stringify([withoutOperator]));
+    const rules = parseRecordScopingRules(
+      JSON.stringify([
+        {
+          roleLabel: validRule.roleLabel,
+          objectNameSingular: validRule.objectNameSingular,
+          conditions: validRule.conditions,
+        },
+      ]),
+    );
 
     expect(rules[0].logicalOperator).toBe('AND');
   });
@@ -37,9 +43,7 @@ describe('parseRecordScopingRules', () => {
       JSON.stringify([
         {
           ...validRule,
-          conditions: [
-            { column: 'stage', operator: 'eq', staticValue: 'WON' },
-          ],
+          conditions: [{ column: 'stage', operator: 'eq', staticValue: 'WON' }],
         },
       ]),
     );
@@ -117,10 +121,16 @@ describe('parseRecordScopingRules', () => {
   });
 
   it('should throw when roleLabel is missing', () => {
-    const { roleLabel, ...withoutRole } = validRule;
-
     expect(() =>
-      parseRecordScopingRules(JSON.stringify([withoutRole])),
+      parseRecordScopingRules(
+        JSON.stringify([
+          {
+            objectNameSingular: validRule.objectNameSingular,
+            logicalOperator: validRule.logicalOperator,
+            conditions: validRule.conditions,
+          },
+        ]),
+      ),
     ).toThrow(/roleLabel must be a non-empty string/);
   });
 });
