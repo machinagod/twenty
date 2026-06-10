@@ -134,7 +134,10 @@ const parseCondition = (
     column: condition.column,
     operator: condition.operator as RecordScopingOperator,
     ...(hasStaticValue
-      ? { staticValue: condition.staticValue as RecordScopingCondition['staticValue'] }
+      ? {
+          staticValue:
+            condition.staticValue as RecordScopingCondition['staticValue'],
+        }
       : {
           currentWorkspaceMemberField:
             condition.currentWorkspaceMemberField as string,
