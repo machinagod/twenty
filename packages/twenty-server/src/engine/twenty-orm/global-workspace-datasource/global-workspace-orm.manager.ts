@@ -5,6 +5,8 @@ import { type ObjectLiteral } from 'typeorm';
 import { getWorkspaceAuthContext } from 'src/engine/core-modules/auth/storage/workspace-auth-context.storage';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { buildObjectIdByNameMaps } from 'src/engine/metadata-modules/flat-object-metadata/utils/build-object-id-by-name-maps.util';
+import { RecordScopingConfigService } from 'src/engine/twenty-orm/record-scoping/services/record-scoping-config.service';
+import { resolveRecordScopingRulesByRoleId } from 'src/engine/twenty-orm/record-scoping/utils/resolve-record-scoping-rules-by-role-id.util';
 import { GlobalWorkspaceDataSource } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-datasource';
 import { GlobalWorkspaceDataSourceService } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-datasource.service';
 import { ExecuteInWorkspaceContextOptions } from 'src/engine/twenty-orm/global-workspace-datasource/types/execute-in-workspace-context-options.type';
@@ -22,6 +24,7 @@ export class GlobalWorkspaceOrmManager {
   constructor(
     private readonly globalWorkspaceDataSourceService: GlobalWorkspaceDataSourceService,
     private readonly workspaceCacheService: WorkspaceCacheService,
+    private readonly recordScopingConfigService: RecordScopingConfigService,
   ) {}
 
   async getRepository<T extends ObjectLiteral>(
@@ -96,6 +99,7 @@ export class GlobalWorkspaceOrmManager {
       apiKeyRoleMap,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
+      flatRoleMaps,
     } = await this.workspaceCacheService.getOrRecompute(workspaceId, [
       'flatObjectMetadataMaps',
       'flatFieldMetadataMaps',
@@ -107,10 +111,16 @@ export class GlobalWorkspaceOrmManager {
       'apiKeyRoleMap',
       'flatRowLevelPermissionPredicateMaps',
       'flatRowLevelPermissionPredicateGroupMaps',
+      'flatRoleMaps',
     ]);
 
     const { idByNameSingular: objectIdByNameSingular } =
       buildObjectIdByNameMaps(flatObjectMetadataMaps);
+
+    const { recordScopingRulesByRoleId } = resolveRecordScopingRulesByRoleId({
+      rules: this.recordScopingConfigService.getRules(),
+      flatRoleMaps,
+    });
 
     return {
       authContext,
@@ -119,6 +129,7 @@ export class GlobalWorkspaceOrmManager {
       flatIndexMaps,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
+      recordScopingRulesByRoleId,
       objectIdByNameSingular,
       featureFlagsMap,
       permissionsPerRoleId,

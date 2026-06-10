@@ -8,6 +8,7 @@ import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object
 import { type UserWorkspaceRoleMap } from 'src/engine/metadata-modules/role-target/types/user-workspace-role-map';
 import { type FlatRowLevelPermissionPredicateGroupMaps } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate-group-maps.type';
 import { type FlatRowLevelPermissionPredicateMaps } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate-maps.type';
+import { type RecordScopingRulesByRoleId } from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
 import { type WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/workspace-event-emitter';
 
 export interface WorkspaceInternalContext {
@@ -21,6 +22,9 @@ export interface WorkspaceInternalContext {
   featureFlagsMap: Record<FeatureFlagKey, boolean>;
   userWorkspaceRoleMap: UserWorkspaceRoleMap;
   apiKeyRoleMap: Record<string, string>;
+  // Clean-room record-level locking rules, resolved to roleId for this workspace.
+  // Optional: undefined/absent means no record scoping is applied.
+  recordScopingRulesByRoleId?: RecordScopingRulesByRoleId;
   eventEmitterService: WorkspaceEventEmitter;
   coreDataSource: DataSource;
 }
