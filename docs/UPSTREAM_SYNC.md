@@ -116,6 +116,35 @@ NODE_ENV=test corepack yarn jest --config ./jest-integration.config.ts \
 Gotcha: must run under Node 24 (see Watch-items). `nx jest --config …` silently
 ignores `--config` — invoke the jest binary through `yarn`, not the nx target.
 
+## Fork CI / workflows (upstream automation that can't run here)
+
+Upstream ships GitHub Actions that dispatch to `twentyhq/ci-privileged` and mint a
+`twentyhq`-scoped app token (`TWENTY_WORKFLOW_DISPATCHER_*`). On this fork those
+secrets don't exist, so the workflows fail (red checks) and can never work. They
+are **disabled at the Actions level** (`gh workflow disable …`) rather than in
+code — a disabled workflow is keyed by path, so the disable survives upstream
+syncs without a per-sync code edit.
+
+- **Preview Environment Dispatch** — disabled. We preview via **Railway native PR
+  Environments** instead (see below), not this upstream dispatch.
+- Other `…-dispatch` workflows (PR Review, Visual Regression, Website Preview,
+  app-prod-parity) are also twentyhq-privileged; disable them too if/when they
+  start showing red on a fork PR (they're mostly path-gated and often don't fire).
+- **CI Utils / danger-js** is left ENABLED — it's a useful PR-hygiene check on
+  normal PRs. It will *time out* (5-min job cap) on a huge upstream-sync PR
+  because the diff is enormous; that red is a one-off artifact of the sync size,
+  is non-blocking (`main` is unprotected), and clears on normal PRs.
+
+### PR previews — Railway native PR Environments
+
+Because the Twenty service deploys a **prebuilt image** (`ghcr.io/machinagod/twenty:main`),
+Railway's native PR Environments clone the base env and run that *same* `:main`
+image — so a PR preview reflects infra/config/migrations, **not the PR's code**.
+That's an accepted limitation (previewing PR code would require building a per-PR
+image and pointing the env at it). Enable in the Railway dashboard:
+**Project (twenty-crm) → Settings → Environments → Enable PR Environments**
+(it's a dashboard toggle; not exposed via the CLI/MCP).
+
 ## Deploy (separate, gated step — never bundled with the rebase)
 
 Redeploying runs **every upstream migration since the last sync** against the live
