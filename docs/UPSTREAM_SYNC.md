@@ -74,8 +74,23 @@ git push -u origin chore/upstream-update
 wired into the workspace ORM (filters SELECTs/UPDATEs for a scoped role; admin
 still sees all). It's the regression net that catches an upstream refactor
 silently dropping the `applyRecordScoping()` call. It's driven by the
-`RECORD_SCOPING_RULES` entry in `.env.test` (a rule scoped to a custom role
-label, inert for every other suite).
+`RECORD_SCOPING_RULES` entry in `.env.test` (rules scoped to a custom role
+label, inert for every other suite) and covers both value sources: static-value
+(company / employees) and member-relative (opportunity / `ownerId = me`).
+
+### Prod config (as of 2026-06-24)
+
+Record scoping is **live in prod**. `RECORD_SCOPING_RULES` on the **Twenty**
+(server) Railway service scopes the `Member` role on `opportunity` to
+`ownerId = me` (members see/edit only opportunities they own). The test's
+member-relative case mirrors this exact shape, so a wiring regression is caught
+before deploy.
+
+It is **deliberately NOT set on the Twenty Worker** service: worker jobs run in a
+system context (`shouldBypassPermissionChecks = true`), so scoping is bypassed
+there regardless and the var would be inert. This is by design, not config drift
+— don't "fix" it by copying the var to the worker. (If a worker path ever starts
+running user-context queries, revisit.)
 
 Local run (services + seeded `test` DB required — mirrors CI's `with-db-reset`):
 
