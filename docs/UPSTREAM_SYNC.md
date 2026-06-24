@@ -58,9 +58,48 @@ npx nx typecheck twenty-server && npx nx typecheck twenty-front
 npx nx test twenty-server      # at least the record-scoping suites
 npx nx build twenty-server && npx nx build twenty-front
 
+#    CRITICAL: run the record-scoping integration test. It's the only thing that
+#    proves the ORM chokepoint still APPLIES scoping after the rebase (unit tests
+#    only cover the pure logic against a mock). Needs Postgres + Redis + ClickHouse
+#    up and a seeded `test` DB — see "Record-scoping integration test" below.
+#    test/integration/graphql/suites/record-scoping.integration-spec.ts
+
 # 6. Push. NO prod touch yet — review before any deploy/migration.
 git push -u origin chore/upstream-update
 ```
+
+## Record-scoping integration test
+
+`record-scoping.integration-spec.ts` proves the clean-room scoping feature is
+wired into the workspace ORM (filters SELECTs/UPDATEs for a scoped role; admin
+still sees all). It's the regression net that catches an upstream refactor
+silently dropping the `applyRecordScoping()` call. It's driven by the
+`RECORD_SCOPING_RULES` entry in `.env.test` (a rule scoped to a custom role
+label, inert for every other suite).
+
+Local run (services + seeded `test` DB required — mirrors CI's `with-db-reset`):
+
+```bash
+# Services (CI uses postgres:18 / redis / clickhouse:25.8.8). Postgres is usually
+# already local; Redis + ClickHouse via Docker:
+docker run -d --name twenty-test-redis -p 6379:6379 redis
+docker run -d --name twenty-test-clickhouse -e CLICKHOUSE_PASSWORD=clickhousePassword \
+  -p 8123:8123 -p 9000:9000 clickhouse/clickhouse-server:25.8.8
+
+# The app connects as PG role `postgres`; it must be superuser locally:
+#   ALTER ROLE postgres WITH SUPERUSER CREATEDB CREATEROLE;
+# Create + seed the test DB (also a good full-migration smoke test):
+cd packages/twenty-server
+NODE_ENV=test NODE_OPTIONS="--import tsx/esm" npx nx database:reset
+
+# Run just this spec. NOTE: `nx jest` drops --config; call jest via yarn instead.
+# (ClickHouse 'twenty' DB-missing errors in the log are unrelated audit noise.)
+NODE_ENV=test corepack yarn jest --config ./jest-integration.config.ts \
+  test/integration/graphql/suites/record-scoping.integration-spec.ts
+```
+
+Gotcha: must run under Node 24 (see Watch-items). `nx jest --config …` silently
+ignores `--config` — invoke the jest binary through `yarn`, not the nx target.
 
 ## Deploy (separate, gated step — never bundled with the rebase)
 
