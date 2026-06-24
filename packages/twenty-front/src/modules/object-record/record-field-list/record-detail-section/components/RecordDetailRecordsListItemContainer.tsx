@@ -11,11 +11,6 @@ const StyledListItem = styled.div<{
   display: flex;
   gap: ${themeCssVariables.spacing[1]};
   height: ${themeCssVariables.spacing[10]};
-  /* Skip style/layout for off-screen relation rows. Height is fixed, so the
-     intrinsic-size placeholder is exact and scrolling stays jank-free. Cuts
-     style-recalc + forced-reflow cost on records with many relation lines. (#5) */
-  content-visibility: auto;
-  contain-intrinsic-size: auto ${themeCssVariables.spacing[10]};
   justify-content: space-between;
   padding-left: ${({ noHorizontalPadding }) =>
     noHorizontalPadding ? 0 : themeCssVariables.spacing[3]};
