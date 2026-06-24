@@ -65,13 +65,6 @@ const StyledInlineCellBaseContainer = styled.div<{ readonly: boolean }>`
   display: flex;
   gap: ${themeCssVariables.spacing[1]};
   height: fit-content;
-  /* Skip style/layout for off-screen field rows in long record fields panels —
-     this is the on-page element bulk behind the ~2.4k-element style recalc (#5).
-     Variable height ⇒ 'auto' keyword remembers the measured size after first
-     paint. Edit/hover popovers are portaled to body, so paint containment here
-     doesn't clip them. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 32px;
   user-select: none;
   width: 100%;
 `;
