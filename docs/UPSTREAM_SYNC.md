@@ -135,15 +135,25 @@ syncs without a per-sync code edit.
   because the diff is enormous; that red is a one-off artifact of the sync size,
   is non-blocking (`main` is unprotected), and clears on normal PRs.
 
-### PR previews — Railway native PR Environments
+### PR previews — none for now (deliberate)
 
-Because the Twenty service deploys a **prebuilt image** (`ghcr.io/machinagod/twenty:main`),
-Railway's native PR Environments clone the base env and run that *same* `:main`
-image — so a PR preview reflects infra/config/migrations, **not the PR's code**.
-That's an accepted limitation (previewing PR code would require building a per-PR
-image and pointing the env at it). Enable in the Railway dashboard:
-**Project (twenty-crm) → Settings → Environments → Enable PR Environments**
-(it's a dashboard toggle; not exposed via the CLI/MCP).
+There is **no PR-preview environment** on the fork, by decision (2026-06-24).
+
+Railway's native PR Environments need a **GitHub-repo-connected service** to watch
+for PRs. Every service in `twenty-crm` is image/plugin-based (`Twenty` and `Twenty
+Worker` deploy `ghcr.io/machinagod/twenty:main`; Postgres/Redis are plugins) with
+`source.repo = null`, so native PR envs have nothing to watch and won't trigger.
+
+If a preview is ever wanted, the two real options are:
+- **Per-PR image preview** — a workflow that builds `ghcr.io/machinagod/twenty:pr-<N>`
+  on PR, deploys it to a reusable Railway `preview` env, runs migrations, comments
+  the URL. Previews real PR code; moderate build + ongoing cost.
+- **Connect the service to the repo** — point the Railway `Twenty` service at the
+  GitHub repo (Railway builds the Dockerfile) so native PR envs work. Enables
+  native previews but changes the prod deploy model away from the GHCR image.
+
+For the upstream-sync PR specifically, the preview need is covered by the gated
+deploy + re-profile, not a preview env.
 
 ## Deploy (separate, gated step — never bundled with the rebase)
 
