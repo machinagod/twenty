@@ -21,6 +21,7 @@ As of the 2026-06-24 sync (`upstream/main` @ `269c8ef400`, 427 commits replayed)
 | **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) | The conflict risk. Hooks into `twenty-orm` query builders (`workspace-{select,update,delete,soft-delete}-query-builder.ts`), `workspace-entity-manager.ts`, `global-workspace-orm.manager.ts`, `orm-workspace-context.storage.ts`, `config-variables.ts`. Mostly self-contained new files under `record-scoping/`. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
 | **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. |
+| **Claude workflows** | `claude.yml` (replaces upstream's 208-line version with the standard 50-line Claude Code action) + `claude-code-review.yml` (new) | Fork's own Claude GitHub integration (orig. PR #1). Re-apply by `git checkout <fork-main> -- .github/workflows/claude.yml .github/workflows/claude-code-review.yml` after each sync (upstream overwrites `claude.yml`). Needs `ANTHROPIC_API_KEY`/Claude app on the fork. |
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
 custom commit until upstream shipped the same fix; at the 2026-06-24 sync it
