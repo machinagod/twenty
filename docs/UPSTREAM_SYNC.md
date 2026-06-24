@@ -125,8 +125,8 @@ are **disabled at the Actions level** (`gh workflow disable …`) rather than in
 code — a disabled workflow is keyed by path, so the disable survives upstream
 syncs without a per-sync code edit.
 
-- **Preview Environment Dispatch** — disabled. We preview via **Railway native PR
-  Environments** instead (see below), not this upstream dispatch.
+- **Preview Environment Dispatch** + **PR Review Dispatch** — disabled (they
+  dispatch to `twentyhq/ci-privileged`). No PR-preview env on the fork (see below).
 - Other `…-dispatch` workflows (PR Review, Visual Regression, Website Preview,
   app-prod-parity) are also twentyhq-privileged; disable them too if/when they
   start showing red on a fork PR (they're mostly path-gated and often don't fire).
@@ -157,16 +157,32 @@ deploy + re-profile, not a preview env.
 
 ## Deploy (separate, gated step — never bundled with the rebase)
 
+Merging to `main` does **not** deploy — it only updates the branch. The prod
+deploy is a **separate, manual** step (the gate): the `Build Railway image`
+workflow (`build-railway-image.yaml`) runs on `workflow_dispatch` only. One
+dispatch builds the `twenty` image, pushes `ghcr.io/machinagod/twenty:{main,<sha>}`,
+then **redeploys the `Twenty` + `Twenty Worker` Railway services** (which apply the
+migrations on boot). It needs repo secret `RAILWAY_TOKEN` (a Railway *project
+token* scoped to twenty-crm/production); without it the build still runs and the
+redeploy is skipped with a warning.
+
 Redeploying runs **every upstream migration since the last sync** against the live
 prod DB. Treat it as a maintenance operation:
 
 1. **DB backup + restore-test first.** 427 commits' worth of migrations is not
-   reversible by wishing.
+   reversible by wishing. (`pg_dump -Fc` of the `postgres` DB via the public proxy.)
 2. Maintenance window.
-3. Merge `chore/upstream-update` → `main`; CD rebuilds the GHCR image and Railway
-   redeploys (server + worker on `ghcr.io/machinagod/twenty:main`).
+3. Merge the sync PR to `main` (does not deploy), then **dispatch `Build Railway
+   image`** (Actions tab → Run workflow, ref `main`). That builds + pushes +
+   redeploys server & worker. Watch the run; verify the live image digest matches
+   the freshly-pushed `:main`.
 4. Smoke-test record-scoping (it gates every workspace query) and re-profile the
    front-end perf scenarios.
+
+First-run check: confirm `railway redeploy` actually pulled the new `:main` digest
+(compare the running deployment's image digest to the just-pushed one). If Railway
+ever reuses a stale digest, switch the deploy step to point the service at the
+immutable `:<sha>` tag via the Railway API instead of redeploying `:main`.
 
 ## Watch-items
 
