@@ -1,9 +1,12 @@
+import { agentChatDraftsByThreadIdState } from '@/ai/states/agentChatDraftsByThreadIdState';
+import { agentChatInputState } from '@/ai/states/agentChatInputState';
 import { agentChatUsageComponentFamilyState } from '@/ai/states/agentChatUsageComponentFamilyState';
+import { currentAiChatThreadState } from '@/ai/states/currentAiChatThreadState';
 import { currentAiChatThreadTitleComponentFamilyState } from '@/ai/states/currentAiChatThreadTitleComponentFamilyState';
 import { threadIdCreatedFromDraftState } from '@/ai/states/threadIdCreatedFromDraftState';
-import { useSwitchAgentChatThreadWithDraft } from '@/ai/hooks/useSwitchAgentChatThreadWithDraft';
 import { useOpenAskAiPageInSidePanel } from '@/side-panel/hooks/useOpenAskAiPageInSidePanel';
 import { useAtomComponentFamilyStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateCallbackState';
+import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useStore } from 'jotai';
 import { isDefined } from 'twenty-shared/utils';
@@ -20,7 +23,13 @@ export const useAiChatThreadClick = (
   const setThreadIdCreatedFromDraft = useSetAtomState(
     threadIdCreatedFromDraftState,
   );
-  const { switchThreadWithDraft } = useSwitchAgentChatThreadWithDraft();
+  const [currentAiChatThread, setCurrentAiChatThread] = useAtomState(
+    currentAiChatThreadState,
+  );
+  const setAgentChatInput = useSetAtomState(agentChatInputState);
+  const setAgentChatDraftsByThreadId = useSetAtomState(
+    agentChatDraftsByThreadIdState,
+  );
   const threadTitleFamilyCallback = useAtomComponentFamilyStateCallbackState(
     currentAiChatThreadTitleComponentFamilyState,
   );
@@ -32,8 +41,21 @@ export const useAiChatThreadClick = (
 
   const handleThreadClick = (thread: AgentChatThread) => {
     setThreadIdCreatedFromDraft(null);
+    const isSameThread = thread.id === currentAiChatThread;
 
-    switchThreadWithDraft(thread.id);
+    if (currentAiChatThread !== null) {
+      setAgentChatDraftsByThreadId((prev) => ({
+        ...prev,
+        [currentAiChatThread]: store.get(agentChatInputState.atom),
+      }));
+    }
+    setCurrentAiChatThread(thread.id);
+
+    if (!isSameThread) {
+      const newDraft =
+        store.get(agentChatDraftsByThreadIdState.atom)[thread.id] ?? '';
+      setAgentChatInput(newDraft);
+    }
 
     const clickedFamilyKey = { threadId: thread.id };
 

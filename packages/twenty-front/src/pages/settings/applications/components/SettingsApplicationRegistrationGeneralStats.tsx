@@ -1,9 +1,9 @@
 import {
+  H2Title,
   IconBrandDocker,
   IconChartBar,
   IconStatusChange,
-} from 'twenty-ui/icon';
-import { H2Title } from 'twenty-ui/typography';
+} from 'twenty-ui-deprecated/display';
 import { useLingui } from '@lingui/react/macro';
 import { SettingsTableCard } from '@/settings/components/SettingsTableCard';
 import {
@@ -11,7 +11,7 @@ import {
   FindApplicationRegistrationStatsDocument,
 } from '~/generated-metadata/graphql';
 import { useQuery } from '@apollo/client/react';
-import { Section } from 'twenty-ui/layout';
+import { Section } from 'twenty-ui-deprecated/layout';
 
 export const SettingsApplicationRegistrationGeneralStats = ({
   registration,

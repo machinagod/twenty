@@ -1,4 +1,4 @@
-import { type CoreApiClient } from 'twenty-client-sdk/core';
+import { CoreApiClient } from 'twenty-client-sdk/core';
 
 import { updatePersonLastContactAtIfNewer } from 'src/utils/update-person-last-contact-at';
 

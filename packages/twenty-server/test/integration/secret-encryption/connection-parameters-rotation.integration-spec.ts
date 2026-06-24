@@ -6,7 +6,6 @@ import { saveImapSmtpCaldavAccount } from 'test/integration/metadata/suites/conn
 import { runSecretEncryptionRotationCommand } from 'test/integration/secret-encryption/utils/run-secret-encryption-rotation-command.util';
 import { buildSecretEncryptionServiceFromEnv } from 'test/integration/upgrade/utils/build-secret-encryption-service.util';
 
-import { EmailConnectionSecurity } from 'src/engine/core-modules/imap-smtp-caldav-connection/enums/email-connection-security.enum';
 import { type EncryptedImapSmtpCaldavParams } from 'src/engine/core-modules/imap-smtp-caldav-connection/types/imap-smtp-caldav-connection.type';
 import { type SecretEncryptionService } from 'src/engine/core-modules/secret-encryption/secret-encryption.service';
 
@@ -54,7 +53,7 @@ const expectAllPasswordsDecryptTo = ({
     expect(params).toBeDefined();
     expect(params?.password).toMatch(V2_ENVELOPE_REGEX);
 
-    const decrypted = secretEncryption.decryptVersionedOrThrow(
+    const decrypted = secretEncryption.decryptVersioned(
       params!.password,
       {
         workspaceId: row.workspaceId,
@@ -84,21 +83,21 @@ describe('secret-encryption:rotate command — connection-parameters site (integ
             port: 993,
             username: 'rotation@example.com',
             password: IMAP_PASSWORD,
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
           SMTP: {
             host: 'smtp.fastmail.com',
             port: 465,
             username: 'rotation@example.com',
             password: SMTP_PASSWORD,
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
           CALDAV: {
             host: 'caldav.fastmail.com',
             port: 443,
             username: 'rotation@example.com',
             password: CALDAV_PASSWORD,
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },

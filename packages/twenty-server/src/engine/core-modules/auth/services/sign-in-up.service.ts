@@ -5,17 +5,10 @@ import { msg } from '@lingui/core/macro';
 import { TWENTY_ICONS_BASE_URL } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
-import {
-  QueryFailedError,
-  Repository,
-  type DataSource,
-  type QueryRunner,
-} from 'typeorm';
+import { Repository, type DataSource, type QueryRunner } from 'typeorm';
 import { v4 } from 'uuid';
 
-import { POSTGRESQL_ERROR_CODES } from 'src/engine/api/graphql/workspace-query-runner/constants/postgres-error-codes.constants';
 import { USER_SIGNUP_EVENT_NAME } from 'src/engine/api/graphql/workspace-query-runner/constants/user-signup-event-name.constants';
-import { type QueryFailedErrorWithCode } from 'src/engine/api/graphql/workspace-query-runner/utils/workspace-query-runner-graphql-api-exception-handler.util';
 import { EventLogEmitterService } from 'src/engine/core-modules/event-logs/emit/event-log-emitter.service';
 import { USER_SIGNUP_EVENT } from 'src/engine/core-modules/event-logs/emit/events/workspace-event/user/user-signup';
 import { WORKSPACE_CREATED_EVENT } from 'src/engine/core-modules/event-logs/emit/events/workspace-event/workspace/workspace-created';
@@ -52,10 +45,6 @@ import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { WorkspaceInvitationService } from 'src/engine/core-modules/workspace-invitation/services/workspace-invitation.service';
 import { AuthProviderEnum } from 'src/engine/core-modules/workspace/types/workspace.type';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
-import {
-  WorkspaceException,
-  WorkspaceExceptionCode,
-} from 'src/engine/core-modules/workspace/workspace.exception';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/workspace-event-emitter';
 import { getDomainFromEmailOrThrow } from 'src/utils/get-domain-from-email-or-throw';
@@ -345,14 +334,16 @@ export class SignInUpService {
       );
     }
 
-    await this.onboardingService.setOnboardingCreateProfilePending(
-      {
-        userId: user.id,
-        workspaceId: workspace.id,
-        value: true,
-      },
-      queryRunner,
-    );
+    if (user.firstName === '' && user.lastName === '') {
+      await this.onboardingService.setOnboardingCreateProfilePending(
+        {
+          userId: user.id,
+          workspaceId: workspace.id,
+          value: true,
+        },
+        queryRunner,
+      );
+    }
   }
 
   private async saveNewUser(
@@ -495,7 +486,6 @@ export class SignInUpService {
 
   async signUpOnNewWorkspace(
     userData: ExistingUserOrPartialUserWithPicture['userData'],
-    options?: { displayName?: string; subdomain?: string },
   ) {
     const email =
       userData.type === 'newUserWithPicture'
@@ -514,26 +504,6 @@ export class SignInUpService {
 
     await this.assertWorkspaceCreationAllowed(userData);
 
-    const displayName = options?.displayName?.trim();
-
-    if (!displayName) {
-      throw new AuthException(
-        'Workspace name is required',
-        AuthExceptionCode.INVALID_INPUT,
-        {
-          userFriendlyMessage: msg`Workspace name is required`,
-        },
-      );
-    }
-
-    const requestedSubdomain = options?.subdomain;
-
-    if (isDefined(requestedSubdomain)) {
-      await this.subdomainManagerService.validateSubdomainOrThrow(
-        requestedSubdomain,
-      );
-    }
-
     const shouldGrantServerAdmin = !(await this.hasServerAdmin());
 
     const isWorkEmailFound = isWorkEmail(email);
@@ -548,13 +518,11 @@ export class SignInUpService {
 
           const workspaceToCreate = this.workspaceRepository.create({
             id: workspaceId,
-            subdomain: isDefined(requestedSubdomain)
-              ? requestedSubdomain
-              : await this.subdomainManagerService.generateSubdomain(
-                  isWorkEmailFound ? { userEmail: email } : {},
-                ),
+            subdomain: await this.subdomainManagerService.generateSubdomain(
+              isWorkEmailFound ? { userEmail: email } : {},
+            ),
             workspaceCustomApplicationId,
-            displayName,
+            displayName: '',
             inviteHash: v4(),
             activationStatus: WorkspaceActivationStatus.PENDING_CREATION,
           });
@@ -645,20 +613,6 @@ export class SignInUpService {
         .insertWorkspaceEvent(WORKSPACE_CREATED_EVENT, {});
 
       return { user, workspace };
-    } catch (error) {
-      const isSubdomainConflict =
-        error instanceof QueryFailedError &&
-        (error as QueryFailedErrorWithCode).code ===
-          POSTGRESQL_ERROR_CODES.UNIQUE_VIOLATION;
-
-      if (isDefined(requestedSubdomain) && isSubdomainConflict) {
-        throw new WorkspaceException(
-          'Subdomain already taken',
-          WorkspaceExceptionCode.SUBDOMAIN_ALREADY_TAKEN,
-        );
-      }
-
-      throw error;
     } finally {
       await this.workspaceCacheService.invalidateAndRecompute(workspaceId, [
         'flatApplicationMaps',

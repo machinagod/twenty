@@ -29,7 +29,6 @@ export const buildPersonMatchedData = async ({
   enrichedAt,
   companyIdByMatchKeyCache,
   overrideExistingValues,
-  shouldPersist,
 }: {
   client: CoreApiClient;
   node: PersonNode;
@@ -37,18 +36,8 @@ export const buildPersonMatchedData = async ({
   enrichedAt: string;
   companyIdByMatchKeyCache: CompanyIdByMatchKeyCache;
   overrideExistingValues: boolean;
-  shouldPersist: boolean;
-}): Promise<{
-  mappedData: Record<string, unknown>;
-  persistData: Record<string, unknown>;
-}> => {
+}): Promise<Record<string, unknown>> => {
   const mapped = mapPerson(outcome.data);
-  const mappedData = pruneUndefined({ ...mapped.standard, ...mapped.pdl });
-
-  if (!shouldPersist) {
-    return { mappedData, persistData: {} };
-  }
-
   const writableStandard = pickWritableStandard({
     standard: mapped.standard,
     current: node as unknown as Record<string, unknown>,
@@ -64,7 +53,7 @@ export const buildPersonMatchedData = async ({
         companyIdByMatchKeyCache,
       });
 
-  const persistData = pruneUndefined({
+  return pruneUndefined({
     ...writableStandard,
     ...mapped.pdl,
     companyId: currentCompanyId,
@@ -73,6 +62,4 @@ export const buildPersonMatchedData = async ({
     pdlLastEnrichedAt: enrichedAt,
     pdlEnrichmentStatus: 'MATCHED',
   });
-
-  return { mappedData, persistData };
 };

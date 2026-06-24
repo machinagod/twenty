@@ -1,4 +1,8 @@
-import { type IconComponent, IconHttpGet, IconHttpPost } from 'twenty-ui/icon';
+import {
+  type IconComponent,
+  IconHttpGet,
+  IconHttpPost,
+} from 'twenty-ui-deprecated/display';
 export type WebhookHttpMethods = 'GET' | 'POST';
 
 export const WEBHOOK_TRIGGER_HTTP_METHOD_OPTIONS: Array<{

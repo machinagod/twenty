@@ -8,24 +8,26 @@ import {
   type ReactNode,
   useContext,
   useMemo,
-  useState,
 } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import {
+  HorizontalSeparator,
   IconAlertTriangle,
   IconInfoCircle,
   IconSquareRoundedCheck,
   IconX,
-} from 'twenty-ui/icon';
-import { HorizontalSeparator } from 'twenty-ui/layout';
-import { ProgressBar } from 'twenty-ui/feedback';
-import { LightButton, LightIconButton } from 'twenty-ui/input';
-import { UndecoratedLink } from 'twenty-ui/navigation';
+} from 'twenty-ui-deprecated/display';
+import {
+  ProgressBar,
+  useProgressAnimation,
+} from 'twenty-ui-deprecated/feedback';
+import { LightButton, LightIconButton } from 'twenty-ui-deprecated/input';
+import { UndecoratedLink } from 'twenty-ui-deprecated/navigation';
 import {
   MOBILE_VIEWPORT,
   ThemeContext,
   themeCssVariables,
-} from 'twenty-ui/theme-constants';
+} from 'twenty-ui-deprecated/theme-constants';
 
 export enum SnackBarVariant {
   Default = 'default',
@@ -157,8 +159,15 @@ export const SnackBar = ({
 }: SnackBarProps) => {
   const { i18n, t } = useLingui();
   const { theme } = useContext(ThemeContext);
-  const [isPaused, setIsPaused] = useState(false);
-  const isAutoDismiss = isUndefined(overrideProgressValue);
+  const { animation: progressAnimation, value: progressValue } =
+    useProgressAnimation({
+      autoPlay: isUndefined(overrideProgressValue),
+      initialValue: isDefined(overrideProgressValue)
+        ? overrideProgressValue
+        : 100,
+      finalValue: 0,
+      options: { duration, onComplete: onClose },
+    });
 
   const icon = useMemo(() => {
     if (isDefined(iconComponent)) {
@@ -194,11 +203,11 @@ export const SnackBar = ({
   }, [iconComponent, variant, i18n, theme.icon.size.md, theme.snackBar]);
 
   const handleMouseEnter = () => {
-    setIsPaused(true);
+    progressAnimation?.pause();
   };
 
   const handleMouseLeave = () => {
-    setIsPaused(false);
+    progressAnimation?.play();
   };
 
   const sanitizedMessage = sanitizeMessageToRenderInSnackbar(message);
@@ -219,10 +228,7 @@ export const SnackBar = ({
       <StyledProgressBarContainer>
         <ProgressBar
           barColor={theme.snackBar[variant].backgroundColor}
-          value={overrideProgressValue ?? 100}
-          countdownDurationInMs={isAutoDismiss ? duration : undefined}
-          isCountdownPaused={isPaused}
-          onCountdownComplete={onClose}
+          value={progressValue}
         />
       </StyledProgressBarContainer>
       <StyledHeader>

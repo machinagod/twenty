@@ -3,7 +3,10 @@ import { type Meta, type StoryObj } from '@storybook/react-vite';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { GraphWidgetTestWrapper } from '@/page-layout/widgets/graph/__tests__/GraphWidgetTestWrapper';
 import { GraphWidgetPieChart } from '@/page-layout/widgets/graph/graph-widget-pie-chart/components/GraphWidgetPieChart';
-import { CatalogDecorator, ComponentDecorator } from 'twenty-ui/testing';
+import {
+  CatalogDecorator,
+  ComponentDecorator,
+} from 'twenty-ui-deprecated/testing';
 import {
   AggregateOperations,
   WidgetConfigurationType,
@@ -97,11 +100,11 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 export const Default: Story = {
   args: {
     data: [
-      { key: 'Qualified', value: 35 },
-      { key: 'Contacted', value: 25 },
-      { key: 'Unqualified', value: 20 },
-      { key: 'Proposal', value: 15 },
-      { key: 'Negotiation', value: 5 },
+      { id: 'Qualified', value: 35 },
+      { id: 'Contacted', value: 25 },
+      { id: 'Unqualified', value: 20 },
+      { id: 'Proposal', value: 15 },
+      { id: 'Negotiation', value: 5 },
     ],
     showLegend: true,
     id: 'pie-chart-default',
@@ -127,9 +130,9 @@ export const Default: Story = {
 export const WithCenterMetric: Story = {
   args: {
     data: [
-      { key: 'Qualified', value: 35 },
-      { key: 'Contacted', value: 25 },
-      { key: 'Unqualified', value: 20 },
+      { id: 'Qualified', value: 35 },
+      { id: 'Contacted', value: 25 },
+      { id: 'Unqualified', value: 20 },
     ],
     showCenterMetric: true,
     id: 'pie-chart-with-center-metric',
@@ -151,9 +154,9 @@ export const WithCenterMetric: Story = {
 export const WithDataLabels: Story = {
   args: {
     data: [
-      { key: 'Qualified', value: 35 },
-      { key: 'Contacted', value: 25 },
-      { key: 'Unqualified', value: 20 },
+      { id: 'Qualified', value: 35 },
+      { id: 'Contacted', value: 25 },
+      { id: 'Unqualified', value: 20 },
     ],
     showDataLabels: true,
     id: 'pie-chart-with-data-labels',
@@ -174,10 +177,10 @@ export const WithDataLabels: Story = {
 export const Revenue: Story = {
   args: {
     data: [
-      { key: 'Product A', value: 420000 },
-      { key: 'Product B', value: 380000 },
-      { key: 'Product C', value: 250000 },
-      { key: 'Product D', value: 180000 },
+      { id: 'Product A', value: 420000 },
+      { id: 'Product B', value: 380000 },
+      { id: 'Product C', value: 250000 },
+      { id: 'Product D', value: 180000 },
     ],
     prefix: '$',
     displayType: 'shortNumber',
@@ -205,9 +208,9 @@ export const Revenue: Story = {
 export const TaskStatus: Story = {
   args: {
     data: [
-      { key: 'Completed', value: 45 },
-      { key: 'In Progress', value: 30 },
-      { key: 'To Do', value: 25 },
+      { id: 'Completed', value: 45 },
+      { id: 'In Progress', value: 30 },
+      { id: 'To Do', value: 25 },
     ],
     displayType: 'percentage',
     showLegend: true,
@@ -234,8 +237,8 @@ export const TaskStatus: Story = {
 export const TwoSlices: Story = {
   args: {
     data: [
-      { key: 'Active', value: 75 },
-      { key: 'Inactive', value: 25 },
+      { id: 'Active', value: 75 },
+      { id: 'Inactive', value: 25 },
     ],
     displayType: 'percentage',
     showLegend: true,
@@ -262,14 +265,14 @@ export const TwoSlices: Story = {
 export const ManySlices: Story = {
   args: {
     data: [
-      { key: 'Category 1', value: 20 },
-      { key: 'Category 2', value: 18 },
-      { key: 'Category 3', value: 16 },
-      { key: 'Category 4', value: 14 },
-      { key: 'Category 5', value: 12 },
-      { key: 'Category 6', value: 10 },
-      { key: 'Category 7', value: 6 },
-      { key: 'Category 8', value: 4 },
+      { id: 'Category 1', value: 20 },
+      { id: 'Category 2', value: 18 },
+      { id: 'Category 3', value: 16 },
+      { id: 'Category 4', value: 14 },
+      { id: 'Category 5', value: 12 },
+      { id: 'Category 6', value: 10 },
+      { id: 'Category 7', value: 6 },
+      { id: 'Category 8', value: 4 },
     ],
     showLegend: true,
     id: 'pie-chart-many-slices',
@@ -295,9 +298,9 @@ export const ManySlices: Story = {
 export const WithoutLegend: Story = {
   args: {
     data: [
-      { key: 'Web', value: 45 },
-      { key: 'Mobile', value: 35 },
-      { key: 'Desktop', value: 20 },
+      { id: 'Web', value: 45 },
+      { id: 'Mobile', value: 35 },
+      { id: 'Desktop', value: 20 },
     ],
     displayType: 'percentage',
     showLegend: false,
@@ -324,10 +327,10 @@ export const WithoutLegend: Story = {
 export const MarketShare: Story = {
   args: {
     data: [
-      { key: 'Brand A', value: 35.5 },
-      { key: 'Brand B', value: 28.2 },
-      { key: 'Brand C', value: 18.7 },
-      { key: 'Others', value: 17.6 },
+      { id: 'Brand A', value: 35.5 },
+      { id: 'Brand B', value: 28.2 },
+      { id: 'Brand C', value: 18.7 },
+      { id: 'Others', value: 17.6 },
     ],
     displayType: 'percentage',
     showLegend: true,
@@ -354,10 +357,10 @@ export const MarketShare: Story = {
 export const Storage: Story = {
   args: {
     data: [
-      { key: 'Documents', value: 125 },
-      { key: 'Media', value: 280 },
-      { key: 'Applications', value: 95 },
-      { key: 'System', value: 50 },
+      { id: 'Documents', value: 125 },
+      { id: 'Media', value: 280 },
+      { id: 'Applications', value: 95 },
+      { id: 'System', value: 50 },
     ],
     suffix: ' GB',
     showLegend: true,
@@ -400,23 +403,23 @@ export const Catalog: Story = {
           props: (sliceCount: number) => {
             const dataMap: Record<
               number,
-              Array<{ key: string; value: number }>
+              Array<{ id: string; value: number }>
             > = {
               2: [
-                { key: 'Yes', value: 65 },
-                { key: 'No', value: 35 },
+                { id: 'Yes', value: 65 },
+                { id: 'No', value: 35 },
               ],
               3: [
-                { key: 'Gold', value: 45 },
-                { key: 'Silver', value: 35 },
-                { key: 'Bronze', value: 20 },
+                { id: 'Gold', value: 45 },
+                { id: 'Silver', value: 35 },
+                { id: 'Bronze', value: 20 },
               ],
               5: [
-                { key: 'Item 1', value: 30 },
-                { key: 'Item 2', value: 25 },
-                { key: 'Item 3', value: 20 },
-                { key: 'Item 4', value: 15 },
-                { key: 'Item 5', value: 10 },
+                { id: 'Item 1', value: 30 },
+                { id: 'Item 2', value: 25 },
+                { id: 'Item 3', value: 20 },
+                { id: 'Item 4', value: 15 },
+                { id: 'Item 5', value: 10 },
               ],
             };
 

@@ -294,7 +294,7 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
     // cursor (@WasIntroducedInUpgrade), so fall back to the legacy `flag` column.
     return (
       rolePermissionFlag.permissionFlag?.universalIdentifier ??
-      SystemPermissionFlag[rolePermissionFlag.flag as PermissionFlagType]
+      SystemPermissionFlag[rolePermissionFlag.flag]
     );
   }
 }

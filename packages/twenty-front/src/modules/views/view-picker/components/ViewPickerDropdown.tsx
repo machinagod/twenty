@@ -2,7 +2,6 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
 import { StyledDropdownButtonContainer } from '@/ui/layout/dropdown/components/StyledDropdownButtonContainer';
-import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { isDropdownOpenComponentState } from '@/ui/layout/dropdown/states/isDropdownOpenComponentState';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useGetRecordIndexTotalCount } from '@/views/hooks/internal/useGetRecordIndexTotalCount';
@@ -15,14 +14,18 @@ import { VIEW_PICKER_DROPDOWN_ID } from '@/views/view-picker/constants/ViewPicke
 import { useUpdateViewFromCurrentState } from '@/views/view-picker/hooks/useUpdateViewFromCurrentState';
 import { useViewPickerMode } from '@/views/view-picker/hooks/useViewPickerMode';
 import { isDefined } from 'twenty-shared/utils';
-import { IconChevronDown, IconList, useIcons } from 'twenty-ui/icon';
-import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
+import {
+  IconChevronDown,
+  IconList,
+  OverflowingTextWithTooltip,
+  useIcons,
+} from 'twenty-ui-deprecated/display';
 import { useContext } from 'react';
 import {
   MOBILE_VIEWPORT,
   ThemeContext,
   themeCssVariables,
-} from 'twenty-ui/theme-constants';
+} from 'twenty-ui-deprecated/theme-constants';
 
 const StyledIconContainer = styled.span`
   display: flex;
@@ -58,8 +61,6 @@ export const ViewPickerDropdown = () => {
   const { updateViewFromCurrentState } = useUpdateViewFromCurrentState();
 
   const { totalCount } = useGetRecordIndexTotalCount();
-
-  const { formatNumber } = useNumberFormat();
 
   const isDropdownOpen = useAtomComponentStateValue(
     isDropdownOpenComponentState,
@@ -97,7 +98,7 @@ export const ViewPickerDropdown = () => {
             <OverflowingTextWithTooltip text={currentView?.name ?? t`All`} />
           </StyledViewName>
           <StyledDropdownLabelAdornments>
-            {isDefined(totalCount) && <>· {formatNumber(totalCount)} </>}
+            {isDefined(totalCount) && <>· {totalCount} </>}
             <IconChevronDown size={theme.icon.size.sm} />
           </StyledDropdownLabelAdornments>
         </StyledDropdownButtonContainer>

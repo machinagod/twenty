@@ -1,28 +1,33 @@
 ---
-title: Desarrolladores
-description: Crea aplicaciones, usa la API, aloja por tu cuenta o contribuye a la base de código.
+title: Primeros pasos
+description: Bienvenido a la documentación para desarrolladores de Twenty, tus recursos para ampliar, autoalojar y contribuir a Twenty.
 ---
 
 import { CardTitle } from "/snippets/card-title.mdx"
 
-<CardGroup cols={3}>
-  <Card href="/l/es/developers/extend/apps/getting-started" img="/images/user-guide/halftone/dev-apps.png">
-    <CardTitle>Aplicaciones</CardTitle>
-    Amplía Twenty con objetos personalizados, lógica del lado del servidor, componentes de IU y agentes de IA — todo como paquetes de TypeScript.
-  </Card>
-
-  <Card href="/l/es/developers/extend/api" img="/images/user-guide/halftone/dev-api.png">
+<CardGroup cols={2}>
+  <Card href="/l/es/developers/api" icon="code">
     <CardTitle>API</CardTitle>
-    APIs REST y GraphQL, ganchos web y OAuth.
+    Consulta y modifica los datos de tu CRM con REST o GraphQL.
   </Card>
 
-  <Card href="/l/es/developers/self-host/capabilities/docker-compose" img="/images/user-guide/halftone/dev-self-host.png">
+  <Card href="/l/es/developers/webhooks" icon="bell">
+    <CardTitle>Webhooks</CardTitle>
+    Recibe notificaciones en tiempo real cuando ocurran eventos.
+  </Card>
+
+  <Card href="/l/es/developers/apps/apps" icon="puzzle-piece">
+    <CardTitle>Apps</CardTitle>
+    Crea aplicaciones personalizadas que amplíen las capacidades de Twenty.
+  </Card>
+
+  <Card href="/l/es/developers/self-host/self-host" icon="desktop">
     <CardTitle>Autoalojar</CardTitle>
-    Ejecuta Twenty en tu propia infraestructura.
+    Despliega y administra Twenty en tu propia infraestructura.
   </Card>
 
-  <Card href="/l/es/developers/contribute/capabilities/local-setup" img="/images/user-guide/halftone/dev-contribute.png">
+  <Card href="/l/es/developers/contribute/contribute" icon="github">
     <CardTitle>Contribuir</CardTitle>
-    Configura el monorepo localmente y envía PRs.
+    Únete a nuestra comunidad de código abierto y contribuye a Twenty.
   </Card>
 </CardGroup>

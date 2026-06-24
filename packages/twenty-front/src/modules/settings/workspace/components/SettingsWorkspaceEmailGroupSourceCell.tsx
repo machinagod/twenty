@@ -1,9 +1,11 @@
 import { styled } from '@linaria/react';
 
 import { type MessageChannel } from '@/accounts/types/MessageChannel';
-import { IconMail } from 'twenty-ui/icon';
-import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  IconMail,
+  OverflowingTextWithTooltip,
+} from 'twenty-ui-deprecated/display';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 
 const StyledNameCell = styled.div`
   align-items: center;

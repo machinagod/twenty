@@ -951,6 +951,7 @@ export class AuthService {
       workspaceInviteHash,
       workspaceId,
       billingCheckoutSessionState,
+      action,
       locale,
       returnToPath,
     }: MicrosoftRequest['user'] | GoogleRequest['user'],
@@ -958,12 +959,20 @@ export class AuthService {
   ): Promise<string> {
     const email = rawEmail.toLowerCase();
 
+    const availableWorkspacesCount =
+      action === 'list-available-workspaces'
+        ? await this.countAvailableWorkspacesByEmail(email)
+        : 0;
+
     const existingUser =
       await this.userService.findUserByEmailWithWorkspaces(email);
 
-    // Route SSO sign-ins through the same create-or-select flow as credentials
-    // instead of landing straight on a workspace subdomain.
-    if (!workspaceId && !workspaceInviteHash) {
+    if (
+      !workspaceId &&
+      !workspaceInviteHash &&
+      action === 'list-available-workspaces' &&
+      availableWorkspacesCount > 1
+    ) {
       const user =
         existingUser ??
         (await this.signInUpService.signUpWithoutWorkspace(
@@ -1005,12 +1014,15 @@ export class AuthService {
       return url.toString();
     }
 
-    const currentWorkspace = await this.findWorkspaceForSignInUp({
-      workspaceId,
-      workspaceInviteHash,
-      email,
-      authProvider,
-    });
+    const currentWorkspace =
+      action === 'create-new-workspace'
+        ? undefined
+        : await this.findWorkspaceForSignInUp({
+            workspaceId,
+            workspaceInviteHash,
+            email,
+            authProvider,
+          });
 
     try {
       const invitation =

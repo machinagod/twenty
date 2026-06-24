@@ -72,11 +72,7 @@ export class GoogleOAuth2ClientProvider {
     );
 
     try {
-      const oAuth2Client = new google.auth.OAuth2({
-        clientId,
-        clientSecret,
-        transporterOptions: { fetchImplementation: fetch },
-      });
+      const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
 
       oAuth2Client.setCredentials({ refresh_token: plaintextRefreshToken });
 

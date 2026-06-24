@@ -2,6 +2,7 @@ import { type I18n } from '@lingui/core';
 import { SOURCE_LOCALE } from 'twenty-shared/translations';
 
 import { generateMessageId } from 'src/engine/core-modules/i18n/utils/generateMessageId';
+import { type ObjectMetadataDTO } from 'src/engine/metadata-modules/object-metadata/dtos/object-metadata.dto';
 import { resolveObjectMetadataStandardOverride } from 'src/engine/metadata-modules/object-metadata/utils/resolve-object-metadata-standard-override.util';
 
 jest.mock('src/engine/core-modules/i18n/utils/generateMessageId');
@@ -30,14 +31,22 @@ describe('resolveObjectMetadataStandardOverride', () => {
         color: 'blue',
         isCustom: true,
         standardOverrides: undefined,
-      };
+      } satisfies Pick<
+        ObjectMetadataDTO,
+        | 'color'
+        | 'labelPlural'
+        | 'labelSingular'
+        | 'description'
+        | 'icon'
+        | 'isCustom'
+        | 'standardOverrides'
+      >;
 
       const result = resolveObjectMetadataStandardOverride(
         objectMetadata,
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('My Custom');
@@ -52,7 +61,16 @@ describe('resolveObjectMetadataStandardOverride', () => {
         color: 'blue',
         isCustom: true,
         standardOverrides: undefined,
-      };
+      } satisfies Pick<
+        ObjectMetadataDTO,
+        | 'color'
+        | 'labelPlural'
+        | 'labelSingular'
+        | 'description'
+        | 'icon'
+        | 'isCustom'
+        | 'standardOverrides'
+      >;
 
       mockGenerateMessageId.mockReturnValue('company.message.id');
       mockI18n._.mockReturnValue('Entreprise');
@@ -62,7 +80,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Company');
@@ -79,14 +96,22 @@ describe('resolveObjectMetadataStandardOverride', () => {
         color: 'blue',
         isCustom: true,
         standardOverrides: undefined,
-      };
+      } satisfies Pick<
+        ObjectMetadataDTO,
+        | 'color'
+        | 'labelPlural'
+        | 'labelSingular'
+        | 'description'
+        | 'icon'
+        | 'isCustom'
+        | 'standardOverrides'
+      >;
 
       const result = resolveObjectMetadataStandardOverride(
         objectMetadata,
         'description',
         undefined,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Custom Description');
@@ -101,14 +126,22 @@ describe('resolveObjectMetadataStandardOverride', () => {
         color: 'blue',
         isCustom: true,
         standardOverrides: undefined,
-      };
+      } satisfies Pick<
+        ObjectMetadataDTO,
+        | 'color'
+        | 'labelPlural'
+        | 'labelSingular'
+        | 'description'
+        | 'icon'
+        | 'isCustom'
+        | 'standardOverrides'
+      >;
 
       const result = resolveObjectMetadataStandardOverride(
         objectMetadata,
         'icon',
         SOURCE_LOCALE,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('custom-icon');
@@ -123,14 +156,22 @@ describe('resolveObjectMetadataStandardOverride', () => {
         color: 'green',
         isCustom: true,
         standardOverrides: undefined,
-      };
+      } satisfies Pick<
+        ObjectMetadataDTO,
+        | 'color'
+        | 'labelPlural'
+        | 'labelSingular'
+        | 'description'
+        | 'icon'
+        | 'isCustom'
+        | 'standardOverrides'
+      >;
 
       const result = resolveObjectMetadataStandardOverride(
         objectMetadata,
         'color',
         SOURCE_LOCALE,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('green');
@@ -155,7 +196,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'icon',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('override-icon');
@@ -181,7 +221,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'color',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('red');
@@ -206,7 +245,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'color',
         SOURCE_LOCALE,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('blue');
@@ -238,7 +276,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'labelSingular',
           'fr-FR',
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('Libellé traduit');
       expect(
@@ -247,7 +284,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'labelPlural',
           'fr-FR',
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('Libellés traduits');
       expect(
@@ -256,7 +292,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'description',
           'fr-FR',
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('Description traduite');
     });
@@ -287,7 +322,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -318,7 +352,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'description',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Description');
@@ -350,7 +383,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         undefined,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -379,7 +411,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'labelSingular',
           SOURCE_LOCALE,
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('Overridden Label');
       expect(
@@ -388,7 +419,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'labelPlural',
           SOURCE_LOCALE,
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('Overridden Labels');
       expect(
@@ -397,7 +427,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'description',
           SOURCE_LOCALE,
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('Overridden Description');
       expect(
@@ -406,7 +435,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
           'icon',
           SOURCE_LOCALE,
           mockI18n,
-          !objectMetadata.isCustom,
         ),
       ).toBe('overridden-icon');
     });
@@ -429,7 +457,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Overridden Label');
@@ -455,7 +482,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         SOURCE_LOCALE,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -481,7 +507,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(mockGenerateMessageId).toHaveBeenCalledWith('Standard Label');
@@ -509,7 +534,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -541,7 +565,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'fr-FR',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Translation Override');
@@ -567,7 +590,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         SOURCE_LOCALE,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Source Override');
@@ -593,7 +615,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         'de-DE',
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Auto Translated Label');
@@ -620,7 +641,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         undefined,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Source Override');
@@ -646,7 +666,6 @@ describe('resolveObjectMetadataStandardOverride', () => {
         'labelSingular',
         undefined,
         mockI18n,
-        !objectMetadata.isCustom,
       );
 
       expect(result).toBe('Auto Translated Label');

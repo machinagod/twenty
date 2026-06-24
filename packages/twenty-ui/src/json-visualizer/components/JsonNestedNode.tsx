@@ -5,11 +5,11 @@ import { useState } from 'react';
 import { isDefined } from '@ui/utilities/utils/isDefined';
 import { type JsonValue } from 'type-fest';
 
-import { type IconComponent } from '@ui/icon';
+import { type IconComponent } from '@ui/display';
 import { JsonArrow } from '@ui/json-visualizer/components/internal/JsonArrow';
 import { JsonNodeLabel } from '@ui/json-visualizer/components/internal/JsonNodeLabel';
+import { JsonNodeValue } from '@ui/json-visualizer/components/internal/JsonNodeValue';
 import { JsonNode } from '@ui/json-visualizer/components/JsonNode';
-import { JsonValueNode } from '@ui/json-visualizer/components/JsonValueNode';
 import { useJsonTreeContextOrThrow } from '@ui/json-visualizer/hooks/useJsonTreeContextOrThrow';
 import { type JsonNodeHighlighting } from '@ui/json-visualizer/types/JsonNodeHighlighting';
 
@@ -45,10 +45,7 @@ export const JsonNestedNode = ({
   const renderedChildren = (
     <ul className={clsx(styles.list, depth > 0 && styles.nested)}>
       {elements.length === 0 ? (
-        <JsonValueNode
-          valueAsString={emptyElementsText}
-          highlighting={undefined}
-        />
+        <JsonNodeValue valueAsString={emptyElementsText} />
       ) : (
         elements.map(({ id, label, value }) => {
           const nextKeyPath = isNonEmptyString(keyPath)

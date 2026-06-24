@@ -53,7 +53,6 @@ export const fromUpdateCommandMenuItemInputToFlatCommandMenuItemToUpdateOrThrow 
       entityApplicationUniversalIdentifier:
         existingFlatCommandMenuItem.applicationUniversalIdentifier,
       workspaceCustomApplicationUniversalIdentifier,
-      isSystemSideEffect: existingFlatCommandMenuItem.isSystemSideEffect,
     });
 
     const { overrides, updatedEditableProperties } =

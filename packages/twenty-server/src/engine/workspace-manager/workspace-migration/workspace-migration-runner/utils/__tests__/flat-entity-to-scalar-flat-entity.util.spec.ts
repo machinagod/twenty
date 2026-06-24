@@ -58,7 +58,6 @@ describe('flatEntityToScalarFlatEntity', () => {
   "isLabelSyncedWithName": false,
   "isNullable": true,
   "isSystem": false,
-  "isSystemSideEffect": false,
   "isUIEditable": true,
   "isUnique": false,
   "label": "Test Label",

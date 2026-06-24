@@ -149,14 +149,6 @@ export class UserWorkspaceService extends TypeOrmQueryService<UserWorkspaceEntit
           { shouldBypassPermissionChecks: true },
         );
 
-      const existingWorkspaceMembers = await workspaceMemberRepository.find({
-        where: { userId: user.id },
-      });
-
-      if (existingWorkspaceMembers.length > 0) {
-        return;
-      }
-
       const userWorkspace = await this.userWorkspaceRepository.findOneOrFail({
         where: {
           userId: user.id,

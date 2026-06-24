@@ -1,9 +1,8 @@
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
 import { styled } from '@linaria/react';
-import { Avatar } from 'twenty-ui/data-display';
-import { MenuItemMultiSelectAvatar } from 'twenty-ui/navigation';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
+import { Avatar } from 'twenty-ui-deprecated/display';
+import { MenuItemMultiSelectAvatar } from 'twenty-ui-deprecated/navigation';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 
 const StyledPinnedItemsContainer = styled.div`
   display: flex;
@@ -32,7 +31,7 @@ export const ObjectFilterDropdownRecordPinnedItems = (props: {
             avatar={
               selectableItem.avatarUrl ? (
                 <Avatar
-                  avatarUrl={getAbsoluteImageUrl(selectableItem.avatarUrl)}
+                  avatarUrl={selectableItem.avatarUrl}
                   placeholderColorSeed={selectableItem.id}
                   placeholder={selectableItem.name}
                   type={selectableItem.avatarType}

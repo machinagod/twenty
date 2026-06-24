@@ -10,9 +10,8 @@ import {
   type UnsubscribeTopicsQuery,
   UnsubscribeTopicVisibility,
 } from '~/generated-metadata/graphql';
-import { Status } from 'twenty-ui/data-display';
-import { IconExternalLink } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/input';
+import { IconExternalLink, Status } from 'twenty-ui-deprecated/display';
+import { Button } from 'twenty-ui-deprecated/input';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
 type UnsubscribeTopic = UnsubscribeTopicsQuery['unsubscribeTopics'][number];

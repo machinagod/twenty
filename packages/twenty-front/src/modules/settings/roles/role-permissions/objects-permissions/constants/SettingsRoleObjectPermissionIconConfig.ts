@@ -8,7 +8,7 @@ import {
   IconTrashOff,
   IconTrashX,
   IconTrashXOff,
-} from 'twenty-ui/icon';
+} from 'twenty-ui-deprecated/display';
 
 type SettingsRoleObjectPermissionIconConfig = {
   Icon: IconComponent;

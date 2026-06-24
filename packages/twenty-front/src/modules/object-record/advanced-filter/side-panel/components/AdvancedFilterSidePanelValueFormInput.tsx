@@ -1,4 +1,3 @@
-import { fieldMetadataItemByIdSelector } from '@/object-metadata/states/fieldMetadataItemByIdSelector';
 import { formatFieldMetadataItemAsFieldDefinition } from '@/object-metadata/utils/formatFieldMetadataItemAsFieldDefinition';
 import { AdvancedFilterSidePanelValueFormCompositeFieldInput } from '@/object-record/advanced-filter/side-panel/components/AdvancedFilterSidePanelValueFormCompositeFieldInput';
 import { AdvancedFilterContext } from '@/object-record/advanced-filter/states/context/AdvancedFilterContext';
@@ -21,7 +20,6 @@ import {
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { RecordFilterOperand } from '@/object-record/record-filter/types/RecordFilterOperand';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
-import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { stringifyRelativeDateFilter } from '@/views/view-filter-value/utils/stringifyRelativeDateFilter';
 import { WORKFLOW_TIMEZONE } from '@/workflow/constants/WorkflowTimeZone';
@@ -93,23 +91,10 @@ export const AdvancedFilterSidePanelValueFormInput = ({
     dropdownInstanceId,
   );
 
-  const {
-    foundFieldMetadataItem: relationTargetFieldMetadataItem,
-    foundObjectMetadataItem: relationTargetObjectMetadataItem,
-  } = useAtomFamilySelectorValue(fieldMetadataItemByIdSelector, {
-    fieldMetadataItemId: recordFilter?.relationTargetFieldMetadataId ?? '',
-  });
-
-  const fieldMetadataItemForValueInput =
-    relationTargetFieldMetadataItem ?? fieldMetadataItemUsedInDropdown;
-
-  const objectMetadataItemForValueInput =
-    relationTargetObjectMetadataItem ?? objectMetadataItem;
-
-  const fieldDefinition = fieldMetadataItemForValueInput
+  const fieldDefinition = fieldMetadataItemUsedInDropdown
     ? formatFieldMetadataItemAsFieldDefinition({
-        field: fieldMetadataItemForValueInput,
-        objectMetadataItem: objectMetadataItemForValueInput,
+        field: fieldMetadataItemUsedInDropdown,
+        objectMetadataItem: objectMetadataItem,
       })
     : null;
 

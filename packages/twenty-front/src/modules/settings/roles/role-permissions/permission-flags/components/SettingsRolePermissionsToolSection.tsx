@@ -8,11 +8,13 @@ import { useSetAtomFamilyState } from '@/ui/utilities/state/jotai/hooks/useSetAt
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 
-import { IconTool } from 'twenty-ui/icon';
-import { H2Title } from 'twenty-ui/typography';
-import { AnimatedExpandableContainer, Section } from 'twenty-ui/layout';
-import { Card } from 'twenty-ui/surfaces';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { H2Title, IconTool } from 'twenty-ui-deprecated/display';
+import {
+  AnimatedExpandableContainer,
+  Card,
+  Section,
+} from 'twenty-ui-deprecated/layout';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 
 const StyledTable = styled.div`
   border-bottom: 1px solid ${themeCssVariables.border.color.light};

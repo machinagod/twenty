@@ -7,7 +7,7 @@ import { useRemoveFocusItemFromFocusStackById } from '@/ui/utilities/focus/hooks
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
 import { isDefined } from 'twenty-shared/utils';
 import { turnIntoEmptyStringIfWhitespacesOnly } from '~/utils/string/turnIntoEmptyStringIfWhitespacesOnly';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 
 type TextAreaVariant = 'default' | 'transparent';
 
@@ -22,7 +22,6 @@ export type TextAreaProps = {
   placeholder?: string;
   value?: string;
   className?: string;
-  onFocus?: () => void;
   onBlur?: () => void;
   readOnly?: boolean;
   variant?: TextAreaVariant;
@@ -103,7 +102,6 @@ export const TextArea = ({
   value = '',
   className,
   onChange,
-  onFocus,
   onBlur,
   readOnly = false,
   variant = 'default',
@@ -129,8 +127,6 @@ export const TextArea = ({
         enableGlobalHotkeysConflictingWithKeyboard: false,
       },
     });
-
-    onFocus?.();
   };
 
   const handleBlur: FocusEventHandler<HTMLTextAreaElement> = () => {

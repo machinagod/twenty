@@ -8,7 +8,7 @@ import {
   IconProgressCheck,
   IconStatusChange,
   type IconComponent,
-} from 'twenty-ui/icon';
+} from 'twenty-ui-deprecated/display';
 import { type GetInstanceAndAllWorkspacesUpgradeStatusQuery } from '~/generated-admin/graphql';
 
 type InstanceAndAllWorkspacesUpgradeStatus =

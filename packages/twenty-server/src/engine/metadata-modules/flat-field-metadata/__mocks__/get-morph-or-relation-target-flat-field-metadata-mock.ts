@@ -32,7 +32,6 @@ export const getRelationTargetFlatFieldMetadataMock = ({
   const createdAt = '2024-01-01T00:00:00.000Z';
 
   return {
-    isSystemSideEffect: false,
     calendarViewIds: [],
     mainGroupByFieldMetadataViewIds: [],
     viewFilterIds: [],

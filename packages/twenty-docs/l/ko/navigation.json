@@ -1,27 +1,24 @@
 {
   "tabs": {
-    "gettingStarted": {
-      "label": "시작하기",
-      "groups": {
-        "welcome": {
-          "label": "환영합니다"
-        },
-        "coreConcepts": {
-          "label": "핵심 개념"
-        }
-      }
-    },
     "userGuide": {
       "label": "사용자 안내서",
       "groups": {
-        "userGuideOverview": {
-          "label": "개요"
+        "discoverTwenty": {
+          "label": "Twenty 알아보기",
+          "groups": {
+            "gettingStartedCapabilities": {
+              "label": "기능"
+            },
+            "gettingStartedHowTos": {
+              "label": "사용 방법"
+            }
+          }
         },
         "dataModel": {
           "label": "데이터 모델",
           "groups": {
-            "dataModelReference": {
-              "label": "참고"
+            "dataModelCapabilities": {
+              "label": "기능"
             },
             "dataModelHowTos": {
               "label": "사용 방법"
@@ -31,8 +28,8 @@
         "dataMigration": {
           "label": "데이터 마이그레이션",
           "groups": {
-            "dataMigrationReference": {
-              "label": "참고"
+            "dataMigrationCapabilities": {
+              "label": "기능"
             },
             "dataMigrationHowTos": {
               "label": "사용 방법"
@@ -42,8 +39,8 @@
         "calendarEmails": {
           "label": "캘린더 및 이메일",
           "groups": {
-            "calendarEmailsReference": {
-              "label": "참고"
+            "calendarEmailsCapabilities": {
+              "label": "기능"
             },
             "calendarEmailsHowTos": {
               "label": "사용 방법"
@@ -53,8 +50,8 @@
         "workflows": {
           "label": "워크플로우",
           "groups": {
-            "workflowsReference": {
-              "label": "참고"
+            "workflowsCapabilities": {
+              "label": "기능"
             },
             "workflowsHowTos": {
               "label": "사용 방법",
@@ -78,26 +75,21 @@
         "ai": {
           "label": "AI",
           "groups": {
-            "aiReference": {
-              "label": "참고"
+            "aiCapabilities": {
+              "label": "기능"
             },
             "aiHowTos": {
               "label": "사용 방법"
             }
           }
         },
-        "layout": {
-          "label": "레이아웃",
+        "viewsPipelines": {
+          "label": "뷰 및 파이프라인",
           "groups": {
-            "layoutReference": {
-              "label": "참고",
-              "groups": {
-                "layoutViews": {
-                  "label": "보기"
-                }
-              }
+            "viewsPipelinesCapabilities": {
+              "label": "기능"
             },
-            "layoutHowTos": {
+            "viewsPipelinesHowTos": {
               "label": "사용 방법"
             }
           }
@@ -105,8 +97,8 @@
         "dashboards": {
           "label": "대시보드",
           "groups": {
-            "dashboardsReference": {
-              "label": "참고"
+            "dashboardsCapabilities": {
+              "label": "기능"
             },
             "dashboardsHowTos": {
               "label": "사용 방법"
@@ -116,8 +108,8 @@
         "permissionsAccess": {
           "label": "권한 및 접근",
           "groups": {
-            "permissionsAccessReference": {
-              "label": "참고"
+            "permissionsAccessCapabilities": {
+              "label": "기능"
             },
             "permissionsAccessHowTos": {
               "label": "사용 방법"
@@ -127,8 +119,8 @@
         "billing": {
           "label": "청구",
           "groups": {
-            "billingReference": {
-              "label": "참고"
+            "billingCapabilities": {
+              "label": "기능"
             },
             "billingHowTos": {
               "label": "사용 방법"
@@ -138,8 +130,8 @@
         "settings": {
           "label": "설정",
           "groups": {
-            "settingsReference": {
-              "label": "참고"
+            "settingsCapabilities": {
+              "label": "기능"
             },
             "settingsHowTos": {
               "label": "사용 방법"
@@ -151,40 +143,59 @@
     "developers": {
       "label": "개발자",
       "groups": {
-        "developersOverview": {
-          "label": "개요"
+        "developersGroup": {
+          "label": "개발자"
         },
-        "apps": {
-          "label": "앱",
+        "extend": {
+          "label": "확장",
           "groups": {
-            "appsGettingStarted": {
-              "label": "시작하기"
-            },
-            "appsConfig": {
-              "label": "설정"
-            },
-            "appsData": {
-              "label": "데이터"
-            },
-            "appsLogic": {
-              "label": "로직"
-            },
-            "appsLayout": {
-              "label": "레이아웃"
-            },
-            "appsOperations": {
-              "label": "작업"
+            "extendCapabilities": {
+              "label": "기능"
             }
           }
         },
-        "api": {
-          "label": "API"
-        },
         "selfHost": {
-          "label": "셀프 호스팅"
+          "label": "셀프 호스팅",
+          "groups": {
+            "selfHostCapabilities": {
+              "label": "기능"
+            }
+          }
         },
         "contribute": {
-          "label": "기여"
+          "label": "기여",
+          "groups": {
+            "contributeCapabilities": {
+              "label": "기능",
+              "groups": {
+                "frontendDevelopment": {
+                  "label": "프론트엔드 개발",
+                  "groups": {
+                    "twentyUi": {
+                      "label": "Twenty UI",
+                      "groups": {
+                        "display": {
+                          "label": "표시"
+                        },
+                        "feedback": {
+                          "label": "피드백"
+                        },
+                        "input": {
+                          "label": "입력"
+                        },
+                        "navigation": {
+                          "label": "네비게이션"
+                        }
+                      }
+                    }
+                  }
+                },
+                "backendDevelopment": {
+                  "label": "백엔드 개발"
+                }
+              }
+            }
+          }
         }
       }
     }

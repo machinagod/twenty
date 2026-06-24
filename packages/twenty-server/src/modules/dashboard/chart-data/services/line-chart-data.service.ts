@@ -295,7 +295,7 @@ export class LineChartDataService {
 
     const series = [
       {
-        key: `${seriesIdPrefix}${aggregateField.name}`,
+        id: `${seriesIdPrefix}${aggregateField.name}`,
         label: aggregateField.label,
         data: dataPoints,
       },
@@ -480,7 +480,7 @@ export class LineChartDataService {
       }
 
       return {
-        key: prefixedSeriesId,
+        id: prefixedSeriesId,
         label: seriesId,
         data: dataPoints,
       };

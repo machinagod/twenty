@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { baseWorkflowActionSettingsSchema } from './base-workflow-action-settings-schema';
-import { expectedOutputSchemaShape } from './expected-output-schema-shape';
 
 export const workflowCodeActionSettingsSchema =
   baseWorkflowActionSettingsSchema.extend({
@@ -16,5 +15,4 @@ export const workflowCodeActionSettingsSchema =
           'Key-value map of input parameters to pass to the logic function at runtime.',
         ),
     }),
-    ...expectedOutputSchemaShape,
   });

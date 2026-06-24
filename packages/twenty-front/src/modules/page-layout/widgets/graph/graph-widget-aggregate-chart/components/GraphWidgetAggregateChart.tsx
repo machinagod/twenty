@@ -2,9 +2,16 @@ import { formatNumberChartTrend } from '@/page-layout/widgets/graph/graph-widget
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { IconTrendingDown, IconTrendingUp } from 'twenty-ui/icon';
-import { H1Title, H1TitleFontColor } from 'twenty-ui/typography';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  H1Title,
+  H1TitleFontColor,
+  IconTrendingDown,
+  IconTrendingUp,
+} from 'twenty-ui-deprecated/display';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 type GraphWidgetAggregateChartProps = {
   value: string | number;
   trendPercentage?: number;

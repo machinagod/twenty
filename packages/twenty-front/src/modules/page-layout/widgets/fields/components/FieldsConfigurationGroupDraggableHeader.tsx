@@ -1,9 +1,11 @@
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
 
-import { IconGripVertical } from 'twenty-ui/icon';
-import { Label } from 'twenty-ui/typography';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { IconGripVertical, Label } from 'twenty-ui-deprecated/display';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 
 const StyledContainer = styled.div`
   align-items: center;

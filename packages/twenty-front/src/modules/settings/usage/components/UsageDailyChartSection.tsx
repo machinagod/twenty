@@ -7,8 +7,8 @@ import { useUsageAnalyticsData } from '@/settings/usage/hooks/useUsageAnalyticsD
 import { useUsageValueFormatter } from '@/settings/usage/hooks/useUsageValueFormatter';
 import { Select } from '@/ui/input/components/Select';
 import { styled } from '@linaria/react';
-import { H2Title } from 'twenty-ui/typography';
-import { Section } from 'twenty-ui/layout';
+import { H2Title } from 'twenty-ui-deprecated/display';
+import { Section } from 'twenty-ui-deprecated/layout';
 import { type UsageOperationType } from '~/generated-metadata/graphql';
 import { formatDate } from '~/utils/date-utils';
 
@@ -63,7 +63,7 @@ export const UsageDailyChartSection = ({
 
   const lineData: LineChartSeriesWithColor[] = [
     {
-      key: chartId,
+      id: chartId,
       label: chartLabel,
       data: timeSeries.map((point) => ({
         x: formatDate(point.date, 'MMM d'),

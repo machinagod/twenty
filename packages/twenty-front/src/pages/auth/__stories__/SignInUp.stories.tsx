@@ -73,7 +73,7 @@ export type Story = StoryObj<typeof SignInUpWithCaptcha>;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement.ownerDocument.body);
+    const canvas = within(canvasElement);
     const continueWithEmailButton = await canvas.findByText(
       'Continue with Email',
       {},

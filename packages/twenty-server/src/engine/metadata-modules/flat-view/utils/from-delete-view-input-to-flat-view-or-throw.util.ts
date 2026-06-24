@@ -49,7 +49,6 @@ export const fromDeleteViewInputToFlatViewOrThrow = ({
     entityApplicationUniversalIdentifier:
       existingFlatViewToDelete.applicationUniversalIdentifier,
     workspaceCustomApplicationUniversalIdentifier,
-    isSystemSideEffect: existingFlatViewToDelete.isSystemSideEffect,
   });
 
   if (shouldDeactivate) {

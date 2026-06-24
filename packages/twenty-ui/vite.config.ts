@@ -57,10 +57,9 @@ export default defineConfig(({ command }) => {
 
   const BUNDLED_DEPS = ['@tabler/icons-react'];
 
-  const externalDeps = Object.keys({
-    ...(packageJson.dependencies || {}),
-    ...(packageJson.peerDependencies || {}),
-  }).filter((dep) => !BUNDLED_DEPS.includes(dep));
+  const externalDeps = Object.keys(packageJson.dependencies || {}).filter(
+    (dep) => !BUNDLED_DEPS.includes(dep),
+  );
 
   return {
     resolve: {
@@ -89,6 +88,7 @@ export default defineConfig(({ command }) => {
       },
     },
     optimizeDeps: {
+      exclude: ['../../node_modules/.vite', '../../node_modules/.cache'],
       // Pre-bundle React up front so Vite's dep optimizer doesn't re-bundle it
       // mid-run during browser-mode Storybook tests — re-bundling rotates the
       // optimized chunk hash and 404s in-flight dynamic imports (vite 8 / rolldown).
@@ -101,7 +101,7 @@ export default defineConfig(({ command }) => {
       ],
     },
     root: __dirname,
-    cacheDir: 'node_modules/.vite',
+    cacheDir: '../../node_modules/.vite/packages/twenty-ui',
     assetsInclude: ['src/**/*.svg'],
     plugins: [
       react(),

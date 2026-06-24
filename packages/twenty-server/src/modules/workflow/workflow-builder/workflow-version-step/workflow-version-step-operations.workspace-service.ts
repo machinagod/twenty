@@ -205,7 +205,6 @@ export class WorkflowVersionStepOperationsWorkspaceService {
                 },
                 _outputSchemaType: 'LINK',
               },
-              expectedOutputSchema: {},
               input: {
                 logicFunctionId: newLogicFunction.id,
                 logicFunctionInput: isDefined(
@@ -273,7 +272,6 @@ export class WorkflowVersionStepOperationsWorkspaceService {
             settings: {
               ...BASE_STEP_DEFINITION,
               outputSchema: initialOutputSchema,
-              expectedOutputSchema: {},
               input: {
                 logicFunctionId,
                 logicFunctionInput: isDefined(
@@ -442,28 +440,6 @@ export class WorkflowVersionStepOperationsWorkspaceService {
           },
         };
       }
-      case WorkflowActionType.PICK_RECORD: {
-        const activeObjectMetadataItem =
-          await this.objectMetadataRepository.findOne({
-            where: { workspaceId, isActive: true, isSystem: false },
-          });
-
-        return {
-          builtStep: {
-            ...baseStep,
-            name: 'Pick Record',
-            type: WorkflowActionType.PICK_RECORD,
-            settings: {
-              ...BASE_STEP_DEFINITION,
-              input: {
-                objectName: activeObjectMetadataItem?.nameSingular || '',
-                strategy: 'RANDOM',
-                recordIds: [],
-              },
-            },
-          },
-        };
-      }
       case WorkflowActionType.FORM: {
         return {
           builtStep: {
@@ -501,7 +477,6 @@ export class WorkflowVersionStepOperationsWorkspaceService {
             type: WorkflowActionType.HTTP_REQUEST,
             settings: {
               ...BASE_STEP_DEFINITION,
-              expectedOutputSchema: {},
               input: {
                 url: '',
                 method: 'GET',

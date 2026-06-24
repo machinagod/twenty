@@ -36,6 +36,7 @@ describe('buildRecordGqlFieldsAggregateForView', () => {
     namePlural: 'opportunities',
     labelSingular: 'Opportunity',
     labelPlural: 'Opportunities',
+    isCustom: false,
     isActive: true,
     isSystem: false,
     isUIEditable: true,

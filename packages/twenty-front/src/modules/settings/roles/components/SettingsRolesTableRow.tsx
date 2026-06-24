@@ -6,13 +6,20 @@ import React, { useContext } from 'react';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath, isDefined } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
-import { IconChevronRight, IconLock, useIcons } from 'twenty-ui/icon';
-import { AppTooltip, TooltipDelay } from 'twenty-ui/surfaces';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  AppTooltip,
+  Avatar,
+  IconChevronRight,
+  IconLock,
+  TooltipDelay,
+  useIcons,
+} from 'twenty-ui-deprecated/display';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 
 import { type RoleWithPartialMembers } from '@/settings/roles/types/RoleWithPartialMembers';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 const StyledAssignedText = styled.div`
   color: ${themeCssVariables.font.color.secondary};
@@ -103,7 +110,7 @@ export const SettingsRolesTableRow = ({ role }: SettingsRolesTableRowProps) => {
               <React.Fragment key={workspaceMember.id}>
                 <div id={`avatar-${workspaceMember.id}`}>
                   <Avatar
-                    avatarUrl={getAbsoluteImageUrl(workspaceMember.avatarUrl)}
+                    avatarUrl={workspaceMember.avatarUrl}
                     placeholderColorSeed={workspaceMember.id}
                     placeholder={workspaceMember.name.firstName ?? ''}
                     type="rounded"

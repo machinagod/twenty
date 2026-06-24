@@ -6,22 +6,13 @@ import { isDefined } from 'twenty-shared/utils';
 import { commandMenuItemsDraftState } from '@/command-menu-item/edit/states/commandMenuItemsDraftState';
 import { UPDATE_COMMAND_MENU_ITEM } from '@/command-menu-item/graphql/mutations/updateCommandMenuItem';
 import { commandMenuItemsSelector } from '@/command-menu-item/states/commandMenuItemsSelector';
-import { useUpdateMetadataStoreDraft } from '@/metadata-store/hooks/useUpdateMetadataStoreDraft';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import {
-  type UpdateCommandMenuItemInput,
-  type UpdateCommandMenuItemMutation,
-  type UpdateCommandMenuItemMutationVariables,
-} from '~/generated-metadata/graphql';
+import { type UpdateCommandMenuItemInput } from '~/generated-metadata/graphql';
 
 export const useSaveCommandMenuItemsDraft = () => {
   const store = useStore();
-  const [updateCommandMenuItem] = useMutation<
-    UpdateCommandMenuItemMutation,
-    UpdateCommandMenuItemMutationVariables
-  >(UPDATE_COMMAND_MENU_ITEM);
+  const [updateCommandMenuItem] = useMutation(UPDATE_COMMAND_MENU_ITEM);
   const commandMenuItems = useAtomStateValue(commandMenuItemsSelector);
-  const { updateInDraft, applyChanges } = useUpdateMetadataStoreDraft();
 
   const saveCommandMenuItemsDraft = useCallback(async () => {
     const draft = store.get(commandMenuItemsDraftState.atom);
@@ -48,10 +39,6 @@ export const useSaveCommandMenuItemsDraft = () => {
       );
     });
 
-    if (changedItems.length === 0) {
-      return;
-    }
-
     await Promise.all(
       changedItems.map((item) => {
         const input: UpdateCommandMenuItemInput = {
@@ -64,16 +51,7 @@ export const useSaveCommandMenuItemsDraft = () => {
         return updateCommandMenuItem({ variables: { input } });
       }),
     );
-
-    updateInDraft('commandMenuItems', changedItems);
-    applyChanges();
-  }, [
-    store,
-    commandMenuItems,
-    updateCommandMenuItem,
-    updateInDraft,
-    applyChanges,
-  ]);
+  }, [store, commandMenuItems, updateCommandMenuItem]);
 
   return { saveCommandMenuItemsDraft };
 };

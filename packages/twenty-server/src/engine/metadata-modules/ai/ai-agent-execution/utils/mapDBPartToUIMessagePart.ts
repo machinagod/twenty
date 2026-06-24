@@ -23,7 +23,6 @@ export const mapDBPartToUIMessagePart = (
         type: 'reasoning',
         text: part.reasoningContent ?? '',
         state: (part.state as 'streaming' | 'done') ?? 'done',
-        providerMetadata: part.providerMetadata ?? undefined,
       };
     case 'file':
       return {
@@ -57,15 +56,9 @@ export const mapDBPartToUIMessagePart = (
     case 'data-routing-status':
       return null;
     default: {
-      const isStaticToolPart =
-        part.type.startsWith('tool-') && part.toolCallId !== null;
-      const isDynamicToolPart =
-        part.type === 'dynamic-tool' && part.toolCallId !== null;
-
-      if (isStaticToolPart || isDynamicToolPart) {
+      if (part.type.includes('tool-') && part.toolCallId) {
         return {
           type: part.type,
-          ...(isDynamicToolPart && { toolName: part.toolName ?? '' }),
           toolCallId: part.toolCallId,
           input: part.toolInput ?? {},
           output: part.toolOutput,
@@ -73,9 +66,6 @@ export const mapDBPartToUIMessagePart = (
           state: part.state,
           ...(part.providerExecuted != null && {
             providerExecuted: part.providerExecuted,
-          }),
-          ...(part.providerMetadata != null && {
-            callProviderMetadata: part.providerMetadata,
           }),
         } as ExtendedUIMessagePart;
       }

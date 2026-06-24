@@ -73,7 +73,6 @@ export class LocalChildProcessRunnerService {
     }
 
     const runnerPath = join(dir, '__runner.cjs');
-    const handlerAccessor = `mod?.${handlerName.split('.').join('?.')}`;
     const code = `
       // Auto-generated. Do not edit.
       const { pathToFileURL } = require('node:url');
@@ -82,9 +81,8 @@ export class LocalChildProcessRunnerService {
         try {
           const builtUrl = pathToFileURL(${JSON.stringify(builtFileAbsPath)});
           const mod = await import(builtUrl.href);
-          const handlerFn = ${handlerAccessor};
-          if (typeof handlerFn !== 'function') {
-            throw new Error('Export "' + ${JSON.stringify(handlerName)} + '" not found in function bundle');
+          if (typeof mod.${handlerName} !== 'function') {
+            throw new Error('Export "${handlerName}" not found in function bundle');
           }
 
           let payload = undefined;
@@ -92,7 +90,7 @@ export class LocalChildProcessRunnerService {
             process.on('message', async (msg) => {
               if (!msg || msg.type !== 'run') return;
               try {
-                const out = await handlerFn(msg.payload);
+                const out = await mod.${handlerName}(msg.payload);
                 process.send && process.send({ ok: true, result: out });
                 process.exit(0);
               } catch (err) {
@@ -104,7 +102,7 @@ export class LocalChildProcessRunnerService {
             // Fallback: read payload from argv[2] (JSON) and print to stdout
             const json = process.argv[2];
             payload = json ? JSON.parse(json) : undefined;
-            const out = await handlerFn(payload);
+            const out = await mod.${handlerName}(payload);
             process.stdout.write(JSON.stringify({ ok: true, result: out }));
             process.exit(0);
           }

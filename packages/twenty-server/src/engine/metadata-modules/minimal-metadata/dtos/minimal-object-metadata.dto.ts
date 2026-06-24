@@ -28,6 +28,9 @@ export class MinimalObjectMetadataDTO {
   color?: string;
 
   @Field()
+  isCustom: boolean;
+
+  @Field()
   isActive: boolean;
 
   @Field()

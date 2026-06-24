@@ -64,7 +64,6 @@ export const fromUpdateViewFieldInputToFlatViewFieldToUpdateOrThrow = ({
     entityApplicationUniversalIdentifier:
       existingFlatViewFieldToUpdate.applicationUniversalIdentifier,
     workspaceCustomApplicationUniversalIdentifier,
-    isSystemSideEffect: existingFlatViewFieldToUpdate.isSystemSideEffect,
   });
 
   const { overrides, updatedEditableProperties } =

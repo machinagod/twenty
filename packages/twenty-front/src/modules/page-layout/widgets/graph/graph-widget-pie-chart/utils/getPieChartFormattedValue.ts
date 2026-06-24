@@ -22,7 +22,7 @@ export const getPieChartFormattedValue = ({
   displayType,
 }: GetPieChartFormattedValueParams): string | null => {
   const item = enrichedData.find(
-    (enrichedDataItem) => enrichedDataItem.key === datum.data.key,
+    (enrichedDataItem) => enrichedDataItem.id === datum.data.id,
   );
   if (!isDefined(item)) return null;
 

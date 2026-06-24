@@ -1,13 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-
-import { type Repository } from 'typeorm';
 
 import { SendEmailTool } from 'src/engine/core-modules/tool/tools/email-tool/send-email-tool';
 import { type Tool } from 'src/engine/core-modules/tool/types/tool.type';
-import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
-import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import {
   WorkflowStepExecutorException,
   WorkflowStepExecutorExceptionCode,
@@ -23,19 +17,8 @@ export class SendEmailWorkflowAction extends EmailWorkflowActionBase {
   constructor(
     private readonly sendEmailTool: SendEmailTool,
     workflowRunStepLogService: WorkflowRunStepLogWorkspaceService,
-    globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
-    @InjectRepository(ConnectedAccountEntity)
-    connectedAccountRepository: Repository<ConnectedAccountEntity>,
-    @InjectRepository(UserWorkspaceEntity)
-    userWorkspaceRepository: Repository<UserWorkspaceEntity>,
   ) {
-    super(
-      SendEmailWorkflowAction.name,
-      workflowRunStepLogService,
-      globalWorkspaceOrmManager,
-      connectedAccountRepository,
-      userWorkspaceRepository,
-    );
+    super(SendEmailWorkflowAction.name, workflowRunStepLogService);
   }
 
   protected getTool(): Tool {

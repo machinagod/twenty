@@ -112,8 +112,7 @@ export class PageLayoutResetService {
 
     if (
       widget.applicationUniversalIdentifier ===
-        workspaceCustomFlatApplication.universalIdentifier &&
-      !widget.isSystemSideEffect
+      workspaceCustomFlatApplication.universalIdentifier
     ) {
       throw new PageLayoutWidgetException(
         `Custom widget "${id}" cannot be reset to default`,
@@ -256,8 +255,7 @@ export class PageLayoutResetService {
 
     if (
       tab.applicationUniversalIdentifier ===
-        workspaceCustomFlatApplication.universalIdentifier &&
-      !tab.isSystemSideEffect
+      workspaceCustomFlatApplication.universalIdentifier
     ) {
       throw new PageLayoutTabException(
         `Custom tab "${id}" cannot be reset to default`,
@@ -406,8 +404,7 @@ export class PageLayoutResetService {
 
     if (
       layout.applicationUniversalIdentifier ===
-        workspaceCustomFlatApplication.universalIdentifier &&
-      !layout.isSystemSideEffect
+      workspaceCustomFlatApplication.universalIdentifier
     ) {
       throw new PageLayoutException(
         `Custom page layout "${id}" cannot be reset to default`,

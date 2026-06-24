@@ -2,7 +2,11 @@ import { type FieldActorValue } from '@/object-record/record-field/ui/types/Fiel
 
 import { t } from '@lingui/core/macro';
 import { ConnectedAccountProvider } from 'twenty-shared/types';
-import { AvatarOrIcon, Chip, ChipVariant } from 'twenty-ui/data-display';
+import {
+  AvatarOrIcon,
+  Chip,
+  ChipVariant,
+} from 'twenty-ui-deprecated/components';
 import {
   IconApi,
   IconCalendar,
@@ -17,8 +21,7 @@ import {
   IconUpload,
   IconWebhook,
   type IconComponent,
-} from 'twenty-ui/icon';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
+} from 'twenty-ui-deprecated/display';
 
 type ActorDisplayProps = Partial<FieldActorValue> & {
   avatarUrl?: string | null;
@@ -97,7 +100,7 @@ export const ActorDisplay = ({
           avatarType={workspaceMemberId ? 'rounded' : 'squared'}
           placeholder={name}
           Icon={LeftIcon}
-          avatarUrl={getAbsoluteImageUrl(avatarUrl ?? undefined)}
+          avatarUrl={avatarUrl ?? undefined}
         />
       }
     />

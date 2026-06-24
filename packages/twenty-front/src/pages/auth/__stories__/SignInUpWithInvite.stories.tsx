@@ -93,7 +93,7 @@ export type Story = StoryObj<typeof SignInUpWithCaptcha>;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement.ownerDocument.body);
+    const canvas = within(canvasElement);
 
     await canvas.findByText('Join Twenty dev team', undefined, {
       timeout: 5000,

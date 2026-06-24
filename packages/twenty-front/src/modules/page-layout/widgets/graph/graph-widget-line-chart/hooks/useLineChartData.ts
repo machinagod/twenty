@@ -37,10 +37,10 @@ export const useLineChartData = ({
         totalGroups: shouldApplyGradient ? data.length : undefined,
       });
 
-      const sanitizedSeriesKey = series.key
+      const sanitizedSeriesId = series.id
         .replace(/\s+/g, '_')
         .replace(/[^a-zA-Z0-9_-]/g, '');
-      const areaFillId = `areaFill-${id}-${sanitizedSeriesKey}-${index}`;
+      const areaFillId = `areaFill-${id}-${sanitizedSeriesId}-${index}`;
 
       return { ...series, colorScheme, areaFillId };
     });
@@ -48,22 +48,22 @@ export const useLineChartData = ({
 
   const legendItems: GraphWidgetLegendItem[] = allEnrichedSeries.map(
     (series) => ({
-      id: series.key,
+      id: series.id,
       label: series.label,
       color: series.colorScheme.solid,
     }),
   );
 
   const visibleData = data.filter(
-    (series) => !graphWidgetHiddenLegendIds.includes(series.key),
+    (series) => !graphWidgetHiddenLegendIds.includes(series.id),
   );
 
   const enrichedSeries = allEnrichedSeries.filter(
-    (series) => !graphWidgetHiddenLegendIds.includes(series.key),
+    (series) => !graphWidgetHiddenLegendIds.includes(series.id),
   );
 
   const nivoData: LineSeries[] = visibleData.map((series) => ({
-    id: series.key,
+    id: series.id,
     data: series.data.map((point) => ({ x: point.x, y: point.y })),
   }));
 

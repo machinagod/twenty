@@ -83,10 +83,6 @@ export const USER_QUERY_FRAGMENT = gql`
       currentBillingSubscription {
         ...CurrentBillingSubscriptionFragment
       }
-      billingCustomer {
-        id
-        hasPaymentMethod
-      }
       billingSubscriptions {
         ...BillingSubscriptionFragment
       }

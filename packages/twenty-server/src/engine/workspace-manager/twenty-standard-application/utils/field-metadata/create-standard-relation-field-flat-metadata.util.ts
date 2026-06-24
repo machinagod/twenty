@@ -101,7 +101,6 @@ export const createStandardRelationFieldFlatMetadata = <
     icon,
     isActive: true,
     isSystem: false,
-    isSystemSideEffect: false,
     isNullable,
     isUnique: false,
     isUIEditable,

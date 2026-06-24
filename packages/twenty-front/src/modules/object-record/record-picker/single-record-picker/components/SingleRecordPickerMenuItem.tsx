@@ -10,10 +10,9 @@ import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/com
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 import { capitalize, isDefined } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
-import { MenuItemSelectAvatar } from 'twenty-ui/navigation';
+import { Avatar } from 'twenty-ui-deprecated/display';
+import { MenuItemSelectAvatar } from 'twenty-ui-deprecated/navigation';
 
 type SingleRecordPickerMenuItemProps = {
   morphItem: RecordPickerPickableMorphItem;
@@ -74,7 +73,7 @@ export const SingleRecordPickerMenuItem = ({
         focused={isSelectedItemId}
         avatar={
           <Avatar
-            avatarUrl={getAbsoluteImageUrl(searchRecordStore.imageUrl)}
+            avatarUrl={searchRecordStore.imageUrl}
             placeholderColorSeed={morphItem.recordId}
             placeholder={searchRecordStore.label}
             size="md"

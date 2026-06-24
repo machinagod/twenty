@@ -29,7 +29,7 @@ Avant de configurer le flux de travail :
 3. Choisissez l'objet auquel vous souhaitez joindre des PDF (par exemple, **Entreprise** ou **Opportunité**)
 
 <Tip>
-Avec un déclencheur manuel, les utilisateurs peuvent exécuter ce flux de travail à l'aide d'un bouton qui apparaît en haut à droite une fois un enregistrement sélectionné, afin de générer et de joindre un PDF.
+  Avec un déclencheur manuel, les utilisateurs peuvent exécuter ce flux de travail à l'aide d'un bouton qui apparaît en haut à droite une fois un enregistrement sélectionné, afin de générer et de joindre un PDF.
 </Tip>
 
 ### Étape 2 : Ajouter une fonction logique
@@ -45,7 +45,7 @@ Avec un déclencheur manuel, les utilisateurs peuvent exécuter ce flux de trava
 | `companyId` | `{{trigger.object.id}}` |
 
 <Note>
-Si vous l'attachez à un objet différent (Personne, Opportunité, etc.), renommez le paramètre en conséquence (par exemple, `personId`, `opportunityId`) et mettez à jour la fonction logique.
+  Si vous l'attachez à un objet différent (Personne, Opportunité, etc.), renommez le paramètre en conséquence (par exemple, `personId`, `opportunityId`) et mettez à jour la fonction logique.
 </Note>
 
 #### Code de la fonction logique
@@ -55,12 +55,11 @@ export const main = async (
   params: { companyId: string },
 ) => {
   const { companyId } = params;
-  // Replace with your Twenty GraphQL endpoints (/metadata for metadata and files or /graphql for your records)
+
+  // Replace with your Twenty GraphQL endpoint
   // Cloud: https://api.twenty.com/graphql
   // Self-hosted: https://your-domain.com/graphql
-
-  const metadataGraphqlEndpoint = 'https://api.twenty.com/metadata';
-  const dataGraphqlEndpoint = 'https://api.twenty.com/graphql';
+  const graphqlEndpoint = 'https://api.twenty.com/graphql';
 
   // Replace with your API key from Settings → APIs
   const authToken = 'YOUR_API_KEY';
@@ -80,40 +79,11 @@ export const main = async (
   const pdfBlob = await pdfResponse.blob();
   const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
 
-  const fieldMetadataIdQuery = `
-    query FindUploadFileFieldMetadataId {
-      objects {
-        edges {
-          node {
-            nameSingular
-            fieldsList {
-              id
-              name
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  // Step 2: Find a fieldMetadataId of "Attachment file" field in Attachments object with GraphQL API
-  const response = await fetch(metadataGraphqlEndpoint, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authToken}`
-      },
-      body: {
-        query: fieldMetadataIdQuery,
-      }
-    });
-  const result = await response.json();
-  const uploadFileFieldMetadataId = result.data.objects.edges.find(object => object.node.nameSingular === 'attachment').node.fieldsList.find(field => field.name === 'file').id;
-
-  // Step 3: Upload the file via GraphQL multipart upload
+  // Step 2: Upload the file via GraphQL multipart upload
   const uploadMutation = `
-    mutation UploadFilesFieldFile($file: Upload!, $fieldMetadataId: String!) {
-      uploadFilesFieldFile(file: $file, fieldMetadataId: $fieldMetadataId) {
-        id
+    mutation UploadFile($file: Upload!, $fileFolder: FileFolder) {
+      uploadFile(file: $file, fileFolder: $fileFolder) {
+        path
       }
     }
   `;
@@ -121,12 +91,12 @@ export const main = async (
   const uploadForm = new FormData();
   uploadForm.append('operations', JSON.stringify({
     query: uploadMutation,
-    variables: { file: null, fieldMetadataId: uploadFileFieldMetadataId },
+    variables: { file: null, fileFolder: 'Attachment' },
   }));
   uploadForm.append('map', JSON.stringify({ '0': ['variables.file'] }));
   uploadForm.append('0', pdfFile);
 
-  const uploadResponse = await fetch(metadataGraphqlEndpoint, {
+  const uploadResponse = await fetch(graphqlEndpoint, {
     method: 'POST',
     headers: { Authorization: `Bearer ${authToken}` },
     body: uploadForm,
@@ -138,15 +108,15 @@ export const main = async (
     throw new Error(`Upload failed: ${uploadResult.errors[0].message}`);
   }
 
-  const fileId = uploadResult.data?.uploadFilesFieldFile?.id;
+  const filePath = uploadResult.data?.uploadFile?.path;
 
-  if (!fileId) {
-    throw new Error('No file id returned from upload');
+  if (!filePath) {
+    throw new Error('No file path returned from upload');
   }
 
-  // Step 4: Create the attachment linked to the company
+  // Step 3: Create the attachment linked to the company
   const attachmentMutation = `
-    mutation CreateOneAttachment($data: AttachmentCreateInput!) {
+    mutation CreateAttachment($data: AttachmentCreateInput!) {
       createAttachment(data: $data) {
         id
         name
@@ -154,7 +124,7 @@ export const main = async (
     }
   `;
 
-  const attachmentResponse = await fetch(dataGraphqlEndpoint, {
+  const attachmentResponse = await fetch(graphqlEndpoint, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${authToken}`,
@@ -165,13 +135,8 @@ export const main = async (
       variables: {
         data: {
           name: filename,
-          targetCompanyId: companyId,
-          file: [
-            {
-              fileId: fileId,
-              label: filename
-            }
-          ]
+          fullPath: filePath,
+          companyId,
         },
       },
     }),
@@ -191,14 +156,14 @@ export const main = async (
 
 #### Pour joindre à un objet différent
 
-Remplacez `targetCompanyId` par le champ approprié :
+Remplacez `companyId` par le champ approprié :
 
-| Objet              | Nom du champ               |
-| ------------------ | -------------------------- |
-| Entreprise         | `targetCompanyId`          |
-| Personne           | `targetPersonId`           |
-| Opportunité        | `targetOpportunityId`      |
-| Objet personnalisé | `targetYourCustomObjectId` |
+| Objet              | Nom du champ         |
+| ------------------ | -------------------- |
+| Entreprise         | `companyId`          |
+| Personne           | `personId`           |
+| Opportunité        | `opportunityId`      |
+| Objet personnalisé | `yourCustomObjectId` |
 
 Mettez à jour à la fois le paramètre de la fonction et l'objet `variables.data` dans la mutation de pièce jointe.
 

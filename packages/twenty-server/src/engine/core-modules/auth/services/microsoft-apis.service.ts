@@ -295,20 +295,19 @@ export class MicrosoftAPIsService {
             },
           });
 
-          const syncableCalendarChannels = calendarChannels.filter(
-            (calendarChannel) =>
+          for (const calendarChannel of calendarChannels) {
+            if (
               calendarChannel.syncStage !==
-              CalendarChannelSyncStage.PENDING_CONFIGURATION,
-          );
-
-          for (const calendarChannel of syncableCalendarChannels) {
-            await this.calendarQueueService.add<CalendarEventListFetchJobData>(
-              CalendarEventListFetchJob.name,
-              {
-                calendarChannelId: calendarChannel.id,
-                workspaceId,
-              },
-            );
+              CalendarChannelSyncStage.PENDING_CONFIGURATION
+            ) {
+              await this.calendarQueueService.add<CalendarEventListFetchJobData>(
+                CalendarEventListFetchJob.name,
+                {
+                  calendarChannelId: calendarChannel.id,
+                  workspaceId,
+                },
+              );
+            }
           }
         }
 

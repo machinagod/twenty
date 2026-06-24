@@ -34,6 +34,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import {
+  H2Title,
   IconArrowDown,
   IconArrowUp,
   IconCalendarEvent,
@@ -42,11 +43,10 @@ import {
   IconCoins,
   IconTag,
   IconUsers,
-} from 'twenty-ui/icon';
-import { H2Title } from 'twenty-ui/typography';
-import { Button } from 'twenty-ui/input';
-import { Section } from 'twenty-ui/layout';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+} from 'twenty-ui-deprecated/display';
+import { Button } from 'twenty-ui-deprecated/input';
+import { Section } from 'twenty-ui-deprecated/layout';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 import {
   BillingPlanKey,
   BillingProductKey,

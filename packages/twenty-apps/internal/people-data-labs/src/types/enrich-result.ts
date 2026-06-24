@@ -5,7 +5,6 @@ export type EnrichResult = {
   recordId: string;
   status: EnrichStatus;
   updatedFields: string[];
-  data?: Record<string, unknown>;
   message: string;
   error?: string;
 };

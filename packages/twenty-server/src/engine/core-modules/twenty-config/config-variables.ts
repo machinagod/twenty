@@ -3,9 +3,7 @@ import { Logger } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import {
   IsDefined,
-  IsNotEmpty,
   IsOptional,
-  IsString,
   IsUrl,
   ValidateIf,
   type ValidationError,
@@ -191,29 +189,6 @@ export class ConfigVariables {
     type: ConfigVariableType.BOOLEAN,
   })
   MESSAGING_PROVIDER_GMAIL_ENABLED = false;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.GOOGLE_AUTH,
-    isSensitive: false,
-    description:
-      'Google Cloud Pub/Sub topic that Gmail push notifications publish to ' +
-      '(format: projects/<project>/topics/<topic>). Required for webhook-based Gmail sync.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  MESSAGING_GMAIL_PUBSUB_TOPIC: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.GOOGLE_AUTH,
-    isSensitive: false,
-    description:
-      'Service account email authorized to deliver Gmail Pub/Sub push ' +
-      'notifications. The signed OIDC token on each push is verified against ' +
-      'this email. Required for webhook-based Gmail sync.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  MESSAGING_GMAIL_PUBSUB_VERIFICATION_EMAIL: string;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,
@@ -509,13 +484,11 @@ export class ConfigVariables {
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.STORAGE_CONFIG,
-    description:
-      'Region of the S3 bucket (e.g. "eu-west-3" for AWS, or a provider-specific slug like "fr-par" for Scaleway). Required.',
+    description: 'AWS region of the S3 bucket (e.g. eu-west-3). Required.',
     type: ConfigVariableType.STRING,
   })
   @ValidateIf((env) => env.STORAGE_TYPE === StorageDriverType.S_3)
-  @IsString()
-  @IsNotEmpty()
+  @IsAWSRegion()
   STORAGE_S3_REGION: AwsRegion;
 
   @ConfigVariablesMetadata({
@@ -744,26 +717,6 @@ export class ConfigVariables {
   CODE_INTERPRETER_TIMEOUT_MS = 300_000;
 
   @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.CODE_INTERPRETER_CONFIG,
-    description:
-      'Idle lifetime in milliseconds for a reused code interpreter sandbox; refreshed on each execution and reclaimed after this period of inactivity (default: 300000)',
-    type: ConfigVariableType.NUMBER,
-  })
-  @IsOptional()
-  @CastToPositiveNumber()
-  CODE_INTERPRETER_IDLE_TIMEOUT_MS = 300_000;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.CODE_INTERPRETER_CONFIG,
-    description:
-      'Maximum age in milliseconds a reused code interpreter sandbox is kept before garbage collection reclaims it; abandoned conversations are reclaimed after this period (default: 86400000)',
-    type: ConfigVariableType.NUMBER,
-  })
-  @IsOptional()
-  @CastToPositiveNumber()
-  CODE_INTERPRETER_SESSION_MAX_AGE_MS = 86_400_000;
-
-  @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ANALYTICS_CONFIG,
     description: 'Enable or disable analytics for telemetry',
     type: ConfigVariableType.BOOLEAN,
@@ -877,15 +830,6 @@ export class ConfigVariables {
   })
   @ValidateIf((env) => env.IS_BILLING_ENABLED === true)
   BILLING_STRIPE_WEBHOOK_SECRET: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.BILLING_CONFIG,
-    description:
-      'Stripe publishable key for billing, exposed to the frontend to mount Stripe Elements',
-    type: ConfigVariableType.STRING,
-  })
-  @ValidateIf((env) => env.IS_BILLING_ENABLED === true)
-  BILLING_STRIPE_PUBLISHABLE_KEY: string;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.BILLING_CONFIG,
@@ -1288,15 +1232,6 @@ export class ConfigVariables {
   @CastToPositiveNumber()
   @IsOptional()
   SIGNING_KEY_ROTATION_DAYS?: number;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
-    description:
-      'Register the cron job that syncs the marketplace catalog from the npm registry. Disable to stop the automatic catalog import.',
-    type: ConfigVariableType.BOOLEAN,
-  })
-  @IsOptional()
-  MARKETPLACE_CATALOG_SYNC_CRON_ENABLED = true;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.RATE_LIMITING,

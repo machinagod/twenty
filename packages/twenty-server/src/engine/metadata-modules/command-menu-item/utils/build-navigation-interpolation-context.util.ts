@@ -9,17 +9,16 @@ export type NavigationInterpolationObjectMetadata = {
   labelSingular: string;
   description?: string | null;
   icon?: string | null;
+  isCustom: boolean;
   standardOverrides?: ObjectStandardOverridesDTO | null;
 };
 
 export const buildNavigationInterpolationContext = ({
   objectMetadata,
-  isStandardApp,
   locale,
   i18nInstance,
 }: {
   objectMetadata: NavigationInterpolationObjectMetadata;
-  isStandardApp: boolean;
   locale: keyof typeof APP_LOCALES | undefined;
   i18nInstance: I18n;
 }): Record<string, unknown> => {
@@ -28,6 +27,7 @@ export const buildNavigationInterpolationContext = ({
     labelSingular: objectMetadata.labelSingular,
     description: objectMetadata.description ?? undefined,
     icon: objectMetadata.icon ?? undefined,
+    isCustom: objectMetadata.isCustom,
     standardOverrides: objectMetadata.standardOverrides ?? undefined,
   };
 
@@ -36,7 +36,6 @@ export const buildNavigationInterpolationContext = ({
     'labelPlural',
     locale,
     i18nInstance,
-    isStandardApp,
   );
 
   const resolvedIcon = resolveObjectMetadataStandardOverride(
@@ -44,7 +43,6 @@ export const buildNavigationInterpolationContext = ({
     'icon',
     locale,
     i18nInstance,
-    isStandardApp,
   );
 
   return {

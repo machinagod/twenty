@@ -8,6 +8,7 @@ import { MAX_EMAIL_RECIPIENTS } from 'twenty-shared/constants';
 import {
   ConnectedAccountProvider,
   type EmailAttachment,
+  FileFolder,
 } from 'twenty-shared/types';
 import { isDefined, isValidUuid } from 'twenty-shared/utils';
 import { In, IsNull, LessThanOrEqual, type Repository } from 'typeorm';
@@ -15,7 +16,6 @@ import { z } from 'zod';
 
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
 import { FileService } from 'src/engine/core-modules/file/services/file.service';
-import { EMAIL_ATTACHMENT_FILE_FOLDERS } from 'src/engine/core-modules/tool/tools/email-tool/constants/email-attachment-file-folders.const';
 import {
   EmailToolException,
   EmailToolExceptionCode,
@@ -52,13 +52,13 @@ export class EmailComposerService {
     private readonly fileService: FileService,
   ) {}
 
-  private async getConnectedAccountOrThrow(
+  private async getConnectedAccount(
     connectedAccountId: string,
     workspaceId: string,
-  ): Promise<ConnectedAccountEntity> {
+  ) {
     if (!isValidUuid(connectedAccountId)) {
       throw new EmailToolException(
-        `Connected account id is not a valid UUID`,
+        `Connected Account ID is not a valid UUID`,
         EmailToolExceptionCode.INVALID_CONNECTED_ACCOUNT_ID,
       );
     }
@@ -78,7 +78,7 @@ export class EmailComposerService {
 
         if (!isDefined(connectedAccount)) {
           throw new EmailToolException(
-            `No connected account found for id '${connectedAccountId}'`,
+            `Connected Account '${connectedAccountId}' not found`,
             EmailToolExceptionCode.CONNECTED_ACCOUNT_NOT_FOUND,
           );
         }
@@ -185,6 +185,7 @@ export class EmailComposerService {
   private async getAttachments(
     files: Array<EmailAttachment>,
     workspaceId: string,
+    fileFolder: FileFolder,
   ): Promise<MessageAttachment[]> {
     if (files.length === 0) {
       return [];
@@ -223,7 +224,7 @@ export class EmailComposerService {
       const fileStream = await this.fileService.getFileStreamById({
         fileId: fileMetadata.id,
         workspaceId,
-        allowedFileFolders: EMAIL_ATTACHMENT_FILE_FOLDERS,
+        fileFolder,
       });
 
       if (fileStream === null) {
@@ -311,6 +312,7 @@ export class EmailComposerService {
   async composeEmail(
     parameters: ComposeEmailParams,
     context: ToolExecutionContext,
+    options: { attachmentsFileFolder: FileFolder },
   ): Promise<EmailComposerResult> {
     const { workspaceId } = context;
     const { subject, body, files, inReplyTo } = parameters;
@@ -355,7 +357,7 @@ export class EmailComposerService {
         await this.getOrThrowFirstConnectedAccountId(workspaceId);
     }
 
-    const connectedAccount = await this.getConnectedAccountOrThrow(
+    const connectedAccount = await this.getConnectedAccount(
       connectedAccountId,
       workspaceId,
     );
@@ -388,7 +390,11 @@ export class EmailComposerService {
       );
     }
 
-    const attachments = await this.getAttachments(files || [], workspaceId);
+    const attachments = await this.getAttachments(
+      files || [],
+      workspaceId,
+      options.attachmentsFileFolder,
+    );
 
     const { JSDOM } = await import('jsdom');
     const window = new JSDOM('').window;

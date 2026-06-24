@@ -1,4 +1,3 @@
-import { useResetCommandMenuItemToDefault } from '@/command-menu-item/edit/hooks/useResetCommandMenuItemToDefault';
 import { useUpdateCommandMenuItemInDraft } from '@/command-menu-item/edit/hooks/useUpdateCommandMenuItemInDraft';
 import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
@@ -8,8 +7,8 @@ import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useLingui } from '@lingui/react/macro';
 import { type ReactElement } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { IconRefresh, IconTag } from 'twenty-ui/icon';
-import { MenuItem, MenuItemToggle } from 'twenty-ui/navigation';
+import { IconRefresh, IconTag } from 'twenty-ui-deprecated/display';
+import { MenuItem, MenuItemToggle } from 'twenty-ui-deprecated/navigation';
 import { type CommandMenuItemFieldsFragment } from '~/generated-metadata/graphql';
 
 type CommandMenuItemOptionsDropdownProps = Pick<
@@ -35,13 +34,14 @@ export const CommandMenuItemOptionsDropdown = ({
   const dropdownId = getCommandMenuItemOptionsDropdownId(itemId);
   const { closeDropdown } = useCloseDropdown();
   const { updateCommandMenuItemInDraft } = useUpdateCommandMenuItemInDraft();
-  const { resetCommandMenuItemToDefault } = useResetCommandMenuItemToDefault();
 
   const normalizedServerShortLabel = serverShortLabel ?? null;
   const normalizedShortLabel = shortLabel ?? null;
   const hasNoShortLabel = normalizedServerShortLabel === null;
   const isLabelHidden =
     normalizedShortLabel === null && isDefined(normalizedServerShortLabel);
+  const hasShortLabelOverride =
+    normalizedShortLabel !== normalizedServerShortLabel;
 
   const handleToggleHideLabel = (toggled: boolean) => {
     updateCommandMenuItemInDraft(itemId, {
@@ -49,9 +49,11 @@ export const CommandMenuItemOptionsDropdown = ({
     });
   };
 
-  const handleResetToDefault = async () => {
+  const handleResetLabelToDefault = () => {
+    updateCommandMenuItemInDraft(itemId, {
+      shortLabel: normalizedServerShortLabel,
+    });
     closeDropdown(dropdownId);
-    await resetCommandMenuItemToDefault(itemId);
   };
 
   return (
@@ -72,9 +74,10 @@ export const CommandMenuItemOptionsDropdown = ({
             />
             <MenuItem
               LeftIcon={IconRefresh}
-              onClick={handleResetToDefault}
+              onClick={handleResetLabelToDefault}
               accent="default"
-              text={t`Reset to default`}
+              text={t`Reset label to default`}
+              disabled={!hasShortLabelOverride}
             />
           </DropdownMenuItemsContainer>
         </DropdownContent>

@@ -1,10 +1,4 @@
-import { Field, InputType, registerEnumType } from '@nestjs/graphql';
-
-import { EmailConnectionSecurity } from 'src/engine/core-modules/imap-smtp-caldav-connection/enums/email-connection-security.enum';
-
-registerEnumType(EmailConnectionSecurity, {
-  name: 'EmailConnectionSecurity',
-});
+import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class AccountType {
@@ -26,8 +20,8 @@ export class ConnectionParametersInput {
   @Field(() => String, { nullable: true })
   password?: string;
 
-  @Field(() => EmailConnectionSecurity, { nullable: true })
-  connectionSecurity?: EmailConnectionSecurity;
+  @Field(() => Boolean, { nullable: true })
+  secure?: boolean;
 }
 
 @InputType('EmailAccountConnectionParameters')

@@ -14,8 +14,6 @@ import { type ObjectMetadataForToolSchema } from 'src/engine/core-modules/record
 import {
   AddressValueOptionalSchema,
   AddressValueSchema,
-  CurrencyResponseValueOptionalSchema,
-  CurrencyResponseValueSchema,
   CurrencyValueOptionalSchema,
   CurrencyValueSchema,
   EmailsValueOptionalSchema,
@@ -190,13 +188,9 @@ export const generateRecordPropertiesZodSchema = (
       }
 
       case FieldMetadataType.CURRENCY: {
-        const baseSchema = forResponse
-          ? field.isNullable
-            ? CurrencyResponseValueOptionalSchema
-            : CurrencyResponseValueSchema
-          : field.isNullable
-            ? CurrencyValueOptionalSchema
-            : CurrencyValueSchema;
+        const baseSchema = field.isNullable
+          ? CurrencyValueOptionalSchema
+          : CurrencyValueSchema;
 
         shape[field.name] = field.description
           ? baseSchema.describe(field.description)

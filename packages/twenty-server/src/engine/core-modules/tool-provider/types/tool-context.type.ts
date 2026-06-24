@@ -11,6 +11,5 @@ export type ToolContext = {
   actorContext?: ActorMetadata;
   userId?: string;
   userWorkspaceId?: string;
-  threadId?: string;
   onCodeExecutionUpdate?: CodeExecutionStreamEmitter;
 };

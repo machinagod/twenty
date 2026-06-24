@@ -7,10 +7,11 @@ import {
   Banner,
   type BannerColor,
   type BannerVariant,
-} from 'twenty-ui/feedback';
-import { type IconComponent, IconX } from 'twenty-ui/icon';
-import { Button, IconButton } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+  type IconComponent,
+  IconX,
+} from 'twenty-ui-deprecated/display';
+import { Button, IconButton } from 'twenty-ui-deprecated/input';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 
 const StyledText = styled.div`
   overflow: hidden;

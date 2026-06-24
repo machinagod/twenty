@@ -18,7 +18,6 @@ import { SignInUpGlobalScopeForm } from '@/auth/sign-in-up/components/SignInUpGl
 import { SignInUpWorkspaceScopeForm } from '@/auth/sign-in-up/components/SignInUpWorkspaceScopeForm';
 import { WorkspaceSelectionFooter } from '@/auth/sign-in-up/components/WorkspaceSelectionFooter';
 import { SignInUpSSOIdentityProviderSelection } from '@/auth/sign-in-up/components/internal/SignInUpSSOIdentityProviderSelection';
-import { SignInUpWorkspaceCreationForm } from '@/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm';
 import { SignInUpWorkspaceScopeFormEffect } from '@/auth/sign-in-up/components/internal/SignInUpWorkspaceScopeFormEffect';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { useGetPublicWorkspaceDataByDomain } from '@/domain-manager/hooks/useGetPublicWorkspaceDataByDomain';
@@ -31,13 +30,13 @@ import { SignInUpTwoFactorAuthenticationProvision } from '@/auth/sign-in-up/comp
 import { SignInUpTOTPVerification } from '@/auth/sign-in-up/components/internal/SignInUpTwoFactorAuthenticationVerification';
 import { useWorkspaceFromInviteHash } from '@/auth/sign-in-up/hooks/useWorkspaceFromInviteHash';
 import { clientConfigApiStatusState } from '@/client-config/states/clientConfigApiStatusState';
-import { ModalContent } from 'twenty-ui/surfaces';
+import { ModalContent } from 'twenty-ui-deprecated/layout';
 import { useLingui } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router-dom';
 import { isDefined } from 'twenty-shared/utils';
-import { Loader } from 'twenty-ui/feedback';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { AnimatedEaseIn } from 'twenty-ui/layout';
+import { Loader } from 'twenty-ui-deprecated/feedback';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
+import { AnimatedEaseIn } from 'twenty-ui-deprecated/utilities';
 import { type PublicWorkspaceData } from '~/generated-metadata/graphql';
 
 const StyledLoaderContainer = styled.div`
@@ -81,7 +80,6 @@ const StandardContent = ({
         SignInUpStep.TwoFactorAuthenticationProvision,
         SignInUpStep.TwoFactorAuthenticationVerification,
         SignInUpStep.WorkspaceSelection,
-        SignInUpStep.WorkspaceCreation,
       ].includes(signInUpStep) && <FooterNote />}
     </ModalContent>
   );
@@ -123,10 +121,6 @@ export const SignInUp = () => {
       return t`Choose a Workspace`;
     }
 
-    if (signInUpStep === SignInUpStep.WorkspaceCreation) {
-      return t`Create your workspace`;
-    }
-
     if (signInUpStep === SignInUpStep.TwoFactorAuthenticationProvision) {
       return t`Setup your 2FA`;
     }
@@ -162,13 +156,6 @@ export const SignInUp = () => {
           <Loader color="gray" />
         </StyledLoaderContainer>
       );
-    }
-
-    // The workspace creation form is shared by both multi-workspace and
-    // single-workspace self-host, so it must render regardless of domain or
-    // workspace scope.
-    if (signInUpStep === SignInUpStep.WorkspaceCreation) {
-      return <SignInUpWorkspaceCreationForm />;
     }
 
     if (isDefaultDomain && isMultiWorkspaceEnabled) {

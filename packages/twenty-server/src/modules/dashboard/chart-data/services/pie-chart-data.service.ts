@@ -203,7 +203,7 @@ export class PieChartDataService {
         : null;
 
       return {
-        key: point.formattedValue,
+        id: point.formattedValue,
         value: point.aggregateValue,
         rawValue: rawValueString,
       };
@@ -214,7 +214,7 @@ export class PieChartDataService {
       orderBy: configuration.orderBy,
       manualSortOrder: configuration.manualSortOrder,
       formattedToRawLookup,
-      getFieldValue: (item) => item.key,
+      getFieldValue: (item) => item.id,
       getNumericValue: (item) => item.value,
       selectFieldOptions: selectOptions,
       fieldType: groupByField.type,

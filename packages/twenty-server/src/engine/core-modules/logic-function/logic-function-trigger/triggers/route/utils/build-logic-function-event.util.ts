@@ -2,7 +2,6 @@ import { type RawBodyRequest } from '@nestjs/common';
 import { type Request } from 'express';
 import { type LogicFunctionEvent } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { isObject, isString } from '@sniptt/guards';
 
 export const filterRequestHeaders = ({
   requestHeaders,
@@ -41,15 +40,15 @@ export const extractRawBody = (request: Request): string | undefined => {
 };
 
 export const extractBody = (request: Request): object | null => {
-  if (!isDefined(request.body)) {
+  if (request.body === undefined || request.body === null) {
     return null;
   }
 
-  if (isObject(request.body) && !Buffer.isBuffer(request.body)) {
+  if (typeof request.body === 'object' && !Buffer.isBuffer(request.body)) {
     return request.body;
   }
 
-  if (isString(request.body)) {
+  if (typeof request.body === 'string') {
     try {
       return JSON.parse(request.body);
     } catch {

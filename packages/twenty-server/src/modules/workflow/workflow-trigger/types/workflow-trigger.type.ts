@@ -83,7 +83,6 @@ export type WorkflowWebhookTrigger = BaseTrigger & {
           httpMethod: 'POST';
           authentication: 'API_KEY' | null;
           expectedBody: object;
-          expectedOutputSchema?: object;
         }
     );
 };

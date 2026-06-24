@@ -89,8 +89,6 @@ export const fromUpdatePageLayoutWidgetInputToFlatPageLayoutWidgetToUpdateOrThro
       entityApplicationUniversalIdentifier:
         existingFlatPageLayoutWidgetToUpdate.applicationUniversalIdentifier,
       workspaceCustomApplicationUniversalIdentifier,
-      isSystemSideEffect:
-        existingFlatPageLayoutWidgetToUpdate.isSystemSideEffect,
     });
 
     const { overrides, updatedEditableProperties } =

@@ -8,11 +8,7 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { viewObjectMetadataIdComponentState } from '@/views/states/viewObjectMetadataIdComponentState';
 import { FieldMetadataType, SettingsPath } from 'twenty-shared/types';
-import {
-  isDefined,
-  isFieldMetadataDateKind,
-  isFieldMetadataSupportedInGroupBy,
-} from 'twenty-shared/utils';
+import { isDefined, isFieldMetadataDateKind } from 'twenty-shared/utils';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
 export const useGetAvailableFieldsForCalendar = () => {
@@ -30,14 +26,8 @@ export const useGetAvailableFieldsForCalendar = () => {
   );
 
   const availableFieldsForCalendar =
-    objectMetadataItem?.readableFields.filter(
-      (field) =>
-        isFieldMetadataDateKind(field.type) &&
-        isFieldMetadataSupportedInGroupBy({
-          type: field.type,
-          name: field.name,
-          isSystem: field.isSystem ?? false,
-        }),
+    objectMetadataItem?.readableFields.filter((field) =>
+      isFieldMetadataDateKind(field.type),
     ) ?? [];
 
   const navigate = useNavigateSettings();

@@ -35,7 +35,6 @@ export const fromObjectManifestToUniversalFlatObjectMetadata = ({
     isLabelSyncedWithName: false,
     fieldUniversalIdentifiers: [],
     indexMetadataUniversalIdentifiers: [],
-    searchFieldMetadataUniversalIdentifiers: [],
     objectPermissionUniversalIdentifiers: [],
     fieldPermissionUniversalIdentifiers: [],
     viewUniversalIdentifiers: [],

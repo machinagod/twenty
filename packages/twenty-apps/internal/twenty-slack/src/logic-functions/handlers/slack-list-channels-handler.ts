@@ -1,10 +1,12 @@
+import { isDefined } from 'twenty-shared/utils';
+
 import {
   type SlackChannelType,
-  type SlackListChannelsInput
+  type SlackListChannelsInput,
 } from 'src/logic-functions/types/slack-list-channels-input.type';
 import {
   type SlackListChannelsResult,
-  type SlackListChannelsResultChannel
+  type SlackListChannelsResultChannel,
 } from 'src/logic-functions/types/slack-list-channels-result.type';
 import { getSlackClient } from 'src/logic-functions/utils/get-slack-client';
 
@@ -61,7 +63,7 @@ export const slackListChannelsHandler = async (
           break;
         }
 
-        if (channel.id == null || channel.name == null) {
+        if (!isDefined(channel.id) || !isDefined(channel.name)) {
           continue;
         }
 
@@ -79,7 +81,7 @@ export const slackListChannelsHandler = async (
 
       const nextCursor = response.response_metadata?.next_cursor;
 
-      if (nextCursor == null || nextCursor.length === 0) {
+      if (!isDefined(nextCursor) || nextCursor.length === 0) {
         break;
       }
 

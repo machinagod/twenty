@@ -24,7 +24,7 @@ import {
   IconLayoutSidebarRight,
   IconList,
   IconListDetails,
-} from 'twenty-ui/icon';
+} from 'twenty-ui-deprecated/display';
 import {
   FieldDisplayMode,
   type FieldConfiguration,

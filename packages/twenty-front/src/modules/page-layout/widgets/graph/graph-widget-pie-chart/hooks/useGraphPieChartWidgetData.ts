@@ -15,7 +15,6 @@ import { isDefined } from 'twenty-shared/utils';
 import {
   PieChartDataDocument,
   type PieChartConfiguration,
-  type PieChartDataItem,
 } from '~/generated-metadata/graphql';
 
 type UseGraphPieChartWidgetDataProps = {
@@ -86,8 +85,8 @@ export const useGraphPieChartWidgetData = ({
   });
 
   const chartData = queryData?.pieChartData?.data?.map(
-    (item: PieChartDataItem): PieChartDataItemWithColor => {
-      const rawValue = formattedToRawLookup.get(item.key);
+    (item: PieChartDataItemWithColor): PieChartDataItemWithColor => {
+      const rawValue = formattedToRawLookup.get(item.id);
 
       const itemColor = determineChartItemColor({
         configurationColor,
@@ -96,7 +95,7 @@ export const useGraphPieChartWidgetData = ({
       });
 
       return {
-        key: item.key,
+        id: item.id,
         value: item.value,
         color: itemColor,
       };

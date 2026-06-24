@@ -1,17 +1,18 @@
-import { NextResponse } from 'next/server';
-import { z } from 'zod';
-
-import { buildLogicFunctionPayload } from '@/partner-application/build-logic-function-payload';
-import { partnerApplicationRequestSchema } from '@/partner-application/partner-application-request-schema';
 import {
   createRateLimiter,
   fetchWithTimeout,
   getClientIpKey,
   readJsonBody,
-} from '@/platform/http';
+} from '@/lib/api';
+import {
+  buildLogicFunctionPayload,
+  partnerApplicationRequestSchema,
+} from '@/app/api/partner-application/partner-application-schema';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
-// z.url (not z.httpUrl) so localhost webhook destinations are accepted in dev;
-// z.httpUrl would reject http://localhost:2020/... by demanding a TLD hostname.
+// Use z.url() (not z.httpUrl) so localhost destinations are accepted in dev.
+// z.httpUrl enforces a TLD-shaped hostname and would reject http://localhost:2020/...
 const webhookUrlSchema = z
   .string()
   .trim()
@@ -22,7 +23,10 @@ const applicationSecretSchema = z.string().trim().min(1);
 const MAX_BODY_BYTES = 16 * 1024;
 const WEBHOOK_TIMEOUT_MS = 8_000;
 
-const checkRateLimit = createRateLimiter({ capacity: 5, refillPerSec: 1 / 60 });
+const checkRateLimit = createRateLimiter({
+  capacity: 5,
+  refillPerSec: 1 / 60,
+});
 
 export async function POST(request: Request) {
   const webhookUrlResult = webhookUrlSchema.safeParse(
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
           present: rawWebhookUrl !== undefined,
           isEmptyAfterTrim: (rawWebhookUrl ?? '').trim() === '',
           length: (rawWebhookUrl ?? '').length,
+          value: rawWebhookUrl,
           parseError: webhookUrlResult.success
             ? null
             : (webhookUrlResult.error.issues[0]?.message ?? 'unknown'),
@@ -55,7 +60,7 @@ export async function POST(request: Request) {
             : (secretResult.error.issues[0]?.message ?? 'unknown'),
         },
         envFileHint:
-          'Next dev reads .env.local. After editing env vars restart the dev server — Next does not hot-reload them.',
+          'Next dev reads .env.local (not .env.prod). After editing env vars you must restart `yarn nx dev twenty-website` — Next does not hot-reload env vars.',
       }),
     );
     return NextResponse.json(
@@ -75,7 +80,10 @@ export async function POST(request: Request) {
     );
     return NextResponse.json(
       { error: 'Too many requests. Please try again shortly.' },
-      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(retryAfterSeconds) },
+      },
     );
   }
 
@@ -104,6 +112,7 @@ export async function POST(request: Request) {
   }
 
   const parsed = partnerApplicationRequestSchema.safeParse(bodyResult.value);
+
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message ?? 'Invalid request body.';
     return NextResponse.json({ error: message }, { status: 400 });
@@ -129,6 +138,7 @@ export async function POST(request: Request) {
     console.error(
       '[partner-application] upstream fetch failed',
       JSON.stringify({
+        url: webhookUrl,
         error: upstream.error,
         payloadKeys: Object.keys(payload),
       }),
@@ -150,7 +160,9 @@ export async function POST(request: Request) {
     console.error(
       '[partner-application] upstream returned non-2xx',
       JSON.stringify({
+        url: webhookUrl,
         status: upstream.response.status,
+        statusText: upstream.response.statusText,
         body: upstreamBody.slice(0, 2000),
         payloadKeys: Object.keys(payload),
       }),
@@ -176,6 +188,7 @@ export async function POST(request: Request) {
     console.error(
       '[partner-application] logic function returned non-ok result',
       JSON.stringify({
+        url: webhookUrl,
         body: upstreamBody.slice(0, 2000),
         payloadKeys: Object.keys(payload),
       }),

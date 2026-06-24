@@ -25,7 +25,6 @@ describe('getColumnNameToFieldMetadataIdMap', () => {
     workspaceId: 'test-workspace-id',
     universalIdentifier: 'test-object-id',
     indexMetadataIds: [],
-    searchFieldMetadataIds: [],
     objectPermissionIds: [],
     fieldPermissionIds: [],
     fieldIds,
@@ -48,7 +47,6 @@ describe('getColumnNameToFieldMetadataIdMap', () => {
     fieldPermissionUniversalIdentifiers: [],
     viewUniversalIdentifiers: [],
     indexMetadataUniversalIdentifiers: [],
-    searchFieldMetadataUniversalIdentifiers: [],
     labelIdentifierFieldMetadataUniversalIdentifier: null,
     imageIdentifierFieldMetadataUniversalIdentifier: null,
   });

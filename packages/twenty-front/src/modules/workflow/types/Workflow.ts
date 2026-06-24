@@ -19,7 +19,6 @@ import {
   type workflowIteratorActionSchema,
   type workflowLogicFunctionActionSchema,
   type workflowManualTriggerSchema,
-  type workflowPickRecordActionSchema,
   type workflowRunSchema,
   type workflowRunStateSchema,
   type workflowRunStatusSchema,
@@ -57,9 +56,6 @@ export type WorkflowUpsertRecordAction = z.infer<
 export type WorkflowFindRecordsAction = z.infer<
   typeof workflowFindRecordsActionSchema
 >;
-export type WorkflowPickRecordAction = z.infer<
-  typeof workflowPickRecordActionSchema
->;
 export type WorkflowDelayAction = z.infer<typeof workflowDelayActionSchema>;
 export type WorkflowFilterAction = z.infer<typeof workflowFilterActionSchema>;
 export type WorkflowFormAction = z.infer<typeof workflowFormActionSchema>;
@@ -83,7 +79,6 @@ export type WorkflowAction =
   | WorkflowDeleteRecordAction
   | WorkflowUpsertRecordAction
   | WorkflowFindRecordsAction
-  | WorkflowPickRecordAction
   | WorkflowFilterAction
   | WorkflowIfElseAction
   | WorkflowFormAction

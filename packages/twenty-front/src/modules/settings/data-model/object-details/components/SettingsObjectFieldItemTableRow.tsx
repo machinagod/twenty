@@ -1,6 +1,5 @@
 import { useDeleteOneFieldMetadataItem } from '@/object-metadata/hooks/useDeleteOneFieldMetadataItem';
 import { useFieldMetadataItem } from '@/object-metadata/hooks/useFieldMetadataItem';
-import { useGetIsMetadataItemCustom } from '@/object-metadata/hooks/useGetIsMetadataItemCustom';
 import { useGetRelationMetadata } from '@/object-metadata/hooks/useGetRelationMetadata';
 import { isLabelIdentifierField } from '@/object-metadata/utils/isLabelIdentifierField';
 import { isDDLLockedState } from '@/client-config/states/isDDLLockedState';
@@ -24,10 +23,13 @@ import {
   IconMinus,
   IconPlus,
   useIcons,
-} from 'twenty-ui/icon';
-import { LightIconButton } from 'twenty-ui/input';
-import { UndecoratedLink } from 'twenty-ui/navigation';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+} from 'twenty-ui-deprecated/display';
+import { LightIconButton } from 'twenty-ui-deprecated/input';
+import { UndecoratedLink } from 'twenty-ui-deprecated/navigation';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 import { RelationType } from '~/generated-metadata/graphql';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 import { type SettingsObjectDetailTableItem } from '~/pages/settings/data-model/types/SettingsObjectDetailTableItem';
@@ -86,8 +88,6 @@ export const SettingsObjectFieldItemTableRow = ({
   const { t } = useLingui();
   const { fieldMetadataItem, objectMetadataItem } =
     settingsObjectDetailTableItem;
-
-  const getIsMetadataItemCustom = useGetIsMetadataItemCustom();
 
   const isDDLLocked = useAtomStateValue(isDDLLockedState);
 
@@ -209,6 +209,7 @@ export const SettingsObjectFieldItemTableRow = ({
         <SettingsItemTypeTag
           item={{
             applicationId: fieldMetadataItem.applicationId,
+            isCustom: fieldMetadataItem.isCustom ?? undefined,
           }}
         />
       </TableCell>
@@ -259,7 +260,7 @@ export const SettingsObjectFieldItemTableRow = ({
           )
         ) : mode === 'view' ? (
           <SettingsObjectFieldInactiveActionDropdown
-            isCustomField={getIsMetadataItemCustom(fieldMetadataItem)}
+            isCustomField={fieldMetadataItem.isCustom === true}
             isSystemField={fieldMetadataItem.isSystem === true}
             readonly={readonly}
             fieldMetadataItemId={fieldMetadataItem.id}

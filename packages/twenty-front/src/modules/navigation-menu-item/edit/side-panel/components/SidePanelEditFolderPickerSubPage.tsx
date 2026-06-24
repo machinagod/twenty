@@ -1,7 +1,6 @@
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
-import { TintedIconTile } from 'twenty-ui/data-display';
-import { useIcons } from 'twenty-ui/icon';
+import { TintedIconTile, useIcons } from 'twenty-ui-deprecated/display';
 
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { FOLDER_ICON_DEFAULT } from '@/navigation-menu-item/common/constants/FolderIconDefault';

@@ -1,7 +1,6 @@
 import {
   Field,
   HideField,
-  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
@@ -77,9 +76,6 @@ export class ViewDTO {
 
   @Field({ nullable: false, defaultValue: false })
   shouldHideEmptyGroups: boolean;
-
-  @Field(() => Int, { nullable: true })
-  kanbanColumnWidth?: number | null;
 
   @Field(() => UUIDScalarType, { nullable: true })
   calendarFieldMetadataId?: string | null;

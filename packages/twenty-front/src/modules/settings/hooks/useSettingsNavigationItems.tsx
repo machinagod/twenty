@@ -17,6 +17,7 @@ import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import {
   IconApi,
+  // IconApps, // TODO: Re-enable when integrations page is ready
   IconAt,
   IconCalendarEvent,
   IconColorSwatch,
@@ -34,7 +35,7 @@ import {
   IconSparkles,
   IconUserCircle,
   IconUsers,
-} from 'twenty-ui/icon';
+} from 'twenty-ui-deprecated/display';
 import { PermissionFlagType } from '~/generated-metadata/graphql';
 
 export type SettingsNavigationSection = {

@@ -15,10 +15,7 @@ import chalk from 'chalk';
 import type { Command } from 'commander';
 import { execSync, spawnSync } from 'node:child_process';
 
-const startAction = async (
-  version: string | undefined,
-  options: { port?: string; test?: boolean },
-) => {
+const startAction = async (options: { port?: string; test?: boolean }) => {
   const defaultPort = options.test ? DEFAULT_TEST_PORT : DEFAULT_PORT;
   const port = options.port ? parseInt(options.port, 10) : defaultPort;
 
@@ -30,7 +27,6 @@ const startAction = async (
   const result = await serverStart({
     port,
     test: options.test,
-    version,
     onProgress: (message) => console.log(chalk.gray(message)),
   });
 
@@ -177,10 +173,8 @@ const upgradeAction = async (
 
 export const registerServerCommands = (program: Command): void => {
   program
-    .command('docker:start [version]')
-    .description(
-      'Start the local Twenty container (version defaults to the app `engines.twenty` range, then `latest`)',
-    )
+    .command('docker:start')
+    .description('Start the local Twenty container')
     .option('-p, --port <port>', 'HTTP port')
     .option('--test', 'Start a separate test instance (port 2021)')
     .action(startAction);
@@ -231,18 +225,13 @@ export const registerServerCommands = (program: Command): void => {
     );
 
   server
-    .command('start [version]')
+    .command('start')
     .option('-p, --port <port>', 'HTTP port')
     .option('--test', 'Start a separate test instance (port 2021)')
-    .action(
-      async (
-        version: string | undefined,
-        options: { port?: string; test?: boolean },
-      ) => {
-        deprecate('start', 'docker:start');
-        await startAction(version, options);
-      },
-    );
+    .action(async (options: { port?: string; test?: boolean }) => {
+      deprecate('start', 'docker:start');
+      await startAction(options);
+    });
 
   server
     .command('stop')

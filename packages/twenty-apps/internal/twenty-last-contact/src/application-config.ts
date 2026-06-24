@@ -6,6 +6,7 @@ import {
   APPLICATION_UNIVERSAL_IDENTIFIER,
   CALENDAR_CRON_INTERVAL_MINUTES_VARIABLE_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
+import { ABOUT_DESCRIPTION } from 'src/constants/about-description.constant';
 
 export default defineApplication({
   universalIdentifier: APPLICATION_UNIVERSAL_IDENTIFIER,
@@ -13,6 +14,7 @@ export default defineApplication({
   screenshots: ['public/gallery/cover.png'],
   displayName: APP_DISPLAY_NAME,
   description: APP_DESCRIPTION,
+  aboutDescription: ABOUT_DESCRIPTION,
   applicationVariables: {
     CALENDAR_CRON_INTERVAL_MINUTES: {
       universalIdentifier:

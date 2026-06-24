@@ -328,7 +328,6 @@ export class PageLayoutUpdateService {
           layoutMode: tabInput.layoutMode ?? PageLayoutTabLayoutMode.GRID,
           overrides: null,
           isActive: true,
-          isSystemSideEffect: false,
         };
       },
     );
@@ -346,7 +345,6 @@ export class PageLayoutUpdateService {
           entityApplicationUniversalIdentifier:
             existingTab.applicationUniversalIdentifier,
           workspaceCustomApplicationUniversalIdentifier,
-          isSystemSideEffect: existingTab.isSystemSideEffect,
         });
 
         const editableProperties = {
@@ -386,7 +384,6 @@ export class PageLayoutUpdateService {
           entityApplicationUniversalIdentifier:
             existingTab.applicationUniversalIdentifier,
           workspaceCustomApplicationUniversalIdentifier,
-          isSystemSideEffect: existingTab.isSystemSideEffect,
         });
 
         const editableProperties = {
@@ -608,7 +605,6 @@ export class PageLayoutUpdateService {
           overrides: null,
           universalOverrides: null,
           isActive: true,
-          isSystemSideEffect: false,
           universalConfiguration:
             fromPageLayoutWidgetConfigurationToUniversalConfiguration({
               configuration: widgetInput.configuration,
@@ -725,7 +721,6 @@ export class PageLayoutUpdateService {
       entityApplicationUniversalIdentifier:
         existingWidget.applicationUniversalIdentifier,
       workspaceCustomApplicationUniversalIdentifier,
-      isSystemSideEffect: existingWidget.isSystemSideEffect,
     });
 
     const configuration = widgetInput.configuration ?? null;

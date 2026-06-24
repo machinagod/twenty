@@ -71,7 +71,6 @@ export const recomputeViewFieldIdentifierAfterFlatObjectIdentifierUpdate = ({
         position: lowestViewFieldPosition - 1,
         isVisible: true,
         isActive: true,
-        isSystemSideEffect: flatView.isSystemSideEffect,
         size: DEFAULT_VIEW_FIELD_SIZE,
         viewId: flatView.id,
         viewUniversalIdentifier: flatView.universalIdentifier,
@@ -93,16 +92,11 @@ export const recomputeViewFieldIdentifierAfterFlatObjectIdentifierUpdate = ({
 
       accumulator.flatViewFieldsToCreate.push(flatViewFieldToCreate);
     } else if (
-      labelMetadataIdentifierViewField.position > lowestViewFieldPosition ||
-      labelMetadataIdentifierViewField.isVisible === false
+      labelMetadataIdentifierViewField.position > lowestViewFieldPosition
     ) {
       const updatedFlatViewField = {
         ...labelMetadataIdentifierViewField,
-        position:
-          labelMetadataIdentifierViewField.position > lowestViewFieldPosition
-            ? lowestViewFieldPosition - 1
-            : labelMetadataIdentifierViewField.position,
-        isVisible: true,
+        position: lowestViewFieldPosition - 1,
       };
 
       accumulator.flatViewFieldsToUpdate.push(updatedFlatViewField);

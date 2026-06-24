@@ -1,5 +1,4 @@
 import { validateObjectMetadataCrossEntity } from 'src/engine/metadata-modules/flat-object-metadata/validators/utils/validate-object-metadata-cross-entity.util';
-import { validatePermissionFlagNotInUseCrossEntity } from 'src/engine/metadata-modules/flat-permission-flag/validators/utils/validate-permission-flag-not-in-use-cross-entity.util';
 import { validateViewFieldLabelIdentifierCrossEntity } from 'src/engine/metadata-modules/flat-view-field/validators/utils/validate-view-field-label-identifier-cross-entity.util';
 import {
   type OrchestratorActionsReport,
@@ -33,15 +32,8 @@ export const crossEntityTransversalValidation = ({
     preDeletionFlatViewFieldMaps,
   });
 
-  const { permissionFlag } = validatePermissionFlagNotInUseCrossEntity({
-    optimisticUniversalFlatMaps,
-    deletedPermissionFlagActions:
-      orchestratorActionsReport.permissionFlag.delete,
-  });
-
   crossEntityFailureReport.objectMetadata.push(...objectMetadata);
   crossEntityFailureReport.viewField.push(...viewField);
-  crossEntityFailureReport.permissionFlag.push(...permissionFlag);
 
   validateUniversalIdentifierCrossEntityUniquenessThroughReportMutation({
     optimisticUniversalFlatMaps,

@@ -49,6 +49,21 @@ export class ObjectMetadataResolver {
   ) {}
 
   @ResolveField(() => Boolean, {
+    deprecationReason:
+      'isCustom is derived from the owning application and will be removed; an object is custom when it does not belong to the twenty-standard application.',
+  })
+  async isCustom(
+    @Parent() objectMetadata: ObjectMetadataDTO,
+    @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
+    @Context() context: { loaders: IDataloaders },
+  ): Promise<boolean> {
+    return context.loaders.isCustomLoader.load({
+      workspaceId,
+      applicationId: objectMetadata.applicationId,
+    });
+  }
+
+  @ResolveField(() => Boolean, {
     deprecationReason: 'Use isUIEditable',
   })
   async isUIReadOnly(
@@ -65,70 +80,48 @@ export class ObjectMetadataResolver {
     return this.objectRecordCountService.getRecordCounts(workspaceId);
   }
 
-  private async resolveStandardOverride(
-    objectMetadata: ObjectMetadataDTO,
-    labelKey:
-      | 'color'
-      | 'labelPlural'
-      | 'labelSingular'
-      | 'description'
-      | 'icon',
-    context: { loaders: IDataloaders } & I18nContext,
-    workspaceId: string,
-  ): Promise<string> {
-    const i18n = this.i18nService.getI18nInstance(context.req.locale);
-
-    const standardApplicationId =
-      await context.loaders.standardApplicationIdLoader.load({ workspaceId });
-
-    return resolveObjectMetadataStandardOverride(
-      objectMetadata,
-      labelKey,
-      context.req.locale,
-      i18n,
-      objectMetadata.applicationId === standardApplicationId,
-    );
-  }
-
   @ResolveField(() => String, { nullable: true })
   async labelPlural(
     @Parent() objectMetadata: ObjectMetadataDTO,
-    @Context() context: { loaders: IDataloaders } & I18nContext,
-    @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
+    @Context() context: I18nContext,
   ): Promise<string> {
-    return this.resolveStandardOverride(
+    const i18n = this.i18nService.getI18nInstance(context.req.locale);
+
+    return resolveObjectMetadataStandardOverride(
       objectMetadata,
       'labelPlural',
-      context,
-      workspaceId,
+      context.req.locale,
+      i18n,
     );
   }
 
   @ResolveField(() => String, { nullable: true })
   async labelSingular(
     @Parent() objectMetadata: ObjectMetadataDTO,
-    @Context() context: { loaders: IDataloaders } & I18nContext,
-    @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
+    @Context() context: I18nContext,
   ): Promise<string> {
-    return this.resolveStandardOverride(
+    const i18n = this.i18nService.getI18nInstance(context.req.locale);
+
+    return resolveObjectMetadataStandardOverride(
       objectMetadata,
       'labelSingular',
-      context,
-      workspaceId,
+      context.req.locale,
+      i18n,
     );
   }
 
   @ResolveField(() => String, { nullable: true })
   async description(
     @Parent() objectMetadata: ObjectMetadataDTO,
-    @Context() context: { loaders: IDataloaders } & I18nContext,
-    @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
+    @Context() context: I18nContext,
   ): Promise<string> {
-    return this.resolveStandardOverride(
+    const i18n = this.i18nService.getI18nInstance(context.req.locale);
+
+    return resolveObjectMetadataStandardOverride(
       objectMetadata,
       'description',
-      context,
-      workspaceId,
+      context.req.locale,
+      i18n,
     );
   }
 
@@ -136,28 +129,30 @@ export class ObjectMetadataResolver {
   @ResolveField(() => String, { nullable: true })
   async icon(
     @Parent() objectMetadata: ObjectMetadataDTO,
-    @Context() context: { loaders: IDataloaders } & I18nContext,
-    @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
+    @Context() context: I18nContext,
   ): Promise<string> {
-    return this.resolveStandardOverride(
+    const i18n = this.i18nService.getI18nInstance(context.req.locale);
+
+    return resolveObjectMetadataStandardOverride(
       objectMetadata,
       'icon',
-      context,
-      workspaceId,
+      context.req.locale,
+      i18n,
     );
   }
 
   @ResolveField(() => String, { nullable: true })
   async color(
     @Parent() objectMetadata: ObjectMetadataDTO,
-    @Context() context: { loaders: IDataloaders } & I18nContext,
-    @AuthWorkspace() { id: workspaceId }: WorkspaceEntity,
+    @Context() context: I18nContext,
   ): Promise<string> {
-    return this.resolveStandardOverride(
+    const i18n = this.i18nService.getI18nInstance(context.req.locale);
+
+    return resolveObjectMetadataStandardOverride(
       objectMetadata,
       'color',
-      context,
-      workspaceId,
+      context.req.locale,
+      i18n,
     );
   }
 

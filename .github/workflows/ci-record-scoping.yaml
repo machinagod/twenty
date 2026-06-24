@@ -1,0 +1,97 @@
+name: CI Record Scoping
+
+# Dedicated gate for the clean-room record-scoping feature. It is load-bearing
+# security — it filters every workspace ORM query — so a silent break (e.g. an
+# upstream refactor dropping the applyRecordScoping() call from a query builder)
+# must turn CI red. Runs the pure-logic unit tests AND the end-to-end integration
+# test that proves the ORM chokepoint actually applies scoping against Postgres.
+# Scoped to the one suite, so it's a fast, clear signal independent of the big
+# integration matrix.
+
+on:
+  pull_request:
+    paths:
+      - 'packages/twenty-server/src/engine/twenty-orm/**'
+      - 'packages/twenty-server/test/integration/graphql/suites/record-scoping.integration-spec.ts'
+      - 'packages/twenty-server/.env.test'
+      - '.github/workflows/ci-record-scoping.yaml'
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record-scoping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      clickhouse:
+        image: clickhouse/clickhouse-server:25.8.8
+        env:
+          CLICKHOUSE_PASSWORD: clickhousePassword
+        ports:
+          - 8123:8123
+          - 9000:9000
+        options: >-
+          --health-cmd "clickhouse-client --host=localhost --port=9000 --user=default --password=clickhousePassword --query='SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      CLICKHOUSE_URL: 'http://default:clickhousePassword@localhost:8123/twenty'
+      CLICKHOUSE_PASSWORD: clickhousePassword
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 1
+
+      - name: Install dependencies
+        uses: ./.github/actions/yarn-install
+
+      # Unit tests first — pure logic, no services; fails fast if the rule/SQL
+      # builder regresses.
+      - name: Record-scoping unit tests
+        run: cd packages/twenty-server && npx jest record-scoping
+
+      # Deps required by database:reset + seed (they import from twenty-shared).
+      - name: Build dependencies
+        run: |
+          npx nx build twenty-shared
+          npx nx build twenty-emails
+
+      - name: Create test DB
+        run: PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d postgres -c 'CREATE DATABASE "test";'
+
+      - name: ClickHouse migrate + seed
+        run: |
+          npx nx clickhouse:migrate twenty-server
+          npx nx clickhouse:seed twenty-server
+
+      - name: Reset + seed test DB (runs migrations)
+        run: cd packages/twenty-server && NODE_OPTIONS="--max-old-space-size=8192 --import tsx/esm" npx nx database:reset
+
+      # The regression net: real GraphQL API -> real ORM -> Postgres. Proves the
+      # chokepoint applies scoping (SELECT/UPDATE, static + member-relative).
+      - name: Record-scoping integration test
+        run: cd packages/twenty-server && NODE_OPTIONS="--max-old-space-size=6144" npx jest --config ./jest-integration.config.ts test/integration/graphql/suites/record-scoping.integration-spec.ts

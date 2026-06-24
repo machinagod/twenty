@@ -2,8 +2,8 @@ import { isDefined } from 'class-validator';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import {
   type AggregateOperations,
-  ViewType,
-  ViewKey,
+  type ViewType,
+  type ViewKey,
   ViewOpenRecordIn,
   ViewVisibility,
 } from 'twenty-shared/types';
@@ -137,15 +137,12 @@ export const createStandardViewFlatMetadata = <
     kanbanAggregateOperationFieldMetadataId,
     mainGroupByFieldMetadataId,
     shouldHideEmptyGroups: false,
-    kanbanColumnWidth: null,
     calendarLayout: null,
     calendarFieldMetadataId,
     anyFieldFilterValue: null,
     visibility: ViewVisibility.WORKSPACE,
     createdByUserWorkspaceId: null,
     isActive: true,
-    isSystemSideEffect:
-      key === ViewKey.INDEX || type === ViewType.FIELDS_WIDGET,
     overrides: null,
     universalOverrides: null,
     viewFieldIds: [],

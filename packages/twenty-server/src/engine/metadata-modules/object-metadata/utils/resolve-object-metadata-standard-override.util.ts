@@ -14,16 +14,19 @@ export const resolveObjectMetadataStandardOverride = (
     | 'labelSingular'
     | 'description'
     | 'icon'
+    | 'isCustom'
     | 'standardOverrides'
   >,
   labelKey: 'color' | 'labelPlural' | 'labelSingular' | 'description' | 'icon',
   locale: keyof typeof APP_LOCALES | undefined,
   i18nInstance: I18n,
-  isStandardApp: boolean,
 ): string => {
   const safeLocale = locale ?? SOURCE_LOCALE;
 
-  if (!isStandardApp) {
+  // Custom object labels are user-authored: never overridden nor translated.
+  // Without this gate, a label colliding with a standard catalog string
+  // (e.g. "Company") would get translated against the user's intent.
+  if (objectMetadata.isCustom) {
     return objectMetadata[labelKey] ?? '';
   }
 

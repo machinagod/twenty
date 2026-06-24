@@ -8,9 +8,12 @@ import {
   getUrlHostnameOrThrow,
   isDefined,
 } from 'twenty-shared/utils';
-import { RoundedLink, SocialLink } from 'twenty-ui/navigation';
+import {
+  LinkType,
+  RoundedLink,
+  SocialLink,
+} from 'twenty-ui-deprecated/navigation';
 import { checkUrlType } from '~/utils/checkUrlType';
-import { isSocialLinkType } from '~/utils/isSocialLinkType';
 
 type LinksDisplayProps = {
   value?: FieldLinksValue;
@@ -44,7 +47,9 @@ export const LinksDisplay = ({ value, onLinkClick }: LinksDisplayProps) => {
   return (
     <ExpandableList>
       {links.map(({ url, label, type }, index) =>
-        isSocialLinkType(type) ? (
+        type === LinkType.LinkedIn ||
+        type === LinkType.Twitter ||
+        type === LinkType.Facebook ? (
           <SocialLink
             key={index}
             href={url}

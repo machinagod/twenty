@@ -1,4 +1,5 @@
-import { defineLogicFunction, type RoutePayload } from 'twenty-sdk/define';
+import { defineLogicFunction } from 'twenty-sdk/define';
+import type { RoutePayload } from 'twenty-sdk/define';
 
 import { LIST_LINEAR_WORKFLOW_STATES_ROUTE_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
 import { listLinearWorkflowStatesHandler } from 'src/logic-functions/handlers/list-linear-workflow-states-handler';

@@ -5,9 +5,14 @@ import { useContext } from 'react';
 import { ObjectMetadataIcon } from '@/object-metadata/components/ObjectMetadataIcon';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { SettingsItemTypeTag } from '@/settings/components/SettingsItemTypeTag';
-import { IconBox } from 'twenty-ui/icon';
-import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  IconBox,
+  OverflowingTextWithTooltip,
+} from 'twenty-ui-deprecated/display';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 
 export type SettingsDataModelObjectPreviewProps = {
   className?: string;
@@ -16,7 +21,7 @@ export type SettingsDataModelObjectPreviewProps = {
     | 'icon'
     | 'labelSingular'
     | 'labelPlural'
-    | 'applicationId'
+    | 'isCustom'
     | 'isRemote'
     | 'nameSingular'
     | 'color'
@@ -64,7 +69,7 @@ type SettingsDataModelObjectPreviewItemProps = {
     | 'icon'
     | 'labelSingular'
     | 'labelPlural'
-    | 'applicationId'
+    | 'isCustom'
     | 'isRemote'
     | 'nameSingular'
     | 'color'

@@ -51,7 +51,7 @@ Segui questi passaggi per un setup manuale.
    curl -o .env https://raw.githubusercontent.com/twentyhq/twenty/refs/heads/main/packages/twenty-docker/.env.example
    ```
 
-2. **Genera una chiave di cifratura**
+2. **Genera Token Segreti**
 
    Esegui il seguente comando per generare una stringa casuale unica:
 
@@ -59,17 +59,15 @@ Segui questi passaggi per un setup manuale.
    openssl rand -base64 32
    ```
 
-   **Importante:** Tieni questo valore segreto / non condividerlo. La perdita di `ENCRYPTION_KEY` significa perdere l'accesso a tutti i segreti archiviati nel database (token OAuth, variabili dell'applicazione, segreti TOTP, ecc.).
+   **Importante:** Tieni questo valore segreto / non condividerlo.
 
 3. **Aggiorna il `.env`**
 
    Sostituisci il valore segnaposto nel tuo file .env con il token generato:
 
    ```ini
-   ENCRYPTION_KEY=random_string
+   APP_SECRET=prima_stringa_casuale
    ```
-
-   Consulta la [Guida alla rotazione delle chiavi](/l/it/developers/self-host/capabilities/key-rotation) per le istruzioni su come ruotarla senza tempi di inattività.
 
 4. **Imposta la Password di Postgres**
 

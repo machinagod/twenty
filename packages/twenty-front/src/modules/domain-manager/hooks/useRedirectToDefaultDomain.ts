@@ -12,10 +12,7 @@ export const useRedirectToDefaultDomain = () => {
   const store = useStore();
 
   const { redirect } = useRedirect();
-  const redirectToDefaultDomain = (options?: {
-    pathname?: string;
-    searchParams?: Record<string, string>;
-  }) => {
+  const redirectToDefaultDomain = () => {
     const url = new URL(window.location.href);
     if (url.hostname !== defaultDomain) {
       setLastAuthenticateWorkspaceDomain(null);
@@ -27,14 +24,6 @@ export const useRedirectToDefaultDomain = () => {
       ) {
         url.searchParams.set('returnToPath', returnToPath);
       }
-
-      if (isNonEmptyString(options?.pathname)) {
-        url.pathname = options.pathname;
-      }
-
-      Object.entries(options?.searchParams ?? {}).forEach(([key, value]) => {
-        url.searchParams.set(key, value);
-      });
 
       url.hostname = defaultDomain;
       redirect(url.toString());

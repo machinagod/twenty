@@ -12,15 +12,16 @@ import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFla
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
-import { IconPlus } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/input';
+import { IconPlus } from 'twenty-ui-deprecated/display';
+import { Button } from 'twenty-ui-deprecated/input';
 import {
   AnimatedPlaceholder,
   AnimatedPlaceholderEmptyContainer,
   AnimatedPlaceholderEmptySubTitle,
   AnimatedPlaceholderEmptyTextContainer,
   AnimatedPlaceholderEmptyTitle,
-} from 'twenty-ui/feedback';
+  EMPTY_PLACEHOLDER_TRANSITION_PROPS,
+} from 'twenty-ui-deprecated/layout';
 import { PermissionFlagType } from '~/generated-metadata/graphql';
 
 const StyledAttachmentsContainer = styled.div`
@@ -102,7 +103,10 @@ export const FilesCard = () => {
             onUploadFiles={onUploadFiles}
           />
         ) : (
-          <AnimatedPlaceholderEmptyContainer>
+          <AnimatedPlaceholderEmptyContainer
+            // oxlint-disable-next-line react/jsx-props-no-spreading
+            {...EMPTY_PLACEHOLDER_TRANSITION_PROPS}
+          >
             <AnimatedPlaceholder type="noFile" />
             <AnimatedPlaceholderEmptyTextContainer>
               <AnimatedPlaceholderEmptyTitle>

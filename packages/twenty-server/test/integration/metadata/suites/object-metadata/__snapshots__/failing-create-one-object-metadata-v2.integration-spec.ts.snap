@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Object metadata creation should fail v2 when labelPlural contains only whitespace 1`] = `
 {
@@ -403,45 +403,7 @@ exports[`Object metadata creation should fail v2 when labelPlural contains only 
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -569,105 +531,16 @@ exports[`Object metadata creation should fail v2 when labelPlural contains only 
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -1079,45 +952,7 @@ exports[`Object metadata creation should fail v2 when labelPlural exceeds maximu
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -1245,105 +1080,16 @@ exports[`Object metadata creation should fail v2 when labelPlural exceeds maximu
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -1766,45 +1512,7 @@ exports[`Object metadata creation should fail v2 when labelSingular contains onl
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -1932,105 +1640,16 @@ exports[`Object metadata creation should fail v2 when labelSingular contains onl
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -2442,45 +2061,7 @@ exports[`Object metadata creation should fail v2 when labelSingular exceeds maxi
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -2608,105 +2189,16 @@ exports[`Object metadata creation should fail v2 when labelSingular exceeds maxi
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -3153,45 +2645,7 @@ exports[`Object metadata creation should fail v2 when name exceeds maximum lengt
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -3319,105 +2773,16 @@ exports[`Object metadata creation should fail v2 when name exceeds maximum lengt
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -3829,45 +3194,7 @@ exports[`Object metadata creation should fail v2 when namePlural has invalid cha
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -3995,105 +3322,16 @@ exports[`Object metadata creation should fail v2 when namePlural has invalid cha
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -4505,45 +3743,7 @@ exports[`Object metadata creation should fail v2 when namePlural is a reserved k
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -4671,105 +3871,16 @@ exports[`Object metadata creation should fail v2 when namePlural is a reserved k
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -5192,45 +4303,7 @@ exports[`Object metadata creation should fail v2 when namePlural is not camelCas
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -5358,105 +4431,16 @@ exports[`Object metadata creation should fail v2 when namePlural is not camelCas
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -5892,45 +4876,7 @@ exports[`Object metadata creation should fail v2 when nameSingular contains only
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -6058,105 +5004,16 @@ exports[`Object metadata creation should fail v2 when nameSingular contains only
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -6574,45 +5431,7 @@ exports[`Object metadata creation should fail v2 when nameSingular contains only
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -6740,105 +5559,16 @@ exports[`Object metadata creation should fail v2 when nameSingular contains only
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -7274,45 +6004,7 @@ exports[`Object metadata creation should fail v2 when nameSingular has invalid c
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -7440,105 +6132,16 @@ exports[`Object metadata creation should fail v2 when nameSingular has invalid c
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -7950,45 +6553,7 @@ exports[`Object metadata creation should fail v2 when nameSingular is a reserved
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -8116,105 +6681,16 @@ exports[`Object metadata creation should fail v2 when nameSingular is a reserved
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -8661,45 +7137,7 @@ exports[`Object metadata creation should fail v2 when nameSingular is not camelC
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -8827,105 +7265,16 @@ exports[`Object metadata creation should fail v2 when nameSingular is not camelC
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -9337,45 +7686,7 @@ exports[`Object metadata creation should fail v2 when names are identical 1`] = 
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -9503,105 +7814,16 @@ exports[`Object metadata creation should fail v2 when names are identical 1`] = 
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },
@@ -10013,45 +8235,7 @@ exports[`Object metadata creation should fail v2 when names with whitespaces res
           "type": "create",
         },
       ],
-      "searchFieldMetadata": [
-        {
-          "errors": [
-            {
-              "code": "FIELD_METADATA_NOT_FOUND",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "OBJECT_METADATA_NOT_FOUND",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "objectMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "searchFieldMetadata",
-          "status": "fail",
-          "type": "create",
-        },
-      ],
       "view": [
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Object metadata not found",
-              "userFriendlyMessage": "Object metadata not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "universalIdentifier": Any<String>,
-          },
-          "metadataName": "view",
-          "status": "fail",
-          "type": "create",
-        },
         {
           "errors": [
             {
@@ -10179,105 +8363,16 @@ exports[`Object metadata creation should fail v2 when names with whitespaces res
           "status": "fail",
           "type": "create",
         },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
-        {
-          "errors": [
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "Field metadata not found",
-              "userFriendlyMessage": "Field metadata not found",
-            },
-            {
-              "code": "INVALID_VIEW_DATA",
-              "message": "View not found",
-              "userFriendlyMessage": "View not found",
-            },
-          ],
-          "flatEntityMinimalInformation": {
-            "fieldMetadataUniversalIdentifier": Any<String>,
-            "universalIdentifier": Any<String>,
-            "viewUniversalIdentifier": Any<String>,
-          },
-          "metadataName": "viewField",
-          "status": "fail",
-          "type": "create",
-        },
       ],
     },
-    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 2 views, 9 viewFields, 5 indices, 1 searchFieldMetadata",
+    "message": "Validation failed for 17 fieldMetadata, 1 objectMetadata, 1 view, 5 viewFields, 5 indices",
     "summary": {
       "fieldMetadata": 17,
       "index": 5,
       "objectMetadata": 1,
-      "searchFieldMetadata": 1,
-      "totalErrors": 35,
-      "view": 2,
-      "viewField": 9,
+      "totalErrors": 29,
+      "view": 1,
+      "viewField": 5,
     },
     "userFriendlyMessage": "Many validation errors",
   },

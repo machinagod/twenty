@@ -10,7 +10,6 @@ import {
   type FindRecordsOutputSchema,
   type FormOutputSchema,
   type IteratorOutputSchema,
-  type ManualTriggerOutputSchema,
   type RecordFieldLeaf,
   type RecordFieldNodeValue,
   type RecordOutputSchemaV2,
@@ -27,7 +26,6 @@ const RECORD_STEP_TYPES = [
   'UPDATE_RECORD',
   'DELETE_RECORD',
   'UPSERT_RECORD',
-  'PICK_RECORD',
 ];
 
 const isRecordOutputSchemaV2 = (
@@ -588,65 +586,24 @@ const searchThroughManualTriggerOutputSchema = ({
   isFullRecord,
 }: {
   stepName: string;
-  manualTriggerOutputSchema: ManualTriggerOutputSchema;
+  manualTriggerOutputSchema: unknown;
   rawVariableName: string;
   isFullRecord: boolean;
 }): VariableSearchResult => {
-  if (!isDefined(manualTriggerOutputSchema)) {
-    return EMPTY_RESULT;
-  }
-
-  const parts = parseVariablePath(stripBrackets(rawVariableName));
-  const stepId = parts[0];
-  const nodeKey = parts[1];
-  const remainingParts = parts.slice(2);
-  const fieldName = remainingParts[remainingParts.length - 1];
-  const pathSegments = remainingParts.slice(0, -1);
-
-  if (!isDefined(stepId) || !isDefined(nodeKey) || !isDefined(fieldName)) {
-    return EMPTY_RESULT;
-  }
-
-  if (nodeKey === 'payload') {
-    const { payload } = manualTriggerOutputSchema;
-
-    if (!isDefined(payload)) {
-      return EMPTY_RESULT;
-    }
-
-    const payloadStepName = `${stepName} > ${payload.label}`;
-
-    // Single-record triggers nest a record schema, bulk triggers a plain map.
-    if (isRecordOutputSchemaV2(payload.value)) {
-      return searchRecordOutputSchema({
-        stepName: payloadStepName,
-        recordOutputSchema: payload.value,
-        selectedField: fieldName,
-        path: pathSegments,
-        isFullRecord,
-      });
-    }
-
-    return searchBaseOutputSchema({
-      stepName: payloadStepName,
-      baseOutputSchema: payload.value,
-      path: pathSegments,
-      selectedField: fieldName,
+  if (isRecordOutputSchemaV2(manualTriggerOutputSchema)) {
+    return searchThroughRecordOutputSchema({
+      stepName,
+      recordOutputSchema: manualTriggerOutputSchema,
+      rawVariableName,
+      isFullRecord,
     });
   }
 
-  if (nodeKey === 'metadata') {
-    const { metadata } = manualTriggerOutputSchema;
-
-    return searchBaseOutputSchema({
-      stepName: `${stepName} > ${metadata.label}`,
-      baseOutputSchema: metadata.value,
-      path: pathSegments,
-      selectedField: fieldName,
-    });
-  }
-
-  return EMPTY_RESULT;
+  return searchThroughBaseOutputSchema({
+    stepName,
+    baseOutputSchema: manualTriggerOutputSchema as BaseOutputSchemaV2,
+    rawVariableName,
+  });
 };
 
 // Main dispatcher
@@ -678,7 +635,7 @@ export const searchVariableInOutputSchema = ({
   if (stepType === 'MANUAL') {
     return searchThroughManualTriggerOutputSchema({
       stepName,
-      manualTriggerOutputSchema: schema as ManualTriggerOutputSchema,
+      manualTriggerOutputSchema: schema,
       rawVariableName,
       isFullRecord,
     });

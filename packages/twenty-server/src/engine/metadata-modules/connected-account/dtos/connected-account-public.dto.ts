@@ -2,7 +2,6 @@ import { Field, ObjectType, OmitType } from '@nestjs/graphql';
 
 import { IsOptional } from 'class-validator';
 
-import { EmailConnectionSecurity } from 'src/engine/core-modules/imap-smtp-caldav-connection/enums/email-connection-security.enum';
 import { ConnectedAccountDTO } from 'src/engine/metadata-modules/connected-account/dtos/connected-account.dto';
 
 @ObjectType('PublicConnectionParametersOutput')
@@ -16,8 +15,8 @@ class PublicConnectionParametersDTO {
   @Field(() => String, { nullable: true })
   username?: string;
 
-  @Field(() => EmailConnectionSecurity, { nullable: true })
-  connectionSecurity?: EmailConnectionSecurity;
+  @Field(() => Boolean, { nullable: true })
+  secure?: boolean;
 }
 
 @ObjectType('PublicImapSmtpCaldavConnectionParameters')

@@ -7,7 +7,6 @@ import { LogicFunctionTriggerJob } from 'src/engine/core-modules/logic-function/
 import { CronTriggerCronCommand } from 'src/engine/core-modules/logic-function/logic-function-trigger/triggers/cron/cron-trigger.cron.command';
 import { CronTriggerCronJob } from 'src/engine/core-modules/logic-function/logic-function-trigger/triggers/cron/cron-trigger.cron.job';
 import { CallDatabaseEventTriggerJobsJob } from 'src/engine/core-modules/logic-function/logic-function-trigger/triggers/database-event/call-database-event-trigger-jobs.job';
-import { LogicFunctionTriggerService } from 'src/engine/core-modules/logic-function/logic-function-trigger/logic-function-trigger.service';
 import { RouteTriggerService } from 'src/engine/core-modules/logic-function/logic-function-trigger/triggers/route/route-trigger.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { LogicFunctionEntity } from 'src/engine/metadata-modules/logic-function/logic-function.entity';
@@ -25,13 +24,8 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     CronTriggerCronJob,
     CronTriggerCronCommand,
     CallDatabaseEventTriggerJobsJob,
-    LogicFunctionTriggerService,
     RouteTriggerService,
   ],
-  exports: [
-    CronTriggerCronCommand,
-    LogicFunctionTriggerService,
-    RouteTriggerService,
-  ],
+  exports: [CronTriggerCronCommand, RouteTriggerService],
 })
 export class LogicFunctionTriggerModule {}

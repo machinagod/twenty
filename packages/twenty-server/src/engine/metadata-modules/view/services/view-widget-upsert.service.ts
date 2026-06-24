@@ -443,7 +443,6 @@ export class ViewWidgetUpsertService {
             existingField.applicationUniversalIdentifier,
           workspaceCustomApplicationUniversalIdentifier:
             applicationUniversalIdentifier,
-          isSystemSideEffect: existingField.isSystemSideEffect,
         });
 
         const { overrides, updatedEditableProperties: sanitizedFieldProps } =
@@ -524,7 +523,6 @@ export class ViewWidgetUpsertService {
         overrides: null,
         universalOverrides: null,
         isActive: true,
-        isSystemSideEffect: false,
         createdAt: now,
         updatedAt: now,
         deletedAt: null,

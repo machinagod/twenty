@@ -4,6 +4,5 @@ export type ToolExecutionContext = {
   workspaceId: string;
   userId?: string;
   userWorkspaceId?: string;
-  threadId?: string;
   onCodeExecutionUpdate?: CodeExecutionStreamEmitter;
 };

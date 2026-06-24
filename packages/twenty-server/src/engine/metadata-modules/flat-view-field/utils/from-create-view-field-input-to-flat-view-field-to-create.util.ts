@@ -67,7 +67,6 @@ export const fromCreateViewFieldInputToFlatViewFieldToCreate = ({
     position: createViewFieldInput.position ?? 0,
     aggregateOperation: createViewFieldInput.aggregateOperation ?? null,
     isActive: true,
-    isSystemSideEffect: false,
     universalOverrides: null,
     viewFieldGroupUniversalIdentifier,
     applicationUniversalIdentifier: flatApplication.universalIdentifier,

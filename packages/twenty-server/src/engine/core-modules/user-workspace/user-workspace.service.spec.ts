@@ -275,10 +275,7 @@ describe('UserWorkspaceService', () => {
       ];
       const workspaceMemberRepository = {
         insert: jest.fn(),
-        find: jest
-          .fn()
-          .mockResolvedValueOnce([])
-          .mockResolvedValue(workspaceMember),
+        find: jest.fn().mockResolvedValue(workspaceMember),
       };
 
       jest
@@ -306,31 +303,6 @@ describe('UserWorkspaceService', () => {
         locale: 'en',
         avatarUrl: 'userWorkspace-avatar-url',
       });
-    });
-
-    it('should not create a workspace member when one already exists', async () => {
-      const workspaceId = 'workspace-id';
-      const user = {
-        id: 'user-id',
-        email: 'test@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        locale: 'en',
-      } as unknown as AuthContextUser;
-      const workspaceMemberRepository = {
-        insert: jest.fn(),
-        find: jest
-          .fn()
-          .mockResolvedValue([{ id: 'existing-member-id', userId: 'user-id' }]),
-      };
-
-      jest
-        .spyOn(globalWorkspaceOrmManager, 'getRepository')
-        .mockResolvedValue(workspaceMemberRepository as any);
-
-      await service.createWorkspaceMember(workspaceId, user);
-
-      expect(workspaceMemberRepository.insert).not.toHaveBeenCalled();
     });
   });
 

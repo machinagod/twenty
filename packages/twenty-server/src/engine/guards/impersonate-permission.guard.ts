@@ -9,7 +9,6 @@ import { msg } from '@lingui/core/macro';
 import { isDefined } from 'class-validator';
 import { PermissionFlagType } from 'twenty-shared/constants';
 
-import { userCanServerImpersonate } from 'src/engine/core-modules/impersonation/utils/user-can-server-impersonate.util';
 import {
   PermissionsException,
   PermissionsExceptionCode,
@@ -37,9 +36,7 @@ export class ImpersonatePermissionGuard implements CanActivate {
       );
     }
 
-    if (userCanServerImpersonate(request.user)) {
-      return true;
-    }
+    if (request.user.canImpersonate === true) return true;
 
     const hasPermission =
       await this.permissionsService.userHasWorkspaceSettingPermission({

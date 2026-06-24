@@ -1,4 +1,4 @@
-import { type IconComponent } from 'twenty-ui/icon';
+import { type IconComponent } from 'twenty-ui-deprecated/display';
 
 export type SpreadsheetImportFieldOption = {
   Icon: IconComponent | null | undefined;

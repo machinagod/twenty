@@ -2,9 +2,7 @@ import crypto from 'crypto';
 
 import { uploadApplicationFile } from 'test/integration/metadata/suites/application/utils/upload-application-file.util';
 
-import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
-
-const TEST_WORKSPACE_ID = SEED_APPLE_WORKSPACE_ID;
+const TEST_WORKSPACE_ID = '20202020-1c25-4d02-bf25-6aeccf7ea419';
 
 export const setupApplicationForSync = async ({
   applicationUniversalIdentifier,

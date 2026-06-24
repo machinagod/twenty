@@ -19,17 +19,21 @@ import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 
 import { currentUserState } from '@/auth/states/currentUserState';
-import { Avatar } from 'twenty-ui/data-display';
-import { IconChevronRight } from 'twenty-ui/icon';
-import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
-import { H2Title } from 'twenty-ui/typography';
-import { Section } from 'twenty-ui/layout';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  Avatar,
+  H2Title,
+  IconChevronRight,
+  OverflowingTextWithTooltip,
+} from 'twenty-ui-deprecated/display';
+import { Section } from 'twenty-ui-deprecated/layout';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 import {
   AdminPanelRecentUsersDocument,
   AdminPanelTopWorkspacesDocument,
 } from '~/generated-admin/graphql';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 const StyledEmptyState = styled.div`
   color: ${themeCssVariables.font.color.tertiary};
@@ -137,7 +141,7 @@ export const SettingsAdminGeneral = () => {
                       overflow="hidden"
                     >
                       <Avatar
-                        avatarUrl={getAbsoluteImageUrl(user.avatarUrl)}
+                        avatarUrl={user.avatarUrl}
                         placeholder={
                           `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
                           user.email
@@ -161,7 +165,7 @@ export const SettingsAdminGeneral = () => {
                       {user.workspaceId ? (
                         <>
                           <Avatar
-                            avatarUrl={getAbsoluteImageUrl(user.workspaceLogo)}
+                            avatarUrl={user.workspaceLogo}
                             placeholder={user.workspaceName || ''}
                             placeholderColorSeed={user.workspaceId}
                             size="sm"
@@ -233,7 +237,7 @@ export const SettingsAdminGeneral = () => {
                       overflow="hidden"
                     >
                       <Avatar
-                        avatarUrl={getAbsoluteImageUrl(workspace.logoUrl)}
+                        avatarUrl={workspace.logoUrl}
                         placeholder={workspace.name || ''}
                         placeholderColorSeed={workspace.id}
                         size="md"

@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 
 import { useAuth } from '@/auth/hooks/useAuth';
 import { tokenPairState } from '@/auth/states/tokenPairState';
-import { clearSessionLocalStorageKeys } from '@/auth/utils/clearSessionLocalStorageKeys';
 import { type AuthTokenPair } from '~/generated-metadata/graphql';
 
 const IMPERSONATION_SESSION_KEY = 'impersonation_original_session';
@@ -48,7 +47,6 @@ export const useImpersonationSession = () => {
         throw error;
       }
 
-      clearSessionLocalStorageKeys();
       reloadWithSession(targetPath);
     },
     [store, getAuthTokensFromLoginToken],
@@ -77,7 +75,6 @@ export const useImpersonationSession = () => {
 
     sessionStorage.removeItem(IMPERSONATION_SESSION_KEY);
     store.set(tokenPairState.atom, session.tokenPair);
-    clearSessionLocalStorageKeys();
     reloadWithSession(session.returnPath);
   }, [store, signOut]);
 

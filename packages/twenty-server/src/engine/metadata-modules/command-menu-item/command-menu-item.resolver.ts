@@ -50,8 +50,6 @@ export class CommandMenuItemResolver {
         commandMenuItem,
         fieldName: 'label',
         objectMetadataLoader: context.loaders.objectMetadataLoader,
-        standardApplicationIdLoader:
-          context.loaders.standardApplicationIdLoader,
         workspaceId: workspace.id,
         locale: context.req.locale,
       })) ?? ''
@@ -68,7 +66,6 @@ export class CommandMenuItemResolver {
       commandMenuItem,
       fieldName: 'shortLabel',
       objectMetadataLoader: context.loaders.objectMetadataLoader,
-      standardApplicationIdLoader: context.loaders.standardApplicationIdLoader,
       workspaceId: workspace.id,
       locale: context.req.locale,
     });
@@ -84,7 +81,6 @@ export class CommandMenuItemResolver {
       commandMenuItem,
       fieldName: 'icon',
       objectMetadataLoader: context.loaders.objectMetadataLoader,
-      standardApplicationIdLoader: context.loaders.standardApplicationIdLoader,
       workspaceId: workspace.id,
       locale: context.req.locale,
     });
@@ -138,15 +134,6 @@ export class CommandMenuItemResolver {
     @AuthWorkspace() workspace: WorkspaceEntity,
   ): Promise<CommandMenuItemDTO> {
     return await this.commandMenuItemService.update(input, workspace.id);
-  }
-
-  @Mutation(() => CommandMenuItemDTO)
-  @UseGuards(NoPermissionGuard)
-  async resetCommandMenuItem(
-    @Args('id', { type: () => UUIDScalarType }) id: string,
-    @AuthWorkspace() workspace: WorkspaceEntity,
-  ): Promise<CommandMenuItemDTO> {
-    return await this.commandMenuItemService.reset(id, workspace.id);
   }
 
   @Mutation(() => CommandMenuItemDTO)

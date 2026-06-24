@@ -22,16 +22,15 @@ import { WorkflowNodeLabel } from '@/workflow/workflow-diagram/workflow-nodes/co
 import { WorkflowNodeRightPart } from '@/workflow/workflow-diagram/workflow-nodes/components/WorkflowNodeRightPart';
 import { WorkflowNodeTitle } from '@/workflow/workflow-diagram/workflow-nodes/components/WorkflowNodeTitle';
 import { WORKFLOW_DIAGRAM_NODE_DEFAULT_SOURCE_HANDLE_ID } from '@/workflow/workflow-diagram/workflow-nodes/constants/WorkflowDiagramNodeDefaultSourceHandleId';
-import { useWorkflowNodeLabel } from '@/workflow/workflow-diagram/workflow-nodes/hooks/useWorkflowNodeLabel';
 import { getNodeIterationCount } from '@/workflow/workflow-diagram/workflow-nodes/utils/getNodeIterationCount';
 import { styled } from '@linaria/react';
 import { Position } from '@xyflow/react';
 import { useContext } from 'react';
-import { isDefined } from 'twenty-shared/utils';
+import { capitalize, isDefined } from 'twenty-shared/utils';
 import { StepStatus } from 'twenty-shared/workflow';
-import { IconCheck, IconX, useIcons } from 'twenty-ui/icon';
-import { Loader } from 'twenty-ui/feedback';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { IconCheck, IconX, useIcons } from 'twenty-ui-deprecated/display';
+import { Loader } from 'twenty-ui-deprecated/feedback';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 
 const StyledNodeLabelWithCounterPart = styled.div`
   align-items: center;
@@ -117,8 +116,6 @@ export const WorkflowRunDiagramStepNode = ({
       ? getNodeIterationCount({ stepInfo })
       : 0;
 
-  const nodeLabel = useWorkflowNodeLabel(data);
-
   const handleClick = () => {
     if (!isDefined(workflowVisualizerWorkflowId)) {
       throw new Error('Workflow ID must be defined');
@@ -156,7 +153,7 @@ export const WorkflowRunDiagramStepNode = ({
         <WorkflowNodeRightPart>
           <StyledNodeLabelWithCounterPart>
             <WorkflowNodeLabel runStatus={data.runStatus} selected={selected}>
-              {nodeLabel}
+              {capitalize(data.nodeType)}
             </WorkflowNodeLabel>
 
             <StyledRightPartContainer>

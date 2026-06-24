@@ -70,7 +70,6 @@ describe('WorkspaceRepository', () => {
       type: FieldMetadataType.UUID,
       objectMetadataId: 'test-metadata-id',
       isActive: true,
-      isSystemSideEffect: false,
       isNullable: false,
       isUnique: true,
       isSystem: true,
@@ -405,7 +404,6 @@ describe('WorkspaceRepository', () => {
         'test-entity',
         { id: 'test-id' },
         { name: 'test' },
-        undefined,
         {
           shouldBypassPermissionChecks: false,
           objectRecordsPermissions: mockObjectRecordsPermissions,

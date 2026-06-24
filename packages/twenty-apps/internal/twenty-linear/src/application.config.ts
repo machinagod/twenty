@@ -1,4 +1,5 @@
 import { defineApplication } from 'twenty-sdk/define';
+import { ABOUT_DESCRIPTION } from './constants/ABOUT_DESCRIPTION.md';
 import { APPLICATION_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
 
 export default defineApplication({
@@ -7,6 +8,7 @@ export default defineApplication({
   description:
     'Connect Linear to Twenty. Each workspace member connects their own Linear account; logic functions can then create issues and read team data on their behalf.',
   logoUrl: 'public/linear-logomark.svg',
+  aboutDescription: ABOUT_DESCRIPTION,
   applicationVariables: undefined,
   author: 'Twenty',
   category: 'Product management',

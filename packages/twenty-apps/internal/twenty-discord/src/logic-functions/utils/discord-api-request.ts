@@ -1,4 +1,4 @@
-import { isDefined } from 'src/utils/is-defined';
+import { isDefined } from 'twenty-shared/utils';
 
 const DISCORD_API_BASE_URL = 'https://discord.com/api/v10';
 

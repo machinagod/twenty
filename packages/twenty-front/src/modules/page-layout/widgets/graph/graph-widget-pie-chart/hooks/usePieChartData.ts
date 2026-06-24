@@ -48,17 +48,17 @@ export const usePieChartData = ({
   }, [data, colorRegistry, colorMode]);
 
   const legendItems: GraphWidgetLegendItem[] = allEnrichedData.map((item) => ({
-    id: item.key,
-    label: String(item.key),
+    id: item.id,
+    label: String(item.id),
     color: item.colorScheme.solid,
   }));
 
   const enrichedData = allEnrichedData.filter(
-    (item) => !graphWidgetHiddenLegendIds.includes(item.key),
+    (item) => !graphWidgetHiddenLegendIds.includes(item.id),
   );
 
   const enrichedDataMap = useMemo(
-    () => new Map(enrichedData.map((item) => [item.key, item])),
+    () => new Map(enrichedData.map((item) => [item.id, item])),
     [enrichedData],
   );
 

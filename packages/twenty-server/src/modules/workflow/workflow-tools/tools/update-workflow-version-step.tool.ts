@@ -6,7 +6,6 @@ import {
   type WorkflowToolContext,
   type WorkflowToolDependencies,
 } from 'src/modules/workflow/workflow-tools/types/workflow-tool-dependencies.type';
-import { summarizeValidation } from 'src/modules/workflow/workflow-tools/utils/summarize-validation.util';
 
 const updateWorkflowVersionStepSchema = z.object({
   workflowVersionId: z
@@ -16,18 +15,7 @@ const updateWorkflowVersionStepSchema = z.object({
   step: z
     .union([workflowActionSchema])
     .describe('The updated step configuration'),
-  validate: z
-    .boolean()
-    .optional()
-    .default(true)
-    .describe(
-      'Run a quick validation and return a compact summary (default true). Set to false when making several edits in a row, then call validate_workflow once at the end instead.',
-    ),
 });
-
-type UpdateWorkflowVersionStepToolInput = UpdateWorkflowVersionStepInput & {
-  validate?: boolean;
-};
 
 export const createUpdateWorkflowVersionStepTool = (
   deps: Pick<
@@ -38,9 +26,9 @@ export const createUpdateWorkflowVersionStepTool = (
 ) => ({
   name: 'update_workflow_version_step' as const,
   description:
-    'Update an existing step in a workflow version. This modifies the step configuration. Returns a compact validation summary; for the full report with available variable paths, call validate_workflow once after your edits — not after every change.',
+    'Update an existing step in a workflow version. This modifies the step configuration.',
   inputSchema: updateWorkflowVersionStepSchema,
-  execute: async (parameters: UpdateWorkflowVersionStepToolInput) => {
+  execute: async (parameters: UpdateWorkflowVersionStepInput) => {
     let result;
 
     try {
@@ -57,20 +45,15 @@ export const createUpdateWorkflowVersionStepTool = (
       };
     }
 
-    if (parameters.validate === false) {
-      return result;
-    }
-
     try {
       const validation =
         await deps.workflowValidationService.validateWorkflowVersion({
           workspaceId: context.workspaceId,
           workflowVersionId: parameters.workflowVersionId,
         });
-
       return {
         ...result,
-        validation: summarizeValidation(validation),
+        validation,
       };
     } catch (error) {
       return {

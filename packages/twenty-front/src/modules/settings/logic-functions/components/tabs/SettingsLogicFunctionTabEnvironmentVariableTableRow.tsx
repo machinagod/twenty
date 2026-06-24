@@ -13,10 +13,10 @@ import {
   IconPencil,
   IconTrash,
   IconX,
-} from 'twenty-ui/icon';
-import { OverflowingTextWithTooltip } from 'twenty-ui/surfaces';
-import { LightIconButton } from 'twenty-ui/input';
-import { MenuItem } from 'twenty-ui/navigation';
+  OverflowingTextWithTooltip,
+} from 'twenty-ui-deprecated/display';
+import { LightIconButton } from 'twenty-ui-deprecated/input';
+import { MenuItem } from 'twenty-ui-deprecated/navigation';
 import type { ApplicationVariable } from '~/generated-metadata/graphql';
 
 const StyledEditModeTableRow = (

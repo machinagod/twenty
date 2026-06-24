@@ -5,22 +5,30 @@ import {
   type EachTestingContext,
 } from 'twenty-shared/testing';
 
-import { EmailConnectionSecurity } from 'src/engine/core-modules/imap-smtp-caldav-connection/enums/email-connection-security.enum';
-
-type ProtocolConnectionContext = {
-  host: string;
-  port: number;
-  username?: string;
-  password?: string;
-  connectionSecurity?: EmailConnectionSecurity;
-};
-
 type TestContext = {
   handle: string;
   connectionParameters: {
-    IMAP?: ProtocolConnectionContext;
-    SMTP?: ProtocolConnectionContext;
-    CALDAV?: ProtocolConnectionContext;
+    IMAP?: {
+      host: string;
+      port: number;
+      username?: string;
+      password?: string;
+      secure?: boolean;
+    };
+    SMTP?: {
+      host: string;
+      port: number;
+      username?: string;
+      password?: string;
+      secure?: boolean;
+    };
+    CALDAV?: {
+      host: string;
+      port: number;
+      username?: string;
+      password?: string;
+      secure?: boolean;
+    };
   };
   id?: string;
 };
@@ -40,7 +48,7 @@ describe('Connected account creation should fail', () => {
             host: 'imap.example.com',
             port: 993,
             username: 'user@example.com',
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },
@@ -54,7 +62,7 @@ describe('Connected account creation should fail', () => {
             host: 'smtp.example.com',
             port: 465,
             username: 'user@example.com',
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },
@@ -68,7 +76,7 @@ describe('Connected account creation should fail', () => {
             host: 'caldav.example.com',
             port: 443,
             username: 'user@example.com',
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },
@@ -82,7 +90,7 @@ describe('Connected account creation should fail', () => {
             host: '',
             port: 993,
             password: 'secret',
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },
@@ -96,7 +104,7 @@ describe('Connected account creation should fail', () => {
             host: 'imap.example.com',
             port: 0,
             password: 'secret',
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },
@@ -110,7 +118,7 @@ describe('Connected account creation should fail', () => {
             host: 'imap.example.com',
             port: 993,
             password: '',
-            connectionSecurity: EmailConnectionSecurity.SSL_TLS,
+            secure: true,
           },
         },
       },

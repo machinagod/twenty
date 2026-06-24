@@ -116,7 +116,6 @@ export const fromCommandMenuItemEntityToFlatCommandMenuItem = ({
     pageLayoutId: commandMenuItemEntity.pageLayoutId,
     pageLayoutUniversalIdentifier,
     isActive: commandMenuItemEntity.isActive,
-    isSystemSideEffect: commandMenuItemEntity.isSystemSideEffect,
     overrides: commandMenuItemEntity.overrides,
     universalOverrides,
   };

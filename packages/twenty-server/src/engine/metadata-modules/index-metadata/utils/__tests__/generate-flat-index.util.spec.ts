@@ -65,7 +65,6 @@ describe('generateFlatIndexMetadataWithNameOrThrow', () => {
     indexWhereClause: overrides.indexWhereClause ?? null,
     isUnique: overrides.isUnique,
     isCustom: false,
-    isSystemSideEffect: false,
     universalFlatIndexFieldMetadatas: overrides.fieldIds.map((id, order) => ({
       createdAt: now,
       updatedAt: now,

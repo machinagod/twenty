@@ -155,27 +155,7 @@
           "label": "Panoramica"
         },
         "apps": {
-          "label": "App",
-          "groups": {
-            "appsGettingStarted": {
-              "label": "Per iniziare"
-            },
-            "appsConfig": {
-              "label": "Configurazione"
-            },
-            "appsData": {
-              "label": "Dati"
-            },
-            "appsLogic": {
-              "label": "Logica"
-            },
-            "appsLayout": {
-              "label": "Layout"
-            },
-            "appsOperations": {
-              "label": "Operazioni"
-            }
-          }
+          "label": "App"
         },
         "api": {
           "label": "API"

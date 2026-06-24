@@ -7,7 +7,6 @@ import { buildSkippedResult } from 'src/logic-functions/utils/build-skipped-resu
 import { chargeMatchedEnrichments } from 'src/logic-functions/utils/charge-matched-enrichments';
 import { INTERNAL_BOOKKEEPING_FIELDS } from 'src/logic-functions/utils/internal-field-names';
 import { nowIso } from 'src/logic-functions/utils/now-iso';
-import { resolveUpdateFieldsMode } from 'src/logic-functions/utils/resolve-update-fields-mode';
 import { type BatchEnrichmentAdapter } from 'src/types/batch-enrichment-adapter';
 import { type BulkEnrichInput } from 'src/types/bulk-enrich-input';
 import { type CompanyIdByMatchKeyCache } from 'src/types/company-id-by-match-key-cache';
@@ -40,137 +39,6 @@ const writeErrorStatusWithBackoff = async <TNode, TData, TParams>({
     .catch(() => undefined);
 };
 
-type MatchedRecord = {
-  recordId: string;
-  mappedData: Record<string, unknown>;
-  persistData: Record<string, unknown>;
-};
-
-const recordMatchedRecords = async <TNode, TData, TParams>({
-  adapter,
-  client,
-  matchedRecords,
-  shouldPersist,
-  resultById,
-}: {
-  adapter: BatchEnrichmentAdapter<TNode, TData, TParams>;
-  client: CoreApiClient;
-  matchedRecords: MatchedRecord[];
-  shouldPersist: boolean;
-  resultById: Map<string, EnrichResult>;
-}): Promise<string[]> => {
-  if (matchedRecords.length === 0) {
-    return [];
-  }
-
-  if (!shouldPersist) {
-    for (const matchedRecord of matchedRecords) {
-      resultById.set(
-        matchedRecord.recordId,
-        buildMatchedResult({
-          recordId: matchedRecord.recordId,
-          updatedFields: [],
-          data: matchedRecord.mappedData,
-        }),
-      );
-    }
-
-    return [];
-  }
-
-  const settledWriteResults = await Promise.allSettled(
-    matchedRecords.map((matchedRecord) =>
-      adapter.updateOne({
-        client,
-        recordId: matchedRecord.recordId,
-        data: matchedRecord.persistData,
-      }),
-    ),
-  );
-
-  const failedRecordIds: string[] = [];
-  for (const [index, writeResult] of settledWriteResults.entries()) {
-    const matchedRecord = matchedRecords[index];
-    if (writeResult.status === 'rejected') {
-      resultById.set(
-        matchedRecord.recordId,
-        buildErrorResult({
-          recordId: matchedRecord.recordId,
-          error: toErrorMessage(writeResult.reason),
-        }),
-      );
-      failedRecordIds.push(matchedRecord.recordId);
-      continue;
-    }
-
-    resultById.set(
-      matchedRecord.recordId,
-      buildMatchedResult({
-        recordId: matchedRecord.recordId,
-        updatedFields: Object.keys(matchedRecord.persistData).filter(
-          (fieldName) => !INTERNAL_BOOKKEEPING_FIELDS.has(fieldName),
-        ),
-        data: matchedRecord.mappedData,
-      }),
-    );
-  }
-
-  return failedRecordIds;
-};
-
-const recordNotFoundRecords = async <TNode, TData, TParams>({
-  adapter,
-  client,
-  notFoundRecordIds,
-  shouldPersist,
-  enrichedAt,
-  resultById,
-}: {
-  adapter: BatchEnrichmentAdapter<TNode, TData, TParams>;
-  client: CoreApiClient;
-  notFoundRecordIds: string[];
-  shouldPersist: boolean;
-  enrichedAt: string;
-  resultById: Map<string, EnrichResult>;
-}): Promise<string[]> => {
-  if (notFoundRecordIds.length === 0) {
-    return [];
-  }
-
-  if (!shouldPersist) {
-    for (const recordId of notFoundRecordIds) {
-      resultById.set(recordId, buildNotFoundResult(recordId));
-    }
-
-    return [];
-  }
-
-  try {
-    await adapter.updateManyStatus({
-      client,
-      recordIds: notFoundRecordIds,
-      data: { pdlEnrichmentStatus: 'NOT_FOUND', pdlLastEnrichedAt: enrichedAt },
-    });
-    for (const recordId of notFoundRecordIds) {
-      resultById.set(recordId, buildNotFoundResult(recordId));
-    }
-
-    return [];
-  } catch (notFoundStatusWriteError) {
-    const notFoundStatusWriteErrorMessage = toErrorMessage(
-      notFoundStatusWriteError,
-    );
-    for (const recordId of notFoundRecordIds) {
-      resultById.set(
-        recordId,
-        buildErrorResult({ recordId, error: notFoundStatusWriteErrorMessage }),
-      );
-    }
-
-    return notFoundRecordIds;
-  }
-};
-
 export const enrichChunk = async <TNode, TData, TParams>({
   client,
   recordIds,
@@ -186,10 +54,6 @@ export const enrichChunk = async <TNode, TData, TParams>({
   resultById: Map<string, EnrichResult>;
   companyIdByMatchKeyCache: CompanyIdByMatchKeyCache;
 }): Promise<void> => {
-  const { shouldPersist, overrideExistingValues } = resolveUpdateFieldsMode(
-    input.updateFields,
-  );
-
   let recordNodes: TNode[];
   try {
     recordNodes = await adapter.readRecords({ client, recordIds });
@@ -262,16 +126,12 @@ export const enrichChunk = async <TNode, TData, TParams>({
         }),
       );
     }
-    if (shouldPersist) {
-      await writeErrorStatusWithBackoff({
-        adapter,
-        client,
-        recordIds: recordsToEnrich.map(
-          (recordToEnrich) => recordToEnrich.recordId,
-        ),
-        enrichedAt,
-      });
-    }
+    await writeErrorStatusWithBackoff({
+      adapter,
+      client,
+      recordIds: recordsToEnrich.map((recordToEnrich) => recordToEnrich.recordId),
+      enrichedAt,
+    });
 
     return;
   }
@@ -285,7 +145,10 @@ export const enrichChunk = async <TNode, TData, TParams>({
   });
 
   const notFoundRecordIds: string[] = [];
-  const matchedRecords: MatchedRecord[] = [];
+  const matchedRecordsToPersist: {
+    recordId: string;
+    data: Record<string, unknown>;
+  }[] = [];
 
   for (let index = 0; index < recordsToEnrich.length; index++) {
     const { recordId, node: recordNode } = recordsToEnrich[index];
@@ -309,16 +172,15 @@ export const enrichChunk = async <TNode, TData, TParams>({
     }
 
     try {
-      const { mappedData, persistData } = await adapter.buildMatchedData({
+      const matchedRecordData = await adapter.buildMatchedData({
         client,
         node: recordNode,
         outcome: enrichmentOutcome,
         enrichedAt,
         companyIdByMatchKeyCache,
-        overrideExistingValues,
-        shouldPersist,
+        overrideExistingValues: input.overrideExistingValues === true,
       });
-      matchedRecords.push({ recordId, mappedData, persistData });
+      matchedRecordsToPersist.push({ recordId, data: matchedRecordData });
     } catch (buildMatchedDataError) {
       resultById.set(
         recordId,
@@ -331,31 +193,76 @@ export const enrichChunk = async <TNode, TData, TParams>({
     }
   }
 
-  const failedMatchedWriteRecordIds = await recordMatchedRecords({
-    adapter,
-    client,
-    matchedRecords,
-    shouldPersist,
-    resultById,
-  });
-  recordIdsToMarkAsError.push(...failedMatchedWriteRecordIds);
+  if (matchedRecordsToPersist.length > 0) {
+    const settledWriteResults = await Promise.allSettled(
+      matchedRecordsToPersist.map((matchedRecord) =>
+        adapter.updateOne({
+          client,
+          recordId: matchedRecord.recordId,
+          data: matchedRecord.data,
+        }),
+      ),
+    );
 
-  const failedNotFoundWriteRecordIds = await recordNotFoundRecords({
-    adapter,
-    client,
-    notFoundRecordIds,
-    shouldPersist,
-    enrichedAt,
-    resultById,
-  });
-  recordIdsToMarkAsError.push(...failedNotFoundWriteRecordIds);
-
-  if (shouldPersist) {
-    await writeErrorStatusWithBackoff({
-      adapter,
-      client,
-      recordIds: recordIdsToMarkAsError,
-      enrichedAt,
+    settledWriteResults.forEach((writeResult, index) => {
+      const matchedRecord = matchedRecordsToPersist[index];
+      if (writeResult.status === 'fulfilled') {
+        resultById.set(
+          matchedRecord.recordId,
+          buildMatchedResult({
+            recordId: matchedRecord.recordId,
+            updatedFields: Object.keys(matchedRecord.data).filter(
+              (fieldName) => !INTERNAL_BOOKKEEPING_FIELDS.has(fieldName),
+            ),
+          }),
+        );
+      } else {
+        resultById.set(
+          matchedRecord.recordId,
+          buildErrorResult({
+            recordId: matchedRecord.recordId,
+            error: toErrorMessage(writeResult.reason),
+          }),
+        );
+        recordIdsToMarkAsError.push(matchedRecord.recordId);
+      }
     });
   }
+
+  if (notFoundRecordIds.length > 0) {
+    try {
+      await adapter.updateManyStatus({
+        client,
+        recordIds: notFoundRecordIds,
+        data: {
+          pdlEnrichmentStatus: 'NOT_FOUND',
+          pdlLastEnrichedAt: enrichedAt,
+        },
+      });
+      for (const recordId of notFoundRecordIds) {
+        resultById.set(recordId, buildNotFoundResult(recordId));
+      }
+    } catch (notFoundStatusWriteError) {
+      const notFoundStatusWriteErrorMessage = toErrorMessage(
+        notFoundStatusWriteError,
+      );
+      for (const recordId of notFoundRecordIds) {
+        resultById.set(
+          recordId,
+          buildErrorResult({
+            recordId,
+            error: notFoundStatusWriteErrorMessage,
+          }),
+        );
+        recordIdsToMarkAsError.push(recordId);
+      }
+    }
+  }
+
+  await writeErrorStatusWithBackoff({
+    adapter,
+    client,
+    recordIds: recordIdsToMarkAsError,
+    enrichedAt,
+  });
 };

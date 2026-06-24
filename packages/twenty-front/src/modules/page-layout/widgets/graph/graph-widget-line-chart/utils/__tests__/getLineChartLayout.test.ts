@@ -17,7 +17,7 @@ describe('getLineChartLayout', () => {
 
   const defaultData: LineChartSeriesWithColor[] = [
     {
-      key: 'series1',
+      id: 'series1',
       label: 'Series 1',
       data: [
         { x: '2024-01', y: 10 },
@@ -90,7 +90,7 @@ describe('getLineChartLayout', () => {
       ...baseParams,
       data: [
         {
-          key: 'series1',
+          id: 'series1',
           label: 'Series 1',
           data: [{ x: '2024-01', y: 50 }],
         },
@@ -119,7 +119,7 @@ describe('getLineChartLayout', () => {
       ...baseParams,
       data: [
         {
-          key: 'series1',
+          id: 'series1',
           label: 'Series 1',
           data: [
             { x: '2024-01', y: 10 },
@@ -127,7 +127,7 @@ describe('getLineChartLayout', () => {
           ],
         },
         {
-          key: 'series2',
+          id: 'series2',
           label: 'Series 2',
           data: [
             { x: '2024-01', y: 15 },

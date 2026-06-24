@@ -8,9 +8,7 @@ import * as tar from 'tar';
 import { cleanupApplicationAndAppRegistration } from 'test/integration/metadata/suites/application/utils/cleanup-application-and-app-registration.util';
 import { type DataSource } from 'typeorm';
 
-import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder/core/constants/seeder-workspaces.constant';
-
-const TEST_WORKSPACE_ID = SEED_APPLE_WORKSPACE_ID;
+const TEST_WORKSPACE_ID = '20202020-1c25-4d02-bf25-6aeccf7ea419';
 
 const MARKETPLACE_QUERY = `
   query {

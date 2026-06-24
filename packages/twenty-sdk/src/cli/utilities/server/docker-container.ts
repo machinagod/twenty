@@ -56,11 +56,8 @@ export const containerExists = (containerName = CONTAINER_NAME): boolean => {
   }
 };
 
-export const getImageForVersion = (version = 'latest'): string => {
-  const tag = /^\d+\.\d+\.\d+/.test(version) ? `v${version}` : version;
-
-  return `twentycrm/twenty-app-dev:${tag}`;
-};
+export const getImageForVersion = (version = 'latest'): string =>
+  `twentycrm/twenty-app-dev:${version}`;
 
 export const getContainerDigest = (
   containerName = CONTAINER_NAME,
@@ -69,23 +66,6 @@ export const getContainerDigest = (
     return execFileSync(
       'docker',
       ['inspect', '-f', '{{.Image}}', containerName],
-      {
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'ignore'],
-      },
-    ).trim();
-  } catch {
-    return null;
-  }
-};
-
-export const getContainerImageTag = (
-  containerName = CONTAINER_NAME,
-): string | null => {
-  try {
-    return execFileSync(
-      'docker',
-      ['inspect', '-f', '{{.Config.Image}}', containerName],
       {
         encoding: 'utf-8',
         stdio: ['pipe', 'pipe', 'ignore'],

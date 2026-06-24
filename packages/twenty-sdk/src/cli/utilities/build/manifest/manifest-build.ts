@@ -23,7 +23,7 @@ import { type PageLayoutTabConfig } from '@/sdk/define/page-layouts/page-layout-
 import { type RoleConfig } from '@/sdk/define/roles/role-config';
 import { type ViewConfig } from '@/sdk/define/views/view-config';
 import { readFile } from 'node:fs/promises';
-import { basename, extname, join, relative } from 'path';
+import { basename, extname, relative } from 'path';
 import { glob } from 'tinyglobby';
 import {
   type AgentManifest,
@@ -72,16 +72,6 @@ const loadAssets = async (appPath: string) => {
   });
 };
 
-const loadReadme = async (appPath: string): Promise<string | undefined> => {
-  try {
-    const content = await readFile(join(appPath, 'README.md'), 'utf-8');
-
-    return content.trim().length > 0 ? content : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
 export const buildManifest = async (
   appPath: string,
 ): Promise<{
@@ -91,7 +81,6 @@ export const buildManifest = async (
   warnings: string[];
 }> => {
   const filePaths = await loadSources(appPath);
-  const readmeContent = await loadReadme(appPath);
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -290,6 +279,11 @@ export const buildManifest = async (
 
         const { handler: _, ...rest } = extract.config;
 
+        const relativeFilePath = relative(appPath, filePath);
+
+        // Auto-infer inputSchema for any trigger that opts in but omits one.
+        // For the AI tool surface we use the JSON schema directly; for the
+        // workflow action surface we convert to Twenty's InputSchema.
         const inferredJsonSchema =
           (rest.toolTriggerSettings && !rest.toolTriggerSettings.inputSchema) ||
           (rest.workflowActionTriggerSettings &&
@@ -325,8 +319,8 @@ export const buildManifest = async (
             ? { workflowActionTriggerSettings }
             : {}),
           handlerName: 'default.config.handler',
-          sourceHandlerPath: relativePath,
-          builtHandlerPath: relativePath.replace(/\.tsx?$/, '.mjs'),
+          sourceHandlerPath: relativeFilePath,
+          builtHandlerPath: relativeFilePath.replace(/\.tsx?$/, '.mjs'),
           builtHandlerChecksum: '[default-checksum]',
         };
 
@@ -564,7 +558,6 @@ export const buildManifest = async (
           ...applicationConfig,
           defaultRoleUniversalIdentifier:
             resolvedDefaultRoleUniversalIdentifier,
-          aboutDescription: readmeContent,
           yarnLockChecksum: null,
           packageJsonChecksum: null,
           ...(postInstallLogicFunctions.length >= 1

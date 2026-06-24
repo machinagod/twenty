@@ -13,9 +13,7 @@ const connectionParameters = z
     port: z.int().nullable().default(null),
     username: z.string().optional(),
     password: z.string().default(''),
-    connectionSecurity: z
-      .enum(['NONE', 'STARTTLS', 'SSL_TLS'])
-      .default('SSL_TLS'),
+    secure: z.boolean().default(true),
   })
   .refine(
     (data) => {

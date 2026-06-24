@@ -10,10 +10,13 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { type ReactElement, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { type IconComponent, IconKey } from 'twenty-ui/icon';
-import { H2Title } from 'twenty-ui/typography';
-import { Section } from 'twenty-ui/layout';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  H2Title,
+  type IconComponent,
+  IconKey,
+} from 'twenty-ui-deprecated/display';
+import { Section } from 'twenty-ui-deprecated/layout';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 import { IdentityProviderType } from '~/generated-metadata/graphql';
 
 const StyledInputsContainer = styled.div`

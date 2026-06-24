@@ -42,10 +42,27 @@ export class MarketplaceCatalogSyncService {
         const universalIdentifier =
           fetchedManifest.application.universalIdentifier;
 
+        const aboutDescription =
+          fetchedManifest.application.aboutDescription ??
+          (await this.marketplaceService.fetchReadmeFromRegistryCdn(
+            pkg.name,
+            pkg.version,
+          ));
+
+        const manifest = aboutDescription
+          ? {
+              ...fetchedManifest,
+              application: {
+                ...fetchedManifest.application,
+                aboutDescription,
+              },
+            }
+          : fetchedManifest;
+
         const cdnBaseUrl = this.twentyConfigService.get('APP_REGISTRY_CDN_URL');
 
         const manifestWithResolvedUrls = resolveManifestAssetUrls(
-          fetchedManifest,
+          manifest,
           (filePath) =>
             buildRegistryCdnUrl({
               cdnBaseUrl,
@@ -57,7 +74,7 @@ export class MarketplaceCatalogSyncService {
 
         await this.applicationRegistrationService.upsertFromCatalog({
           universalIdentifier,
-          name: fetchedManifest.application.displayName ?? pkg.name,
+          name: manifest.application.displayName ?? pkg.name,
           sourceType: ApplicationRegistrationSourceType.NPM,
           sourcePackage: pkg.name,
           latestAvailableVersion: pkg.version ?? null,

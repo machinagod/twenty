@@ -15,7 +15,7 @@ const buildManifest = (
 ) => buildBaseManifest({ appId: TEST_APP_ID, roleId: TEST_ROLE_ID, overrides });
 
 const OBJECT_GQL_FIELDS =
-  'id nameSingular namePlural labelSingular labelPlural description icon isActive universalIdentifier';
+  'id nameSingular namePlural labelSingular labelPlural description icon isCustom isActive universalIdentifier';
 
 const findCustomObjects = async () => {
   const { objects } = await findManyObjectMetadata({
@@ -27,7 +27,7 @@ const findCustomObjects = async () => {
     expectToFail: false,
   });
 
-  return objects;
+  return objects.filter((object) => object.isCustom);
 };
 
 describe('Manifest update - objects', () => {
@@ -107,6 +107,7 @@ describe('Manifest update - objects', () => {
       labelPlural: 'Invoices',
       description: 'A billing invoice',
       icon: 'IconFileInvoice',
+      isCustom: true,
     });
   }, 60000);
 

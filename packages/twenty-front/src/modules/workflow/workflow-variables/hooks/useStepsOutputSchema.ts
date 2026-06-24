@@ -14,7 +14,6 @@ import {
   computeStepOutputSchema,
   shouldComputeOutputSchemaOnFrontend,
 } from '@/workflow/workflow-variables/utils/generate/computeStepOutputSchema';
-import { resolvePersistedStepOutputSchema } from '@/workflow/workflow-variables/utils/resolvePersistedStepOutputSchema';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
@@ -45,15 +44,29 @@ export const useStepsOutputSchema = () => {
           return;
         }
 
+        // TODO: Remove this fallback after upgrade command
+        // `upgrade:1-21:migrate-ai-agent-text-to-json-response-format`
+        // has run on all workspaces.
+        const persistedOutputSchema =
+          step.type === 'AI_AGENT' &&
+          (!isDefined(step.settings?.outputSchema) ||
+            Object.keys(step.settings.outputSchema).length === 0)
+            ? {
+                response: {
+                  isLeaf: true,
+                  type: 'string',
+                  label: 'Response',
+                  value: null,
+                },
+              }
+            : step.settings?.outputSchema;
+
         const outputSchema = shouldComputeOnFrontend
           ? computeStepOutputSchema({
               step,
               objectMetadataItems,
             })
-          : resolvePersistedStepOutputSchema({
-              stepType: step.type,
-              settings: step.settings,
-            });
+          : persistedOutputSchema;
 
         const stepOutputSchema: StepOutputSchemaV2 = {
           id: step.id,
@@ -102,10 +115,7 @@ export const useStepsOutputSchema = () => {
               step: trigger,
               objectMetadataItems,
             })
-          : resolvePersistedStepOutputSchema({
-              stepType: trigger.type,
-              settings: trigger.settings,
-            });
+          : trigger.settings?.outputSchema;
 
         const triggerOutputSchema: StepOutputSchemaV2 = {
           id: TRIGGER_STEP_ID,

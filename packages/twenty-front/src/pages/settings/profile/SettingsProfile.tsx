@@ -13,11 +13,9 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import { Status } from 'twenty-ui/data-display';
-import { IconShield } from 'twenty-ui/icon';
-import { H2Title } from 'twenty-ui/typography';
-import { Section } from 'twenty-ui/layout';
-import { UndecoratedLink } from 'twenty-ui/navigation';
+import { H2Title, IconShield, Status } from 'twenty-ui-deprecated/display';
+import { Section } from 'twenty-ui-deprecated/layout';
+import { UndecoratedLink } from 'twenty-ui-deprecated/navigation';
 
 export const SettingsProfile = () => {
   const { t } = useLingui();
@@ -59,7 +57,7 @@ export const SettingsProfile = () => {
             title={t`Name`}
             description={t`Your name as it will be displayed`}
           />
-          <NameFields key={currentWorkspaceMember.id} />
+          <NameFields />
         </Section>
         <Section>
           <H2Title

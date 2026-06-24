@@ -1,17 +1,18 @@
 import { styled } from '@linaria/react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { EmailComposerFields } from '@/activities/emails/components/EmailComposerFields';
 import { useEmailComposerState } from '@/activities/emails/hooks/useEmailComposerState';
 import { type ReplyContextReady } from '@/activities/emails/hooks/useReplyContext';
-import { EmailThreadComposerFooterEffect } from '@/page-layout/widgets/email-thread/components/EmailThreadComposerFooterEffect';
 import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
+import { sidePanelWidgetFooterCommandMenuItemsState } from '@/ui/layout/side-panel/states/sidePanelWidgetFooterCommandMenuItemsState';
 import { type SidePanelFooterCommandMenuItem } from '@/ui/layout/side-panel/types/SidePanelFooterCommandMenuItem';
 import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
+import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { t } from '@lingui/core/macro';
-import { IconArrowBackUp, IconSend, IconX } from 'twenty-ui/icon';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { getOsControlSymbol } from 'twenty-ui/utilities';
+import { IconArrowBackUp, IconSend, IconX } from 'twenty-ui-deprecated/display';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
+import { getOsControlSymbol } from 'twenty-ui-deprecated/utilities';
 
 const StyledReplyBar = styled.button`
   align-items: center;
@@ -54,47 +55,58 @@ export const EmailThreadComposer = ({
     onSent: handleReplySent,
   });
 
-  const { handleSend, canSend } = composerState;
+  const setSidePanelWidgetFooterCommandMenuItems = useSetAtomState(
+    sidePanelWidgetFooterCommandMenuItemsState,
+  );
 
-  const footerCommandMenuItems =
-    useMemo((): SidePanelFooterCommandMenuItem[] => {
-      if (!isComposerOpen) {
-        return [
-          {
-            id: 'reply',
-            label: t`Reply`,
-            Icon: IconArrowBackUp,
-            isPrimaryCTA: true,
-            onClick: () => setIsComposerOpen(true),
-          },
-        ];
-      }
-
+  const footerActions = useMemo((): SidePanelFooterCommandMenuItem[] => {
+    if (!isComposerOpen) {
       return [
         {
-          id: 'cancel-reply',
-          label: t`Cancel reply`,
-          Icon: IconX,
-          isPinned: false,
-          onClick: () => setIsComposerOpen(false),
-        },
-        {
-          id: 'send',
-          label: t`Send`,
-          Icon: IconSend,
+          id: 'reply',
+          label: t`Reply`,
+          Icon: IconArrowBackUp,
           isPrimaryCTA: true,
-          hotkeys: [getOsControlSymbol(), '⏎'],
-          onClick: handleSend,
-          disabled: !canSend,
+          onClick: () => setIsComposerOpen(true),
         },
       ];
-    }, [isComposerOpen, handleSend, canSend, setIsComposerOpen]);
+    }
+
+    return [
+      {
+        id: 'cancel-reply',
+        label: t`Cancel reply`,
+        Icon: IconX,
+        isPinned: false,
+        onClick: () => setIsComposerOpen(false),
+      },
+      {
+        id: 'send',
+        label: t`Send`,
+        Icon: IconSend,
+        isPrimaryCTA: true,
+        hotkeys: [getOsControlSymbol(), '⏎'],
+        onClick: composerState.handleSend,
+        disabled: !composerState.canSend,
+      },
+    ];
+  }, [isComposerOpen, composerState, setIsComposerOpen]);
+
+  useEffect(() => {
+    if (!isInSidePanel) {
+      return;
+    }
+
+    setSidePanelWidgetFooterCommandMenuItems(footerActions);
+
+    return () => setSidePanelWidgetFooterCommandMenuItems([]);
+  }, [isInSidePanel, footerActions, setSidePanelWidgetFooterCommandMenuItems]);
 
   const handleSendHotkey = useCallback(() => {
-    if (isComposerOpen && canSend) {
-      handleSend();
+    if (isComposerOpen && composerState.canSend) {
+      composerState.handleSend();
     }
-  }, [isComposerOpen, canSend, handleSend]);
+  }, [isComposerOpen, composerState]);
 
   useHotkeysOnFocusedElement({
     keys: ['ctrl+Enter,meta+Enter'],
@@ -103,23 +115,18 @@ export const EmailThreadComposer = ({
     dependencies: [handleSendHotkey],
   });
 
-  return (
-    <>
-      {isInSidePanel && (
-        <EmailThreadComposerFooterEffect
-          footerCommandMenuItems={footerCommandMenuItems}
-        />
-      )}
-      {isComposerOpen ? (
-        <EmailComposerFields composerState={composerState} />
-      ) : (
-        !isInSidePanel && (
-          <StyledReplyBar onClick={() => setIsComposerOpen(true)}>
-            <IconArrowBackUp size={16} />
-            {t`Reply...`}
-          </StyledReplyBar>
-        )
-      )}
-    </>
-  );
+  if (!isComposerOpen) {
+    if (isInSidePanel) {
+      return null;
+    }
+
+    return (
+      <StyledReplyBar onClick={() => setIsComposerOpen(true)}>
+        <IconArrowBackUp size={16} />
+        {t`Reply...`}
+      </StyledReplyBar>
+    );
+  }
+
+  return <EmailComposerFields composerState={composerState} />;
 };

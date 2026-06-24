@@ -32,7 +32,7 @@ import {
   IconChartPie,
   IconFrame,
   IconTable,
-} from 'twenty-ui/icon';
+} from 'twenty-ui-deprecated/display';
 import { type FrontComponent, WidgetType } from '~/generated-metadata/graphql';
 
 export const SidePanelPageLayoutDashboardWidgetTypeSelect = () => {

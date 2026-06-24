@@ -9,6 +9,7 @@ import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
 import {
+  AppTooltip,
   IconArrowUpRight,
   IconInfoCircle,
   IllustrationIconArray,
@@ -16,15 +17,15 @@ import {
   IllustrationIconNumbers,
   IllustrationIconText,
   IllustrationIconToggle,
-} from 'twenty-ui/icon';
-import {
-  AppTooltip,
   OverflowingTextWithTooltip,
   TooltipDelay,
-} from 'twenty-ui/surfaces';
-import { Button } from 'twenty-ui/input';
-import { UndecoratedLink } from 'twenty-ui/navigation';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+} from 'twenty-ui-deprecated/display';
+import { Button } from 'twenty-ui-deprecated/input';
+import { UndecoratedLink } from 'twenty-ui-deprecated/navigation';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 
 type SchemaProperty = {
   type?: string;

@@ -1,5 +1,6 @@
 import { createManyOperation } from 'test/integration/graphql/utils/create-many-operation.util';
 import { search } from 'test/integration/graphql/utils/search.util';
+import { createOneFieldMetadata } from 'test/integration/metadata/suites/field-metadata/utils/create-one-field-metadata.util';
 import { updateOneFieldMetadata } from 'test/integration/metadata/suites/field-metadata/utils/update-one-field-metadata.util';
 import { createOneObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/create-one-object-metadata.util';
 import { deleteOneObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/delete-one-object-metadata.util';
@@ -10,24 +11,125 @@ import { FieldMetadataType } from 'twenty-shared/types';
 
 import { type FieldMetadataDTO } from 'src/engine/metadata-modules/field-metadata/dtos/field-metadata.dto';
 
-// ISO search surface: renaming an indexed field (the name field, the default search field of a
-// custom object) must recompute the searchVector asExpression so global search keeps working,
-// since the expression embeds the field's column name.
-describe('Field metadata update - search vector rename recompute', () => {
+describe('Field metadata update - search vector side effect', () => {
   let testObjectMetadataId: string;
-  let nameFieldMetadataId: string;
+  let testFieldMetadataId: string;
   let createdRecordId: string;
 
-  const OBJECT_NAME_SINGULAR = 'searchVectorRenameObject';
-  const OBJECT_NAME_PLURAL = 'searchVectorRenameObjects';
-  const RENAMED_NAME_FIELD = 'searchableLabelColumn';
-  const RECORD_NAME_VALUE = 'RenameRecomputeSearchToken33';
+  const OBJECT_NAME_SINGULAR = 'searchVectorTestObject';
+  const OBJECT_NAME_PLURAL = 'searchVectorTestObjects';
+  const INITIAL_FIELD_NAME = 'searchableTitle';
+  const UPDATED_FIELD_NAME = 'renamedTitle';
+  const RECORD_FIELD_VALUE = 'UniqueSearchableValue123';
+  const RECORD_NAME_FIELD_VALUE = 'NameValue';
 
-  const getSearchVectorAsExpression = async (): Promise<string> => {
+  beforeAll(async () => {
+    const {
+      data: {
+        createOneObject: { id: objectMetadataId },
+      },
+    } = await createOneObjectMetadata({
+      expectToFail: false,
+      input: {
+        nameSingular: OBJECT_NAME_SINGULAR,
+        namePlural: OBJECT_NAME_PLURAL,
+        labelSingular: 'Search Vector Test Object',
+        labelPlural: 'Search Vector Test Objects',
+        icon: 'IconSearch',
+        isLabelSyncedWithName: false,
+      },
+    });
+
+    testObjectMetadataId = objectMetadataId;
+
+    const {
+      data: {
+        createOneField: { id: fieldMetadataId },
+      },
+    } = await createOneFieldMetadata({
+      expectToFail: false,
+      input: {
+        name: INITIAL_FIELD_NAME,
+        label: 'Searchable Title',
+        type: FieldMetadataType.TEXT,
+        objectMetadataId: testObjectMetadataId,
+        isLabelSyncedWithName: false,
+      },
+      gqlFields: `
+        id
+        name
+        label
+      `,
+    });
+
+    testFieldMetadataId = fieldMetadataId;
+
+    await updateOneObjectMetadata({
+      input: {
+        idToUpdate: testObjectMetadataId,
+        updatePayload: {
+          labelIdentifierFieldMetadataId: testFieldMetadataId,
+        },
+      },
+      expectToFail: false,
+    });
+
+    const { data } = await createManyOperation({
+      objectMetadataSingularName: OBJECT_NAME_SINGULAR,
+      objectMetadataPluralName: OBJECT_NAME_PLURAL,
+      gqlFields: `id name ${INITIAL_FIELD_NAME}`,
+      data: [
+        {
+          [INITIAL_FIELD_NAME]: RECORD_FIELD_VALUE,
+          name: RECORD_NAME_FIELD_VALUE,
+        },
+      ],
+      expectToFail: false,
+    });
+
+    createdRecordId = data.createdRecords[0].id;
+  });
+
+  afterAll(async () => {
+    await updateOneObjectMetadata({
+      expectToFail: false,
+      input: {
+        idToUpdate: testObjectMetadataId,
+        updatePayload: {
+          isActive: false,
+        },
+      },
+    });
+    await deleteOneObjectMetadata({
+      expectToFail: false,
+      input: { idToDelete: testObjectMetadataId },
+    });
+  });
+
+  it('should update search vector asExpression when renaming a field used as label identifier and search should work with new field name', async () => {
+    await updateOneFieldMetadata({
+      input: {
+        idToUpdate: testFieldMetadataId,
+        updatePayload: {
+          name: UPDATED_FIELD_NAME,
+          label: 'Renamed Title',
+          isLabelSyncedWithName: false,
+        },
+      },
+      gqlFields: `
+        id
+        name
+        label
+      `,
+      expectToFail: false,
+    });
+
     const { objects } = await findManyObjectMetadata({
       expectToFail: false,
       input: {
-        filter: { id: { eq: testObjectMetadataId } },
+        filter: {
+          id: { eq: testObjectMetadataId },
+        },
         paging: { first: 1 },
       },
       gqlFields: `
@@ -42,6 +144,9 @@ describe('Field metadata update - search vector rename recompute', () => {
       `,
     });
 
+    expect(objects).toBeDefined();
+    expect(objects.length).toBe(1);
+
     const testObject = objects[0];
 
     jestExpectToBeDefined(testObject);
@@ -55,105 +160,24 @@ describe('Field metadata update - search vector rename recompute', () => {
 
     const settings = searchVectorField.settings as {
       asExpression?: string;
+      generatedType?: string;
     };
 
     jestExpectToBeDefined(settings);
-    jestExpectToBeDefined(settings.asExpression);
-
-    return settings.asExpression;
-  };
-
-  beforeAll(async () => {
-    const {
-      data: {
-        createOneObject: { id: objectMetadataId },
-      },
-    } = await createOneObjectMetadata({
-      expectToFail: false,
-      input: {
-        nameSingular: OBJECT_NAME_SINGULAR,
-        namePlural: OBJECT_NAME_PLURAL,
-        labelSingular: 'Search Vector Rename Object',
-        labelPlural: 'Search Vector Rename Objects',
-        icon: 'IconSearch',
-        isLabelSyncedWithName: false,
-      },
-    });
-
-    testObjectMetadataId = objectMetadataId;
-
-    const { objects } = await findManyObjectMetadata({
-      expectToFail: false,
-      input: {
-        filter: { id: { eq: testObjectMetadataId } },
-        paging: { first: 1 },
-      },
-      gqlFields: `
-        id
-        fieldsList {
-          id
-          name
-        }
-      `,
-    });
-
-    const nameField = objects[0]?.fieldsList?.find(
-      (field: FieldMetadataDTO) => field.name === 'name',
-    );
-
-    jestExpectToBeDefined(nameField);
-    nameFieldMetadataId = nameField.id;
-
-    const { data } = await createManyOperation({
-      objectMetadataSingularName: OBJECT_NAME_SINGULAR,
-      objectMetadataPluralName: OBJECT_NAME_PLURAL,
-      gqlFields: `id name`,
-      data: [{ name: RECORD_NAME_VALUE }],
-      expectToFail: false,
-    });
-
-    createdRecordId = data.createdRecords[0].id;
-  });
-
-  afterAll(async () => {
-    await updateOneObjectMetadata({
-      expectToFail: false,
-      input: {
-        idToUpdate: testObjectMetadataId,
-        updatePayload: { isActive: false },
-      },
-    });
-    await deleteOneObjectMetadata({
-      expectToFail: false,
-      input: { idToDelete: testObjectMetadataId },
-    });
-  });
-
-  it('should recompute the search vector and keep search working when the indexed name field is renamed', async () => {
-    await updateOneFieldMetadata({
-      input: {
-        idToUpdate: nameFieldMetadataId,
-        updatePayload: {
-          name: RENAMED_NAME_FIELD,
-          label: 'Searchable Label Column',
-          isLabelSyncedWithName: false,
-        },
-      },
-      gqlFields: `id name`,
-      expectToFail: false,
-    });
-
-    const asExpression = await getSearchVectorAsExpression();
-
-    expect(asExpression).toContain(RENAMED_NAME_FIELD);
+    expect(settings.asExpression).toBeDefined();
+    expect(settings.asExpression).toContain(UPDATED_FIELD_NAME);
+    expect(settings.asExpression).not.toContain(INITIAL_FIELD_NAME);
 
     const searchResult = await search({
-      searchInput: RECORD_NAME_VALUE,
+      searchInput: RECORD_FIELD_VALUE,
       includedObjectNameSingulars: [OBJECT_NAME_SINGULAR],
       limit: 10,
       expectToFail: false,
     });
 
+    expect(searchResult.data).toBeDefined();
+    expect(searchResult.data.search).toBeDefined();
+    expect(searchResult.data.search.edges).toBeDefined();
     expect(searchResult.data.search.edges.length).toBe(1);
     expect(searchResult.data.search.edges[0].node.recordId).toBe(
       createdRecordId,

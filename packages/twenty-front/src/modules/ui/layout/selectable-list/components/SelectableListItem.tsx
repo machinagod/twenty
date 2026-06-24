@@ -39,9 +39,17 @@ export const SelectableListItem = ({
       return;
     }
 
-    listItemRef.current.scrollIntoView?.({
+    const scrollContainer = listItemRef.current.closest(
+      '[id^="scroll-wrapper-"]',
+    ) as HTMLElement | null;
+
+    if (isDefined(scrollContainer) && scrollContainer.scrollTop === 0) {
+      return;
+    }
+
+    listItemRef.current.scrollIntoView({
       behavior: 'auto',
-      block: 'nearest',
+      block: 'start',
     });
   }, [isSelectedItemId]);
 

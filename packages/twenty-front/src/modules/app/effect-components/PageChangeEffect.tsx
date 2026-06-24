@@ -301,13 +301,13 @@ export const PageChangeEffect = () => {
         });
         break;
       }
-      case isMatchingLocation(location, AppPath.WorkspaceActivation): {
+      case isMatchingLocation(location, AppPath.CreateWorkspace): {
         resetFocusStackToFocusItem({
           focusStackItem: {
-            focusId: PageFocusId.WorkspaceActivation,
+            focusId: PageFocusId.CreateWorkspace,
             componentInstance: {
               componentType: FocusComponentType.PAGE,
-              componentInstanceId: PageFocusId.WorkspaceActivation,
+              componentInstanceId: PageFocusId.CreateWorkspace,
             },
             globalHotkeysConfig: {
               enableGlobalHotkeysWithModifiers: false,

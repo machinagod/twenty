@@ -19,24 +19,13 @@ export const buildCompanyMatchedData = async ({
   outcome,
   enrichedAt,
   overrideExistingValues,
-  shouldPersist,
 }: {
   node: CompanyNode;
   outcome: { data: PdlCompanyData };
   enrichedAt: string;
   overrideExistingValues: boolean;
-  shouldPersist: boolean;
-}): Promise<{
-  mappedData: Record<string, unknown>;
-  persistData: Record<string, unknown>;
-}> => {
+}): Promise<Record<string, unknown>> => {
   const mapped = mapCompany(outcome.data);
-  const mappedData = pruneUndefined({ ...mapped.standard, ...mapped.pdl });
-
-  if (!shouldPersist) {
-    return { mappedData, persistData: {} };
-  }
-
   const writableStandard = pickWritableStandard({
     standard: mapped.standard,
     current: node as unknown as Record<string, unknown>,
@@ -44,13 +33,11 @@ export const buildCompanyMatchedData = async ({
     overrideExistingValues,
   });
 
-  const persistData = pruneUndefined({
+  return pruneUndefined({
     ...writableStandard,
     ...mapped.pdl,
     pdlRawPayload: outcome.data,
     pdlLastEnrichedAt: enrichedAt,
     pdlEnrichmentStatus: 'MATCHED',
   });
-
-  return { mappedData, persistData };
 };

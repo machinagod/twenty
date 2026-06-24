@@ -2,14 +2,8 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 
 import { Sandbox } from '@e2b/code-interpreter';
-import { Logger } from '@nestjs/common';
-
-import { isDefined } from 'twenty-shared/utils';
 
 import { DEFAULT_CODE_INTERPRETER_TIMEOUT_MS } from 'src/engine/core-modules/code-interpreter/code-interpreter.constants';
-import { getOrCreateSessionSandbox } from 'src/engine/core-modules/code-interpreter/drivers/utils/get-or-create-session-sandbox.util';
-import { releaseSessionSandboxes } from 'src/engine/core-modules/code-interpreter/drivers/utils/release-session-sandboxes.util';
-import { sweepExpiredSessionSandboxes } from 'src/engine/core-modules/code-interpreter/drivers/utils/sweep-expired-session-sandboxes.util';
 import { getMimeType } from 'src/engine/core-modules/code-interpreter/utils/get-mime-type.util';
 
 import {
@@ -24,13 +18,12 @@ import {
 export type E2BDriverOptions = {
   apiKey: string;
   timeoutMs?: number;
-  idleTimeoutMs?: number;
 };
 
 const SANDBOX_SCRIPTS_PATH = join(__dirname, '..', 'sandbox-scripts');
 
 async function uploadDirectoryToSandbox(
-  sandbox: Sandbox,
+  sbx: Sandbox,
   localPath: string,
   remotePath: string,
 ) {
@@ -41,19 +34,17 @@ async function uploadDirectoryToSandbox(
     const remoteEntryPath = `${remotePath}/${entry.name}`;
 
     if (entry.isDirectory()) {
-      await uploadDirectoryToSandbox(sandbox, localEntryPath, remoteEntryPath);
+      await uploadDirectoryToSandbox(sbx, localEntryPath, remoteEntryPath);
     } else {
       const content = await fs.readFile(localEntryPath);
       const arrayBuffer = new Uint8Array(content).buffer;
 
-      await sandbox.files.write(remoteEntryPath, arrayBuffer);
+      await sbx.files.write(remoteEntryPath, arrayBuffer);
     }
   }
 }
 
 export class E2BDriver implements CodeInterpreterDriver {
-  private readonly logger = new Logger(E2BDriver.name);
-
   constructor(private options: E2BDriverOptions) {}
 
   async execute(
@@ -62,52 +53,27 @@ export class E2BDriver implements CodeInterpreterDriver {
     context?: ExecutionContext,
     callbacks?: StreamCallbacks,
   ): Promise<CodeExecutionResult> {
-    const { apiKey } = this.options;
-    const sessionId = context?.sessionId;
-    const idleTimeoutMs =
-      this.options.idleTimeoutMs ?? DEFAULT_CODE_INTERPRETER_TIMEOUT_MS;
-    const timeoutMs =
-      this.options.timeoutMs ?? DEFAULT_CODE_INTERPRETER_TIMEOUT_MS;
-
-    let sandbox: Sandbox;
-    let isReused = false;
-    let keepWarm = false;
-
-    if (isDefined(sessionId)) {
-      keepWarm = true;
-      ({ sandbox, isReused } = await getOrCreateSessionSandbox({
-        sandboxApi: Sandbox,
-        apiKey,
-        sessionId,
-        timeoutMs,
-        idleTimeoutMs,
-      }));
-    } else {
-      sandbox = await Sandbox.create({ apiKey, timeoutMs });
-    }
+    const sbx = await Sandbox.create({
+      apiKey: this.options.apiKey,
+      timeoutMs: this.options.timeoutMs ?? DEFAULT_CODE_INTERPRETER_TIMEOUT_MS,
+    });
 
     try {
-      // A reused sandbox already has the scripts from its first run.
-      if (!isReused) {
-        try {
-          await uploadDirectoryToSandbox(
-            sandbox,
-            SANDBOX_SCRIPTS_PATH,
-            '/home/user/scripts',
-          );
-        } catch {
-          // Scripts directory might not exist
-        }
-      }
-
-      if (isReused) {
-        await this.resetOutputDirectory(sandbox);
+      // Upload pre-installed scripts to sandbox
+      try {
+        await uploadDirectoryToSandbox(
+          sbx,
+          SANDBOX_SCRIPTS_PATH,
+          '/home/user/scripts',
+        );
+      } catch {
+        // Scripts directory might not exist
       }
 
       for (const file of files ?? []) {
         const arrayBuffer = new Uint8Array(file.content).buffer;
 
-        await sandbox.files.write(`/home/user/${file.filename}`, arrayBuffer);
+        await sbx.files.write(`/home/user/${file.filename}`, arrayBuffer);
       }
 
       const envSetup = context?.env
@@ -127,7 +93,7 @@ export class E2BDriver implements CodeInterpreterDriver {
       const outputFiles: OutputFile[] = [];
       let chartCounter = 0;
 
-      const execution = await sandbox.runCode(envSetup + code, {
+      const execution = await sbx.runCode(envSetup + code, {
         onStdout: (data) => callbacks?.onStdout?.(data.line),
         onStderr: (data) => callbacks?.onStderr?.(data.line),
         onResult: async (result) => {
@@ -145,13 +111,12 @@ export class E2BDriver implements CodeInterpreterDriver {
       });
 
       try {
-        const outputDir = await sandbox.files.list('/home/user/output');
+        const outputDir = await sbx.files.list('/home/user/output');
 
         for (const file of outputDir) {
           if (file.type === 'file') {
-            const content = await sandbox.files.read(
+            const content = await sbx.files.read(
               `/home/user/output/${file.name}`,
-              { format: 'bytes' },
             );
 
             const outputFile: OutputFile = {
@@ -176,35 +141,7 @@ export class E2BDriver implements CodeInterpreterDriver {
         error: execution.error?.value,
       };
     } finally {
-      if (!keepWarm) {
-        await sandbox.kill();
-      }
+      await sbx.kill();
     }
-  }
-
-  private async resetOutputDirectory(sandbox: Sandbox): Promise<void> {
-    const outputDirectory = '/home/user/output';
-
-    try {
-      if (await sandbox.files.exists(outputDirectory)) {
-        await sandbox.files.remove(outputDirectory);
-      }
-
-      await sandbox.files.makeDir(outputDirectory);
-    } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error);
-
-      this.logger.warn(
-        `Failed to reset reused sandbox output directory; results may include stale files: ${reason}`,
-      );
-    }
-  }
-
-  async releaseSession(sessionId: string): Promise<void> {
-    await releaseSessionSandboxes(Sandbox, this.options.apiKey, sessionId);
-  }
-
-  async sweepExpiredSessions(maxAgeMs: number): Promise<number> {
-    return sweepExpiredSessionSandboxes(Sandbox, this.options.apiKey, maxAgeMs);
   }
 }

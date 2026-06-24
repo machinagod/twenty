@@ -6,10 +6,9 @@ import { SettingsOptionCardContentToggle } from '@/settings/components/SettingsO
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { Section } from '@react-email/components';
-import { IconUserPlus } from 'twenty-ui/icon';
-import { H2Title } from 'twenty-ui/typography';
-import { Card } from 'twenty-ui/surfaces';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { H2Title, IconUserPlus } from 'twenty-ui-deprecated/display';
+import { Card } from 'twenty-ui-deprecated/layout';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 import { type CalendarChannelVisibility } from '~/generated/graphql';
 
 const StyledDetailsContainer = styled.div`

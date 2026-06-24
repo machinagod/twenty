@@ -1,22 +1,30 @@
 import { gql } from 'graphql-tag';
 import { makeMetadataAPIRequest } from 'test/integration/metadata/suites/utils/make-metadata-api-request.util';
 
-import { EmailConnectionSecurity } from 'src/engine/core-modules/imap-smtp-caldav-connection/enums/email-connection-security.enum';
-
-type ProtocolConnectionInput = {
-  host: string;
-  port: number;
-  username?: string;
-  password?: string;
-  connectionSecurity?: EmailConnectionSecurity;
-};
-
 type SaveImapSmtpCaldavAccountInput = {
   handle: string;
   connectionParameters: {
-    IMAP?: ProtocolConnectionInput;
-    SMTP?: ProtocolConnectionInput;
-    CALDAV?: ProtocolConnectionInput;
+    IMAP?: {
+      host: string;
+      port: number;
+      username?: string;
+      password?: string;
+      secure?: boolean;
+    };
+    SMTP?: {
+      host: string;
+      port: number;
+      username?: string;
+      password?: string;
+      secure?: boolean;
+    };
+    CALDAV?: {
+      host: string;
+      port: number;
+      username?: string;
+      password?: string;
+      secure?: boolean;
+    };
   };
   id?: string;
 };

@@ -1,6 +1,6 @@
 export enum PageFocusId {
   Settings = 'settings',
-  WorkspaceActivation = 'workspace-activation',
+  CreateWorkspace = 'create-workspace',
   SignInUp = 'sign-in-up',
   CreateProfile = 'create-profile',
   InviteTeam = 'invite-team',

@@ -9,9 +9,12 @@ import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
 import { SettingsAccountsPasswordController } from '@/settings/accounts/components/SettingsAccountsPasswordController';
 import { type ConnectionFormData } from '@/settings/accounts/hooks/useImapSmtpCaldavConnectionForm';
 import { type AccountType } from 'twenty-shared/constants';
-import { H2Title } from 'twenty-ui/typography';
-import { Section } from 'twenty-ui/layout';
-import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme-constants';
+import { H2Title } from 'twenty-ui-deprecated/display';
+import { Section } from 'twenty-ui-deprecated/layout';
+import {
+  MOBILE_VIEWPORT,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 
 const StyledFormContainer = styled.div`
   display: flex;
@@ -189,19 +192,18 @@ export const SettingsAccountsConnectionForm = ({
 
             <StyledFieldGroup>
               <Controller
-                name="IMAP.connectionSecurity"
+                name="IMAP.secure"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    label={t`IMAP Connection security`}
+                    label={t`IMAP Encryption`}
                     options={[
-                      { label: 'None', value: 'NONE' },
-                      { label: 'STARTTLS', value: 'STARTTLS' },
-                      { label: 'SSL/TLS', value: 'SSL_TLS' },
+                      { label: 'SSL/TLS', value: true },
+                      { label: 'None', value: false },
                     ]}
                     value={field.value}
                     onChange={field.onChange}
-                    dropdownId="imap-connection-security-dropdown"
+                    dropdownId="imap-secure-dropdown"
                   />
                 )}
               />
@@ -285,19 +287,18 @@ export const SettingsAccountsConnectionForm = ({
 
             <StyledFieldGroup>
               <Controller
-                name="SMTP.connectionSecurity"
+                name="SMTP.secure"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    label={t`SMTP Connection security`}
+                    label={t`SMTP Encryption`}
                     options={[
-                      { label: 'None', value: 'NONE' },
-                      { label: 'STARTTLS', value: 'STARTTLS' },
-                      { label: 'SSL/TLS', value: 'SSL_TLS' },
+                      { label: 'SSL/TLS', value: true },
+                      { label: 'STARTTLS', value: false },
                     ]}
                     value={field.value}
                     onChange={field.onChange}
-                    dropdownId="smtp-connection-security-dropdown"
+                    dropdownId="smtp-secure-dropdown"
                   />
                 )}
               />

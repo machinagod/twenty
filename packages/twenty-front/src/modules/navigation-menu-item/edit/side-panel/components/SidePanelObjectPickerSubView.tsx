@@ -1,6 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
-import { TintedIconTile } from 'twenty-ui/data-display';
-import { IconSettings } from 'twenty-ui/icon';
+import { IconSettings, TintedIconTile } from 'twenty-ui-deprecated/display';
 
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { SidePanelObjectPickerItem } from '@/navigation-menu-item/edit/side-panel/components/SidePanelObjectPickerItem';

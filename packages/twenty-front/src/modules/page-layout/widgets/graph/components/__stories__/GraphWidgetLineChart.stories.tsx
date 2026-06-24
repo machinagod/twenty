@@ -3,7 +3,10 @@ import { type ComponentProps } from 'react';
 
 import { GraphWidgetTestWrapper } from '@/page-layout/widgets/graph/__tests__/GraphWidgetTestWrapper';
 import { GraphWidgetLineChart } from '@/page-layout/widgets/graph/graph-widget-line-chart/components/GraphWidgetLineChart';
-import { CatalogDecorator, ComponentDecorator } from 'twenty-ui/testing';
+import {
+  CatalogDecorator,
+  ComponentDecorator,
+} from 'twenty-ui-deprecated/testing';
 
 const meta: Meta<typeof GraphWidgetLineChart> = {
   title: 'Modules/PageLayout/Widgets/GraphWidgetLineChart',
@@ -121,13 +124,13 @@ export const Default: Story = {
     id: 'line-chart-default',
     data: [
       {
-        key: 'series1',
+        id: 'series1',
         label: 'Revenue',
         color: 'blue',
         data: generateLinearData(12),
       },
       {
-        key: 'series2',
+        id: 'series2',
         label: 'Profit',
         color: 'turquoise',
         data: generateLinearData(12),
@@ -149,13 +152,13 @@ export const WithArea: Story = {
     id: 'line-chart-area',
     data: [
       {
-        key: 'sales',
+        id: 'sales',
         label: 'Sales',
         color: 'purple',
         data: generateLinearData(12),
       },
       {
-        key: 'costs',
+        id: 'costs',
         label: 'Costs',
         color: 'orange',
         data: generateLinearData(12),
@@ -175,19 +178,19 @@ export const StackedArea: Story = {
     id: 'line-chart-stacked',
     data: [
       {
-        key: 'product-a',
+        id: 'product-a',
         label: 'Product A',
         color: 'blue',
         data: generateLinearData(8),
       },
       {
-        key: 'product-b',
+        id: 'product-b',
         label: 'Product B',
         color: 'turquoise',
         data: generateLinearData(8),
       },
       {
-        key: 'product-c',
+        id: 'product-c',
         label: 'Product C',
         color: 'purple',
         data: generateLinearData(8),
@@ -209,7 +212,7 @@ export const StackedWithNegativeValues: Story = {
     id: 'line-chart-stacked-negative',
     data: [
       {
-        key: 'series-positive',
+        id: 'series-positive',
         label: 'Positive Series',
         color: 'blue',
         data: [
@@ -219,7 +222,7 @@ export const StackedWithNegativeValues: Story = {
         ],
       },
       {
-        key: 'series-negative',
+        id: 'series-negative',
         label: 'Negative Series',
         color: 'red',
         data: [
@@ -245,7 +248,7 @@ export const StepChart: Story = {
     id: 'line-chart-step',
     data: [
       {
-        key: 'inventory',
+        id: 'inventory',
         label: 'Inventory Level',
         color: 'orange',
         data: generateLinearData(10),
@@ -265,7 +268,7 @@ export const LogScaleDemo: Story = {
     id: 'line-chart-log-scale',
     data: [
       {
-        key: 'exponential',
+        id: 'exponential',
         label: 'Exponential Growth',
         color: 'purple',
         data: [
@@ -278,7 +281,7 @@ export const LogScaleDemo: Story = {
         ],
       },
       {
-        key: 'linear',
+        id: 'linear',
         label: 'Linear Growth',
         color: 'turquoise',
         data: [
@@ -305,7 +308,7 @@ export const WithNullValues: Story = {
     id: 'line-chart-nulls',
     data: [
       {
-        key: 'incomplete',
+        id: 'incomplete',
         label: 'With Gaps',
         color: 'blue',
         data: [
@@ -333,19 +336,19 @@ export const MultiSeriesMixed: Story = {
     id: 'line-chart-mixed',
     data: [
       {
-        key: 'actual',
+        id: 'actual',
         label: 'Actual',
         color: 'blue',
         data: generateLinearData(12),
       },
       {
-        key: 'forecast',
+        id: 'forecast',
         label: 'Forecast',
         color: 'purple',
         data: generateLinearData(12),
       },
       {
-        key: 'target',
+        id: 'target',
         label: 'Target',
         color: 'orange',
         data: generateLinearData(12).map((dataPoint) => ({
@@ -368,7 +371,7 @@ export const OverlappingGradientBlend: Story = {
     id: 'line-chart-blend',
     data: [
       {
-        key: 'red-series',
+        id: 'red-series',
         label: 'Red Wave',
         color: 'red',
         data: [
@@ -383,7 +386,7 @@ export const OverlappingGradientBlend: Story = {
         ],
       },
       {
-        key: 'blue-series',
+        id: 'blue-series',
         label: 'Blue Wave',
         color: 'blue',
         data: [
@@ -398,7 +401,7 @@ export const OverlappingGradientBlend: Story = {
         ],
       },
       {
-        key: 'green-series',
+        id: 'green-series',
         label: 'Green Wave',
         color: 'turquoise',
         data: [
@@ -427,7 +430,7 @@ export const HighContrastOverlap: Story = {
     id: 'line-chart-contrast',
     data: [
       {
-        key: 'yellow-series',
+        id: 'yellow-series',
         label: 'Yellow',
         color: 'yellow',
         data: [
@@ -441,7 +444,7 @@ export const HighContrastOverlap: Story = {
         ],
       },
       {
-        key: 'purple-series',
+        id: 'purple-series',
         label: 'Purple',
         color: 'purple',
         data: [
@@ -469,7 +472,7 @@ export const CurveComparison: Story = {
     id: 'line-chart-curves',
     data: [
       {
-        key: 'dataset',
+        id: 'dataset',
         label: 'Same Data',
         color: 'orange',
         data: [
@@ -497,7 +500,7 @@ export const StepInterpolations: Story = {
     id: 'line-chart-steps',
     data: [
       {
-        key: 'step-normal',
+        id: 'step-normal',
         label: 'Step',
         color: 'blue',
         data: [
@@ -510,7 +513,7 @@ export const StepInterpolations: Story = {
         ],
       },
       {
-        key: 'step-before',
+        id: 'step-before',
         label: 'Step Before',
         color: 'purple',
         data: [
@@ -523,7 +526,7 @@ export const StepInterpolations: Story = {
         ],
       },
       {
-        key: 'step-after',
+        id: 'step-after',
         label: 'Step After',
         color: 'turquoise',
         data: [
@@ -550,7 +553,7 @@ export const NaturalVsMonotone: Story = {
     id: 'line-chart-smooth',
     data: [
       {
-        key: 'natural',
+        id: 'natural',
         label: 'Natural Curve',
         color: 'pink',
         data: [
@@ -564,7 +567,7 @@ export const NaturalVsMonotone: Story = {
         ],
       },
       {
-        key: 'monotone',
+        id: 'monotone',
         label: 'Monotone X',
         color: 'orange',
         data: [
@@ -592,7 +595,7 @@ export const SliceTooltipDemo: Story = {
     id: 'line-chart-slice-tooltip',
     data: [
       {
-        key: 'revenue',
+        id: 'revenue',
         label: 'Revenue',
         color: 'blue',
         data: [
@@ -605,7 +608,7 @@ export const SliceTooltipDemo: Story = {
         ],
       },
       {
-        key: 'costs',
+        id: 'costs',
         label: 'Costs',
         color: 'red',
         data: [
@@ -618,7 +621,7 @@ export const SliceTooltipDemo: Story = {
         ],
       },
       {
-        key: 'profit',
+        id: 'profit',
         label: 'Profit',
         color: 'turquoise',
         data: [
@@ -646,7 +649,7 @@ export const PointTooltipDemo: Story = {
     id: 'line-chart-point-tooltip',
     data: [
       {
-        key: 'revenue',
+        id: 'revenue',
         label: 'Revenue',
         color: 'blue',
         data: [
@@ -659,7 +662,7 @@ export const PointTooltipDemo: Story = {
         ],
       },
       {
-        key: 'costs',
+        id: 'costs',
         label: 'Costs',
         color: 'red',
         data: [
@@ -672,7 +675,7 @@ export const PointTooltipDemo: Story = {
         ],
       },
       {
-        key: 'profit',
+        id: 'profit',
         label: 'Profit',
         color: 'turquoise',
         data: [
@@ -700,13 +703,13 @@ export const Catalog: Story = {
     id: 'line-chart-catalog',
     data: [
       {
-        key: 'series1',
+        id: 'series1',
         label: 'Series 1',
         color: 'blue',
         data: generateLinearData(8),
       },
       {
-        key: 'series2',
+        id: 'series2',
         label: 'Series 2',
         color: 'purple',
         data: generateLinearData(8),
@@ -736,7 +739,7 @@ export const Catalog: Story = {
           props: (color: string) => ({
             data: [
               {
-                key: 'series',
+                id: 'series',
                 label: `${color} Series`,
                 color,
                 data: generateLinearData(8),

@@ -7,7 +7,6 @@ import { isDefined } from 'twenty-shared/utils';
 
 import { type MetadataUniversalFlatEntity } from 'src/engine/metadata-modules/flat-entity/types/metadata-universal-flat-entity.type';
 import { type FlatPageLayoutWidget } from 'src/engine/metadata-modules/flat-page-layout-widget/types/flat-page-layout-widget.type';
-import { PageLayoutType } from 'src/engine/metadata-modules/page-layout/enums/page-layout-type.enum';
 import { type WidgetType } from 'src/engine/metadata-modules/page-layout-widget/enums/widget-type.enum';
 import { type AllPageLayoutWidgetConfiguration } from 'src/engine/metadata-modules/page-layout-widget/types/all-page-layout-widget-configuration.type';
 import { STANDARD_PAGE_LAYOUTS } from 'src/engine/workspace-manager/twenty-standard-application/constants/standard-page-layout.constant';
@@ -70,7 +69,6 @@ export const createStandardPageLayoutWidgetFlatMetadata = ({
   const layout = STANDARD_PAGE_LAYOUTS[
     layoutName as keyof typeof STANDARD_PAGE_LAYOUTS
   ] as {
-    type: PageLayoutType;
     tabs: Record<
       string,
       StandardPageLayoutTabConfig & {
@@ -109,7 +107,6 @@ export const createStandardPageLayoutWidgetFlatMetadata = ({
     objectMetadataId,
     objectMetadataUniversalIdentifier,
     isActive: true,
-    isSystemSideEffect: layout.type === PageLayoutType.RECORD_PAGE,
     createdAt: now,
     updatedAt: now,
     deletedAt: null,

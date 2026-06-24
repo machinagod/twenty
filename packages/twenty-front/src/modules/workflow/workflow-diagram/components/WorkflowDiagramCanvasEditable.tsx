@@ -30,7 +30,6 @@ import {
   ReactFlowProvider,
   type Connection,
   type Edge,
-  type OnNodeDrag,
 } from '@xyflow/react';
 import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
@@ -134,7 +133,10 @@ export const WorkflowDiagramCanvasEditable = () => {
     });
   };
 
-  const onNodeDragStop: OnNodeDrag<WorkflowDiagramNode> = async (_, node) => {
+  const onNodeDragStop = async (
+    _: MouseEvent | TouchEvent,
+    node: WorkflowDiagramNode,
+  ) => {
     const stepToUpdate =
       workflowWithCurrentVersion?.currentVersion?.steps?.find(
         (step) => step.id === node.id,

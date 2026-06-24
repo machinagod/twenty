@@ -8,7 +8,7 @@ import { useVerifyLogin } from '@/auth/hooks/useVerifyLogin';
 import { clientConfigApiStatusState } from '@/client-config/states/clientConfigApiStatusState';
 import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCurrentLocationOnAWorkspace';
 import { useRedirectToWorkspaceDomain } from '@/domain-manager/hooks/useRedirectToWorkspaceDomain';
-import { ModalContent } from 'twenty-ui/surfaces';
+import { ModalContent } from 'twenty-ui-deprecated/layout';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -72,9 +72,7 @@ export const VerifyEmailEffect = () => {
             email,
           );
 
-          enqueueSuccessSnackBar(successSnackbarParams);
-
-          return navigate(AppPath.SignInUp);
+          return enqueueSuccessSnackBar(successSnackbarParams);
         }
 
         const { loginToken, workspaceUrls } = await verifyEmailAndGetLoginToken(

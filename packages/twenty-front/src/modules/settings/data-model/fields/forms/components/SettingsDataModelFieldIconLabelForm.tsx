@@ -3,7 +3,6 @@ import { useContext } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { type z } from 'zod';
 
-import { useGetIsMetadataItemCustom } from '@/object-metadata/hooks/useGetIsMetadataItemCustom';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { fieldMetadataItemSchema } from '@/object-metadata/validation-schemas/fieldMetadataItemSchema';
 import { AdvancedSettingsContentWrapperWithDot } from '@/settings/components/AdvancedSettingsContentWrapperWithDot';
@@ -16,9 +15,17 @@ import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
 import { useLingui } from '@lingui/react/macro';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { IconInfoCircle, IconRefresh } from 'twenty-ui/icon';
-import { AppTooltip, Card, TooltipDelay } from 'twenty-ui/surfaces';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import {
+  AppTooltip,
+  IconInfoCircle,
+  IconRefresh,
+  TooltipDelay,
+} from 'twenty-ui-deprecated/display';
+import { Card } from 'twenty-ui-deprecated/layout';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 import { computeMetadataNameFromLabel } from '~/pages/settings/data-model/utils/computeMetadataNameFromLabel';
 
 export const settingsDataModelFieldIconLabelFormSchema = (
@@ -95,11 +102,6 @@ export const SettingsDataModelFieldIconLabelForm = ({
 
   const { t } = useLingui();
 
-  const getIsMetadataItemCustom = useGetIsMetadataItemCustom();
-
-  const isCustomField =
-    isDefined(fieldMetadataItem) && getIsMetadataItemCustom(fieldMetadataItem);
-
   const labelTextInputId = `${fieldMetadataItem?.id}-label`;
   const nameTextInputId = `${fieldMetadataItem?.id}-name`;
 
@@ -124,7 +126,8 @@ export const SettingsDataModelFieldIconLabelForm = ({
     fieldMetadataItem?.type === FieldMetadataType.RELATION ||
     fieldMetadataItem?.type === FieldMetadataType.MORPH_RELATION;
 
-  const isCustomButNotRelationField = isCustomField && !isRelation;
+  const isCustomButNotRelationField =
+    fieldMetadataItem?.isCustom === true && !isRelation;
 
   const canToggleSyncLabelWithName =
     !isCreationMode && isCustomButNotRelationField;
@@ -135,8 +138,7 @@ export const SettingsDataModelFieldIconLabelForm = ({
   const isLabelEditEnabled =
     isCreationMode ||
     (!isCreationMode &&
-      ((isDefined(fieldMetadataItem) && !isCustomField) ||
-        isCustomButNotRelationField));
+      (fieldMetadataItem?.isCustom === false || isCustomButNotRelationField));
 
   return (
     <>
@@ -169,7 +171,8 @@ export const SettingsDataModelFieldIconLabelForm = ({
                 trigger('label');
                 if (
                   isCreationMode ||
-                  (isLabelSyncedWithName === true && isCustomField)
+                  (isLabelSyncedWithName === true &&
+                    fieldMetadataItem?.isCustom === true)
                 ) {
                   fillNameFromLabel(value);
                 }
@@ -258,7 +261,10 @@ export const SettingsDataModelFieldIconLabelForm = ({
                               return;
                             }
 
-                            if (isCustomField && !isRelation) {
+                            if (
+                              fieldMetadataItem.isCustom === true &&
+                              !isRelation
+                            ) {
                               fillNameFromLabel(label);
                               return;
                             }

@@ -11,14 +11,16 @@ import { sidePanelSearchObjectFilterState } from '@/side-panel/states/sidePanelS
 import { sidePanelSearchState } from '@/side-panel/states/sidePanelSearchState';
 import { useCloseAnyOpenDropdown } from '@/ui/layout/dropdown/hooks/useCloseAnyOpenDropdown';
 import { emitSidePanelOpenEvent } from '@/ui/layout/side-panel/utils/emitSidePanelOpenEvent';
-import { waitForSidePanelClose } from '@/ui/layout/side-panel/utils/waitForSidePanelClose';
 import { useRemoveFocusItemFromFocusStackById } from '@/ui/utilities/focus/hooks/useRemoveFocusItemFromFocusStackById';
 import { t } from '@lingui/core/macro';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 import { SidePanelPages } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { IconColumnInsertRight, IconDotsVertical } from 'twenty-ui/icon';
+import {
+  IconColumnInsertRight,
+  IconDotsVertical,
+} from 'twenty-ui-deprecated/display';
 
 export const useSidePanelMenu = () => {
   const store = useStore();
@@ -31,30 +33,26 @@ export const useSidePanelMenu = () => {
   const { removeFocusItemFromFocusStackById } =
     useRemoveFocusItemFromFocusStackById();
 
-  const closeSidePanelMenu = useCallback(async () => {
+  const closeSidePanelMenu = useCallback(() => {
     const isSidePanelOpened = store.get(isSidePanelOpenedState.atom);
 
-    if (!isSidePanelOpened) {
-      return;
+    if (isSidePanelOpened) {
+      const isLayoutCustomizationModeEnabled = store.get(
+        isLayoutCustomizationModeEnabledState.atom,
+      );
+
+      if (isLayoutCustomizationModeEnabled) {
+        resetRecordIndexSelection();
+      }
+
+      store.set(sidePanelNavigationStackState.atom, []);
+      store.set(isSidePanelOpenedState.atom, false);
+      store.set(isSidePanelClosingState.atom, true);
+      closeAnyOpenDropdown();
+      removeFocusItemFromFocusStackById({
+        focusId: SIDE_PANEL_FOCUS_ID,
+      });
     }
-
-    const isLayoutCustomizationModeEnabled = store.get(
-      isLayoutCustomizationModeEnabledState.atom,
-    );
-
-    if (isLayoutCustomizationModeEnabled) {
-      resetRecordIndexSelection();
-    }
-
-    store.set(sidePanelNavigationStackState.atom, []);
-    store.set(isSidePanelOpenedState.atom, false);
-    store.set(isSidePanelClosingState.atom, true);
-    closeAnyOpenDropdown();
-    removeFocusItemFromFocusStackById({
-      focusId: SIDE_PANEL_FOCUS_ID,
-    });
-
-    await waitForSidePanelClose();
   }, [
     closeAnyOpenDropdown,
     removeFocusItemFromFocusStackById,
@@ -65,9 +63,6 @@ export const useSidePanelMenu = () => {
   const openSidePanelMenu = useCallback(() => {
     emitSidePanelOpenEvent();
     closeAnyOpenDropdown();
-    store.set(sidePanelSearchState.atom, '');
-    store.set(sidePanelSearchObjectFilterState.atom, null);
-
     const isLayoutCustomizationModeEnabled = store.get(
       isLayoutCustomizationModeEnabledState.atom,
     );

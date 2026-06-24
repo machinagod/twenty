@@ -1,5 +1,4 @@
-import { Avatar } from 'twenty-ui/data-display';
-import { useIcons } from 'twenty-ui/icon';
+import { Avatar, useIcons } from 'twenty-ui-deprecated/display';
 import {
   CoreObjectNameSingular,
   NavigationMenuItemType,
@@ -14,7 +13,6 @@ import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadat
 import { SidePanelItemWithAddToNavigationDrag } from '@/side-panel/components/SidePanelItemWithAddToNavigationDrag';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 type SearchRecord = {
   recordId: string;
@@ -91,7 +89,7 @@ export const SidePanelNewSidebarItemRecordItem = ({
                 ? 'squared'
                 : 'rounded'
             }
-            avatarUrl={getAbsoluteImageUrl(record.imageUrl)}
+            avatarUrl={record.imageUrl}
             placeholderColorSeed={record.recordId}
             placeholder={record.label}
           />

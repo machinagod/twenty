@@ -1,4 +1,4 @@
-import { type CoreApiClient } from 'twenty-client-sdk/core';
+import { CoreApiClient } from 'twenty-client-sdk/core';
 
 import { extractConnection } from '@modules/resend/shared/utils/typed-client';
 

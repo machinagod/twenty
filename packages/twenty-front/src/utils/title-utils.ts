@@ -32,7 +32,7 @@ export const getPageTitleFromPath = (pathname: string): string => {
       return t`Sign in or Create an account`;
     case AppPath.Invite:
       return t`Invite`;
-    case AppPath.WorkspaceActivation:
+    case AppPath.CreateWorkspace:
       return t`Create Workspace`;
     case AppPath.CreateProfile:
       return t`Create Profile`;

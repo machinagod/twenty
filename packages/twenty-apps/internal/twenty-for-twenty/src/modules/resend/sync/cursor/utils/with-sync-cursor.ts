@@ -1,4 +1,4 @@
-import { type CoreApiClient } from 'twenty-client-sdk/core';
+import { CoreApiClient } from 'twenty-client-sdk/core';
 import { isDefined } from '@utils/is-defined';
 
 import { getOrCreateSyncCursor } from 'src/modules/resend/sync/cursor/utils/get-or-create-sync-cursor';

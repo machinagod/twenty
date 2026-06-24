@@ -32,9 +32,10 @@ const TEMPLATE_PACKAGE_JSON = {
   version: '0.1.0',
   license: 'MIT',
   scripts: { twenty: 'twenty' },
-  dependencies: {},
-  devDependencies: {
+  dependencies: {
     'twenty-client-sdk': '0.0.0',
+  },
+  devDependencies: {
     'twenty-sdk': '0.0.0',
   },
 };
@@ -151,7 +152,7 @@ describe('copyBaseApplicationProject', () => {
     expect(packageJson.devDependencies['twenty-sdk']).toBe(
       createTwentyAppPackageJson.version,
     );
-    expect(packageJson.devDependencies['twenty-client-sdk']).toBe(
+    expect(packageJson.dependencies['twenty-client-sdk']).toBe(
       createTwentyAppPackageJson.version,
     );
   });

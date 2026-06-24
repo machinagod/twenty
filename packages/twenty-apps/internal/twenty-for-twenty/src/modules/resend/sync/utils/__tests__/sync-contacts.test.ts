@@ -1,5 +1,5 @@
 import type { Resend } from 'resend';
-import { type CoreApiClient } from 'twenty-client-sdk/core';
+import { CoreApiClient } from 'twenty-client-sdk/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { syncContacts } from '@modules/resend/sync/utils/sync-contacts';

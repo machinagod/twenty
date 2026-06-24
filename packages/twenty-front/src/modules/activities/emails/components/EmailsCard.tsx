@@ -1,5 +1,4 @@
 import { styled } from '@linaria/react';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
 
 import { ActivityList } from '@/activities/components/ActivityList';
 import { CustomResolverFetchMoreLoader } from '@/activities/components/CustomResolverFetchMoreLoader';
@@ -8,14 +7,16 @@ import { ComposeEmailButton } from '@/activities/emails/components/ComposeEmailB
 import { EmailThreadPreview } from '@/activities/emails/components/EmailThreadPreview';
 import { EmptyInboxPlaceholder } from '@/activities/emails/components/EmptyInboxPlaceholder';
 import { TIMELINE_THREADS_DEFAULT_PAGE_SIZE } from '@/activities/emails/constants/Messaging';
-import { getTimelineThreadsFromObjectRecord } from '@/activities/emails/graphql/queries/getTimelineThreadsFromObjectRecord';
+import { getTimelineThreadsFromCompanyId } from '@/activities/emails/graphql/queries/getTimelineThreadsFromCompanyId';
+import { getTimelineThreadsFromOpportunityId } from '@/activities/emails/graphql/queries/getTimelineThreadsFromOpportunityId';
+import { getTimelineThreadsFromPersonId } from '@/activities/emails/graphql/queries/getTimelineThreadsFromPersonId';
 import { useCustomResolver } from '@/activities/hooks/useCustomResolver';
-import { useSubscribeTimelineToParticipantChanges } from '@/activities/hooks/useSubscribeTimelineToParticipantChanges';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { Trans } from '@lingui/react/macro';
-import { H1Title, H1TitleFontColor } from 'twenty-ui/typography';
-import { Section } from 'twenty-ui/layout';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { H1Title, H1TitleFontColor } from 'twenty-ui-deprecated/display';
+import { Section } from 'twenty-ui-deprecated/layout';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 import {
   type TimelineThread,
   type TimelineThreadsWithTotal,
@@ -51,25 +52,26 @@ const StyledEmailCount = styled.span`
 export const EmailsCard = () => {
   const targetRecord = useTargetRecord();
 
-  const { data, firstQueryLoading, isFetchingMore, fetchMoreRecords, refetch } =
+  const [query, queryName] =
+    targetRecord.targetObjectNameSingular === CoreObjectNameSingular.Person
+      ? [getTimelineThreadsFromPersonId, 'getTimelineThreadsFromPersonId']
+      : targetRecord.targetObjectNameSingular === CoreObjectNameSingular.Company
+        ? [getTimelineThreadsFromCompanyId, 'getTimelineThreadsFromCompanyId']
+        : [
+            getTimelineThreadsFromOpportunityId,
+            'getTimelineThreadsFromOpportunityId',
+          ];
+
+  const { data, firstQueryLoading, isFetchingMore, fetchMoreRecords } =
     useCustomResolver<TimelineThreadsWithTotal>(
-      getTimelineThreadsFromObjectRecord,
-      'getTimelineThreadsFromObjectRecord',
+      query,
+      queryName,
       'timelineThreads',
       targetRecord,
       TIMELINE_THREADS_DEFAULT_PAGE_SIZE,
     );
 
-  useSubscribeTimelineToParticipantChanges({
-    queryId: `emails-${targetRecord.id}`,
-    participantObjectNameSingular: CoreObjectNameSingular.MessageParticipant,
-    relatedPersonIds:
-      data?.getTimelineThreadsFromObjectRecord?.relatedPersonIds ?? [],
-    refetch,
-  });
-
-  const { totalNumberOfThreads, timelineThreads } =
-    data?.getTimelineThreadsFromObjectRecord ?? {};
+  const { totalNumberOfThreads, timelineThreads } = data?.[queryName] ?? {};
   const hasMoreTimelineThreads =
     timelineThreads && totalNumberOfThreads
       ? timelineThreads?.length < totalNumberOfThreads

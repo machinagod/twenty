@@ -76,10 +76,6 @@ export class CronRegisterAllCommand extends CommandRunner {
       this.twentyConfigService.get('SIGNING_KEY_ROTATION_DAYS'),
     );
 
-    const isMarketplaceCatalogSyncEnabled = this.twentyConfigService.get(
-      'MARKETPLACE_CATALOG_SYNC_CRON_ENABLED',
-    );
-
     const allCommands = [
       {
         name: 'MessagingMessagesImport',
@@ -160,7 +156,6 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'MarketplaceCatalogSync',
         command: this.marketplaceCatalogSyncCronCommand,
-        isEnabled: isMarketplaceCatalogSyncEnabled,
       },
       {
         name: 'ApplicationVersionCheck',

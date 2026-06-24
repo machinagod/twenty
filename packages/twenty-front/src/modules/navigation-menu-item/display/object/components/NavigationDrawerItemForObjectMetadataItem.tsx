@@ -26,11 +26,12 @@ import {
   NavigationMenuItemType,
 } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
-import { IconLock, useIcons } from 'twenty-ui/icon';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { Avatar, IconLock, useIcons } from 'twenty-ui-deprecated/display';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 import { type NavigationMenuItem } from '~/generated-metadata/graphql';
-import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 export type NavigationDrawerItemForObjectMetadataItemProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
@@ -86,12 +87,11 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
   const hasNavigationMenuItem = isRecord || isView || isObject;
 
   const navigationPath = hasNavigationMenuItem
-    ? getNavigationMenuItemComputedLink({
-        item: navigationMenuItem!,
+    ? getNavigationMenuItemComputedLink(
+        navigationMenuItem!,
         objectMetadataItems,
         views,
-        lastVisitedViewPerObjectMetadataItem,
-      })
+      )
     : getAppPath(
         AppPath.RecordIndexPage,
         { objectNamePlural: objectMetadataItem.namePlural },
@@ -151,7 +151,7 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
               ? 'squared'
               : 'rounded'
           }
-          avatarUrl={getAbsoluteImageUrl(recordIdentifier?.avatarUrl)}
+          avatarUrl={recordIdentifier?.avatarUrl}
           placeholderColorSeed={navigationMenuItem!.targetRecordId ?? undefined}
           placeholder={itemLabel}
         />

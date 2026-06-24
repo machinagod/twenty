@@ -25,9 +25,7 @@ export const formatThreads = (
   return threads
     .filter((thread) => isDefined(threadParticipantsByThreadId[thread.id]))
     .map((thread) => {
-      const visibility =
-        threadVisibilityByThreadId[thread.id] ??
-        MessageChannelVisibility.METADATA;
+      const visibility = threadVisibilityByThreadId[thread.id];
 
       return {
         ...thread,

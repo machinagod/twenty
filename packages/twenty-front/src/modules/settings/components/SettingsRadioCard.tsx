@@ -1,9 +1,12 @@
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
-import { CardContent } from 'twenty-ui/surfaces';
-import { type IconComponent } from 'twenty-ui/icon';
-import { Radio } from 'twenty-ui/input';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { CardContent } from 'twenty-ui-deprecated/layout';
+import { type IconComponent } from 'twenty-ui-deprecated/display';
+import { Radio } from 'twenty-ui-deprecated/input';
+import {
+  ThemeContext,
+  themeCssVariables,
+} from 'twenty-ui-deprecated/theme-constants';
 
 const StyledRadioCardContentContainer = styled.div`
   > * {
@@ -37,7 +40,6 @@ const StyledTitle = styled.div`
 const StyledDescription = styled.div`
   color: ${themeCssVariables.font.color.tertiary};
   font-size: ${themeCssVariables.font.size.sm};
-  line-height: ${themeCssVariables.text.lineHeight.lg};
 `;
 
 type SettingsRadioCardProps = {

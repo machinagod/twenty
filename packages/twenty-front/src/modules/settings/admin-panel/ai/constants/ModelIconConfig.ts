@@ -6,7 +6,7 @@ import {
   IconProviderOpenai,
   IconRobot,
   type IconComponent,
-} from 'twenty-ui/icon';
+} from 'twenty-ui-deprecated/display';
 
 import { ModelFamily } from '~/generated-admin/graphql';
 

@@ -531,24 +531,6 @@ export const ALL_MANY_TO_ONE_METADATA_RELATIONS = {
     workspace: null,
     application: null,
   },
-  searchFieldMetadata: {
-    workspace: null,
-    application: null,
-    objectMetadata: {
-      metadataName: 'objectMetadata',
-      foreignKey: 'objectMetadataId',
-      inverseOneToManyProperty: 'searchFieldMetadatas',
-      isNullable: false,
-      universalForeignKey: 'objectMetadataUniversalIdentifier',
-    },
-    fieldMetadata: {
-      metadataName: 'fieldMetadata',
-      foreignKey: 'fieldMetadataId',
-      inverseOneToManyProperty: null,
-      isNullable: false,
-      universalForeignKey: 'fieldMetadataUniversalIdentifier',
-    },
-  },
 } as const satisfies ManyToOneMetadataRelationsProperties;
 
 // satisfies with complex mapped types involving nested generics doesn't always catch missing required keys

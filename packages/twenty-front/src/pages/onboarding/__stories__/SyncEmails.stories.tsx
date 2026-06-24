@@ -43,7 +43,7 @@ export type Story = StoryObj<typeof SyncEmails>;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement.ownerDocument.body);
+    const canvas = within(canvasElement);
     await canvas.findByText('Emails and Calendar');
   },
 };

@@ -4,13 +4,12 @@ name: Visual Regression Dispatch
 # Runs in the context of the base repo (not the fork) so it has access to secrets,
 # making it work for external contributor PRs.
 #
-# All paths trigger the same ci-privileged workflow (post-visual-regression-comment.yaml)
-# via workflow_dispatch, passing the project as an input. ci-privileged routes to the
-# correct Argos project based on it.
+# All dispatches use the same event_type=visual-regression with project/artifact_name
+# in the payload. ci-privileged routes to the correct Argos project based on these.
 
 on:
   workflow_run:
-    workflows: ['CI UI', 'CI Front']
+    workflows: ['CI UI', 'CI New UI', 'CI Front']
     types: [completed]
 
 permissions:
@@ -40,9 +39,10 @@ jobs:
             const name = context.payload.workflow_run.name;
             const projectByWorkflow = {
               'CI UI': 'twenty-ui',
+              'CI New UI': 'twenty-new-ui',
               'CI Front': 'twenty-front',
             };
-            const project = projectByWorkflow[name] ?? 'twenty-front';
+            const project = projectByWorkflow[name] ?? 'twenty-ui';
             const artifactName = `argos-screenshots-${project}`;
             core.setOutput('workflow_name', name);
             core.setOutput('project', project);
@@ -147,19 +147,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Mint ci-privileged dispatch token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ vars.TWENTY_WORKFLOW_DISPATCHER_CLIENT_ID }}
-          private-key: ${{ secrets.TWENTY_WORKFLOW_DISPATCHER_PRIVATE_KEY }}
-          owner: twentyhq
-          repositories: ci-privileged
-          permission-actions: write
-
       - name: Dispatch to ci-privileged
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.CI_PRIVILEGED_DISPATCH_TOKEN }}
           PROJECT: ${{ needs.resolve-context.outputs.project }}
           PR_NUMBER: ${{ needs.resolve-context.outputs.pr_number }}
           WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
@@ -170,19 +160,91 @@ jobs:
           ARTIFACT_NAME: ${{ needs.resolve-context.outputs.artifact_name }}
         run: |
           ARGS=(
-            -f project="$PROJECT"
-            -f artifact_name="$ARTIFACT_NAME"
-            -f run_id="$WORKFLOW_RUN_ID"
-            -f repo="$REPOSITORY"
-            -f branch="$BRANCH"
-            -f commit="$COMMIT"
+            --method POST
+            -f event_type=visual-regression
+            -f "client_payload[project]=$PROJECT"
+            -f "client_payload[artifact_name]=$ARTIFACT_NAME"
+            -f "client_payload[run_id]=$WORKFLOW_RUN_ID"
+            -f "client_payload[repo]=$REPOSITORY"
+            -f "client_payload[branch]=$BRANCH"
+            -f "client_payload[commit]=$COMMIT"
           )
 
           if [ -n "$PR_NUMBER" ]; then
-            ARGS+=(-f pr_number="$PR_NUMBER")
+            ARGS+=(-f "client_payload[pr_number]=$PR_NUMBER")
           fi
           if [ -n "$REFERENCE_COMMIT" ]; then
-            ARGS+=(-f reference_commit="$REFERENCE_COMMIT")
+            ARGS+=(-f "client_payload[reference_commit]=$REFERENCE_COMMIT")
           fi
 
-          gh workflow run post-visual-regression-comment.yaml --repo twentyhq/ci-privileged --ref main "${ARGS[@]}"
+          gh api repos/twentyhq/ci-privileged/dispatches "${ARGS[@]}"
+
+  # ── Dispatch: cross-comparison baseline (CI UI on main → twenty-ui-vs-new-ui) ──
+  dispatch-comparison-baseline:
+    needs: resolve-context
+    if: >-
+      needs.resolve-context.outputs.workflow_name == 'CI UI' &&
+      needs.resolve-context.outputs.has_artifact == 'true' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch to ci-privileged (comparison baseline)
+        env:
+          GH_TOKEN: ${{ secrets.CI_PRIVILEGED_DISPATCH_TOKEN }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          REPOSITORY: ${{ github.repository }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          COMMIT: ${{ github.event.workflow_run.head_sha }}
+          ARTIFACT_NAME: ${{ needs.resolve-context.outputs.artifact_name }}
+        run: |
+          gh api repos/twentyhq/ci-privileged/dispatches \
+            --method POST \
+            -f event_type=visual-regression \
+            -f "client_payload[project]=twenty-ui-vs-new-ui" \
+            -f "client_payload[artifact_name]=$ARTIFACT_NAME" \
+            -f "client_payload[run_id]=$WORKFLOW_RUN_ID" \
+            -f "client_payload[repo]=$REPOSITORY" \
+            -f "client_payload[branch]=$BRANCH" \
+            -f "client_payload[commit]=$COMMIT"
+
+  # ── Dispatch: cross-comparison PR (CI New UI on PRs → twenty-ui-vs-new-ui) ──
+  dispatch-comparison-pr:
+    needs: resolve-context
+    if: >-
+      needs.resolve-context.outputs.workflow_name == 'CI New UI' &&
+      needs.resolve-context.outputs.has_artifact == 'true' &&
+      needs.resolve-context.outputs.is_pr == 'true' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch to ci-privileged (comparison PR)
+        env:
+          GH_TOKEN: ${{ secrets.CI_PRIVILEGED_DISPATCH_TOKEN }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          REPOSITORY: ${{ github.repository }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          COMMIT: ${{ github.event.workflow_run.head_sha }}
+          PR_NUMBER: ${{ needs.resolve-context.outputs.pr_number }}
+          REFERENCE_COMMIT: ${{ needs.resolve-context.outputs.merge_base_sha }}
+          ARTIFACT_NAME: ${{ needs.resolve-context.outputs.artifact_name }}
+        run: |
+          ARGS=(
+            --method POST
+            -f event_type=visual-regression
+            -f "client_payload[project]=twenty-ui-vs-new-ui"
+            -f "client_payload[artifact_name]=$ARTIFACT_NAME"
+            -f "client_payload[run_id]=$WORKFLOW_RUN_ID"
+            -f "client_payload[repo]=$REPOSITORY"
+            -f "client_payload[branch]=$BRANCH"
+            -f "client_payload[commit]=$COMMIT"
+            -f "client_payload[pr_number]=$PR_NUMBER"
+          )
+
+          if [ -n "$REFERENCE_COMMIT" ]; then
+            ARGS+=(-f "client_payload[reference_commit]=$REFERENCE_COMMIT")
+          fi
+
+          gh api repos/twentyhq/ci-privileged/dispatches "${ARGS[@]}"

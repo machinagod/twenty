@@ -37,10 +37,7 @@ export const CustomStackedAreasLayer = ({
   const seriesById = useMemo(
     () =>
       new Map(
-        enrichedSeries.map((seriesItem) => [
-          String(seriesItem.key),
-          seriesItem,
-        ]),
+        enrichedSeries.map((seriesItem) => [String(seriesItem.id), seriesItem]),
       ),
     [enrichedSeries],
   );

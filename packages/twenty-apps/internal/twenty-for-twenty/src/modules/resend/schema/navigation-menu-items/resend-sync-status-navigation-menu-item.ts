@@ -4,7 +4,8 @@ import {
   RESEND_SYNC_STATUS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 } from '@modules/resend/constants/universal-identifiers';
 import { RESEND_SYNC_STATUS_NAVIGATION_MENU_ITEM_NAME } from '@modules/resend/manual-sync/constants/resend-sync-status-menu-item-name';
-import { defineNavigationMenuItem, NavigationMenuItemType } from 'twenty-sdk/define';
+import { defineNavigationMenuItem } from 'twenty-sdk/define';
+import { NavigationMenuItemType } from 'twenty-sdk/define';
 
 export default defineNavigationMenuItem({
   universalIdentifier:
