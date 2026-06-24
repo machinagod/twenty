@@ -25,6 +25,7 @@ describe('isRecordMatchingRLSRowLevelPermissionPredicate', () => {
     workspaceId: 'test-workspace-id',
     universalIdentifier: 'test-object-id',
     indexMetadataIds: [],
+    searchFieldMetadataIds: [],
     objectPermissionIds: [],
     fieldPermissionIds: [],
     fieldIds,
@@ -36,7 +37,8 @@ describe('isRecordMatchingRLSRowLevelPermissionPredicate', () => {
     shortcut: null,
     description: null,
     standardOverrides: null,
-    isUIReadOnly: false,
+    isUIEditable: true,
+    isUICreatable: true,
     labelIdentifierFieldMetadataId: null,
     imageIdentifierFieldMetadataId: null,
     duplicateCriteria: null,
@@ -46,6 +48,7 @@ describe('isRecordMatchingRLSRowLevelPermissionPredicate', () => {
     fieldPermissionUniversalIdentifiers: [],
     viewUniversalIdentifiers: [],
     indexMetadataUniversalIdentifiers: [],
+    searchFieldMetadataUniversalIdentifiers: [],
     labelIdentifierFieldMetadataUniversalIdentifier: null,
     imageIdentifierFieldMetadataUniversalIdentifier: null,
   });
@@ -285,5 +288,45 @@ describe('isRecordMatchingRLSRowLevelPermissionPredicate', () => {
     });
 
     expect(result).toBe(true);
+  });
+
+  it('matches "is not empty" on a relation field by its related record id', () => {
+    expect(
+      isRecordMatchingRLSRowLevelPermissionPredicate({
+        record: { ...baseRecord, company: { id: 'company-1' } } as ObjectRecord,
+        filter: { company: { is: 'NOT_NULL' } },
+        flatObjectMetadata,
+        flatFieldMetadataMaps,
+      }),
+    ).toBe(true);
+
+    expect(
+      isRecordMatchingRLSRowLevelPermissionPredicate({
+        record: { ...baseRecord, company: null } as ObjectRecord,
+        filter: { company: { is: 'NOT_NULL' } },
+        flatObjectMetadata,
+        flatFieldMetadataMaps,
+      }),
+    ).toBe(false);
+  });
+
+  it('matches "is empty" on a relation field by its related record id', () => {
+    expect(
+      isRecordMatchingRLSRowLevelPermissionPredicate({
+        record: { ...baseRecord, company: null } as ObjectRecord,
+        filter: { company: { is: 'NULL' } },
+        flatObjectMetadata,
+        flatFieldMetadataMaps,
+      }),
+    ).toBe(true);
+
+    expect(
+      isRecordMatchingRLSRowLevelPermissionPredicate({
+        record: { ...baseRecord, company: { id: 'company-1' } } as ObjectRecord,
+        filter: { company: { is: 'NULL' } },
+        flatObjectMetadata,
+        flatFieldMetadataMaps,
+      }),
+    ).toBe(false);
   });
 });

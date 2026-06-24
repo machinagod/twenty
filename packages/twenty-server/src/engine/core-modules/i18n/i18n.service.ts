@@ -48,12 +48,13 @@ export class I18nService implements OnModuleInit {
     {} as Record<keyof typeof APP_LOCALES, I18n>;
 
   async loadTranslations() {
-    // Lingui's `t`…`` macro (e.g. server-side exception messages) resolves against
-    // the global i18n singleton, which we never load a catalog into. Without a
-    // messages compiler, every fallback lookup logs "Uncompiled message detected!"
-    // and floods the logs. Registering compileMessage silences it (and lets ICU
-    // interpolation work on raw fallbacks).
+    // The global i18n singleton backs server-side t`…` calls and has no
+    // compiled catalog, so it needs a runtime message compiler. Since lingui
+    // 5.9 it also throws unless a locale is activated, so activate the source
+    // locale (t`…` then renders the English source text via the compiler).
     i18n.setMessagesCompiler(compileMessage);
+    i18n.load(SOURCE_LOCALE, enMessages);
+    i18n.activate(SOURCE_LOCALE);
 
     const messagesByLocale: Record<keyof typeof APP_LOCALES, Messages> = {
       en: enMessages,

@@ -33,8 +33,7 @@ import {
   AnimatedPlaceholderEmptySubTitle,
   AnimatedPlaceholderEmptyTextContainer,
   AnimatedPlaceholderEmptyTitle,
-  EMPTY_PLACEHOLDER_TRANSITION_PROPS,
-} from 'twenty-ui-deprecated/layout';
+} from 'twenty-ui/feedback';
 import { FieldDisplayMode } from '~/generated-metadata/graphql';
 
 const StyledContainer = styled.div`
@@ -74,10 +73,7 @@ export const FieldWidget = ({ widget }: FieldWidgetProps) => {
     return (
       <SidePanelProvider value={{ isInSidePanel }}>
         <StyledContainer>
-          <AnimatedPlaceholderEmptyContainer
-            // oxlint-disable-next-line react/jsx-props-no-spreading
-            {...EMPTY_PLACEHOLDER_TRANSITION_PROPS}
-          >
+          <AnimatedPlaceholderEmptyContainer>
             <AnimatedPlaceholder type="noRecord" />
             <AnimatedPlaceholderEmptyTextContainer>
               <AnimatedPlaceholderEmptyTitle>

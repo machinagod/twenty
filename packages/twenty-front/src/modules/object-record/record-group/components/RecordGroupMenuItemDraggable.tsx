@@ -6,9 +6,9 @@ import {
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
-import { Tag } from 'twenty-ui-deprecated/components';
-import { IconEye, IconEyeOff } from 'twenty-ui-deprecated/display';
-import { MenuItemDraggable } from 'twenty-ui-deprecated/navigation';
+import { Tag } from 'twenty-ui/data-display';
+import { IconEye, IconEyeOff } from 'twenty-ui/icon';
+import { MenuItemDraggable } from 'twenty-ui/navigation';
 
 type RecordGroupMenuItemDraggableProps = {
   recordGroupId: string;
@@ -48,8 +48,8 @@ export const RecordGroupMenuItemDraggable = ({
       {
         Icon: recordGroupDefinition.isVisible ? IconEyeOff : IconEye,
         ariaLabel: recordGroupDefinition.isVisible
-          ? t`Hide group ${groupValue}`
-          : t`Show group ${groupValue}`,
+          ? t`Hide group ${groupValue ?? ''}`
+          : t`Show group ${groupValue ?? ''}`,
         dataTestId: recordGroupDefinition.isVisible
           ? `hide-group-${recordGroupDefinition.value?.toLowerCase().replace(' ', '-') ?? ''}`
           : `show-group-${recordGroupDefinition.value?.toLowerCase().replace(' ', '-') ?? ''}`,

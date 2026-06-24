@@ -109,6 +109,7 @@ describe('WorkspaceEntityManager', () => {
       targetTableName: 'test_entity',
       fieldIds: ['field-id'],
       indexMetadataIds: [],
+      searchFieldMetadataIds: [],
       objectPermissionIds: [],
       fieldPermissionIds: [],
       viewIds: [],
@@ -120,7 +121,8 @@ describe('WorkspaceEntityManager', () => {
       standardOverrides: null,
       applicationId: 'test-application-id',
       isLabelSyncedWithName: false,
-      isUIReadOnly: false,
+      isUIEditable: true,
+      isUICreatable: true,
       duplicateCriteria: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -130,6 +132,7 @@ describe('WorkspaceEntityManager', () => {
       fieldPermissionUniversalIdentifiers: [],
       viewUniversalIdentifiers: [],
       indexMetadataUniversalIdentifiers: [],
+      searchFieldMetadataUniversalIdentifiers: [],
       labelIdentifierFieldMetadataUniversalIdentifier: null,
       imageIdentifierFieldMetadataUniversalIdentifier: null,
     };
@@ -145,6 +148,7 @@ describe('WorkspaceEntityManager', () => {
       label: 'Field Name',
       objectMetadataId: 'test-entity-id',
       isNullable: true,
+      isSystemSideEffect: false,
       isLabelSyncedWithName: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -154,7 +158,7 @@ describe('WorkspaceEntityManager', () => {
       icon: null,
       isActive: true,
       isSystem: false,
-      isUIReadOnly: false,
+      isUIEditable: true,
       isUnique: false,
       options: null,
       settings: null,
@@ -238,6 +242,7 @@ describe('WorkspaceEntityManager', () => {
         IS_LOGIC_FUNCTION_PREBUILT_MODE_ENABLED: false,
         IS_SETTINGS_DISCOVERY_HERO_ENABLED: false,
         IS_CALL_RECORDING_ENABLED: false,
+        IS_MESSAGING_CALENDAR_WEBHOOK_ENABLED: false,
       },
       userWorkspaceRoleMap: {},
       eventEmitterService: {
@@ -472,7 +477,13 @@ describe('WorkspaceEntityManager', () => {
   describe('Update Methods', () => {
     it('should call createQueryBuilder with permissionOptions for update', async () => {
       await withWorkspaceContext(mockWorkspaceContext, () =>
-        entityManager.update('test-entity', {}, {}, mockPermissionOptions),
+        entityManager.update(
+          'test-entity',
+          {},
+          {},
+          undefined,
+          mockPermissionOptions,
+        ),
       );
       expect(entityManager['createQueryBuilder']).toHaveBeenCalledWith(
         'test-entity',

@@ -4,11 +4,8 @@ import { styled } from '@linaria/react';
 import { isNonEmptyString } from '@sniptt/guards';
 import { type ReactNode, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { IconChevronLeft } from 'twenty-ui-deprecated/display';
-import {
-  ThemeContext,
-  themeCssVariables,
-} from 'twenty-ui-deprecated/theme-constants';
+import { IconChevronLeft } from 'twenty-ui/icon';
+import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 
 export type MobileBreadcrumbProps = {
   className?: string;
@@ -62,8 +59,6 @@ export const MobileBreadcrumb = ({
     ? previousLink.children
     : '';
 
-  const linkText = previousLink.children;
-
   return (
     <StyledWrapper className={className}>
       {previousLink?.href ? (
@@ -71,7 +66,7 @@ export const MobileBreadcrumb = ({
           <IconChevronLeft size={theme.icon.size.md} />
           <StyledLinkContainer>
             <Link title={text} to={previousLink.href}>
-              {t`Back to ${linkText}`}
+              {t`Back to ${text}`}
             </Link>
           </StyledLinkContainer>
         </>

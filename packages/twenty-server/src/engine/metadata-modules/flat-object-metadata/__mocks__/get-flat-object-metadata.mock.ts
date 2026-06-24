@@ -20,6 +20,7 @@ export const getFlatObjectMetadataMock = (
   return {
     viewIds: [],
     indexMetadataIds: [],
+    searchFieldMetadataIds: [],
     objectPermissionIds: [],
     fieldPermissionIds: [],
     fieldIds: [],
@@ -34,7 +35,8 @@ export const getFlatObjectMetadataMock = (
     isRemote: false,
     isSearchable: true,
     isSystem: false,
-    isUIReadOnly: false,
+    isUIEditable: true,
+    isUICreatable: true,
     labelIdentifierFieldMetadataId,
     labelPlural: 'default flat object metadata label plural',
     labelSingular: 'default flat object metadata label singular',
@@ -54,6 +56,7 @@ export const getFlatObjectMetadataMock = (
     fieldPermissionUniversalIdentifiers: [],
     viewUniversalIdentifiers: [],
     indexMetadataUniversalIdentifiers: [],
+    searchFieldMetadataUniversalIdentifiers: [],
     labelIdentifierFieldMetadataUniversalIdentifier:
       labelIdentifierFieldMetadataId,
     imageIdentifierFieldMetadataUniversalIdentifier:

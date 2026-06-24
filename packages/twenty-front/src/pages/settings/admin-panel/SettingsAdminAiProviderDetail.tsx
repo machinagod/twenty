@@ -9,7 +9,6 @@ import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 import { AI_ADMIN_PATH } from '@/settings/admin-panel/ai/constants/AiAdminPath';
 import { AI_PROVIDER_SOURCE } from '@/settings/admin-panel/ai/constants/AiProviderSource';
 import {
-  H2Title,
   type IconComponent,
   IconFlag,
   IconKey,
@@ -19,10 +18,11 @@ import {
   IconTag,
   IconTrash,
   IconWorld,
-} from 'twenty-ui-deprecated/display';
-import { Button, SearchInput } from 'twenty-ui-deprecated/input';
-import { Section } from 'twenty-ui-deprecated/layout';
-import { RoundedLink, UndecoratedLink } from 'twenty-ui-deprecated/navigation';
+} from 'twenty-ui/icon';
+import { H2Title } from 'twenty-ui/typography';
+import { Button, SearchInput } from 'twenty-ui/input';
+import { Section } from 'twenty-ui/layout';
+import { RoundedLink, UndecoratedLink } from 'twenty-ui/navigation';
 
 import { useClientConfig } from '@/client-config/hooks/useClientConfig';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
@@ -424,7 +424,7 @@ export const SettingsAdminAiProviderDetail = () => {
 
       <ConfirmationModal
         modalInstanceId={REMOVE_PROVIDER_MODAL_ID}
-        title={t`Remove provider "${provider?.label ?? providerName}"`}
+        title={t`Remove provider "${provider?.label ?? providerName ?? ''}"`}
         subtitle={t`This will disconnect all models from this provider. Models will no longer be available until a new provider is configured.`}
         onConfirmClick={handleRemoveProvider}
         confirmButtonText={t`Remove`}

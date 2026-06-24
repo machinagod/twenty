@@ -6,6 +6,7 @@ export const computeOrderedMigrationActions = (
 ): AllUniversalWorkspaceMigrationAction[] => {
   return [
     // Object and fields and indexes
+    ...aggregatedOrchestratorActionsReport.searchFieldMetadata.delete,
     ...aggregatedOrchestratorActionsReport.index.delete,
     ...aggregatedOrchestratorActionsReport.fieldMetadata.delete,
     ...aggregatedOrchestratorActionsReport.objectMetadata.delete,
@@ -15,6 +16,8 @@ export const computeOrderedMigrationActions = (
     ...aggregatedOrchestratorActionsReport.fieldMetadata.update,
     ...aggregatedOrchestratorActionsReport.index.create,
     ...aggregatedOrchestratorActionsReport.index.update.flat(),
+    ...aggregatedOrchestratorActionsReport.searchFieldMetadata.create,
+    ...aggregatedOrchestratorActionsReport.searchFieldMetadata.update,
     ///
 
     // Views
@@ -71,16 +74,13 @@ export const computeOrderedMigrationActions = (
     ...aggregatedOrchestratorActionsReport.fieldPermission.update,
     ///
 
-    // Permission flags
+    // Permission flag definitions and their role assignments.
     ...aggregatedOrchestratorActionsReport.rolePermissionFlag.delete,
-    ...aggregatedOrchestratorActionsReport.rolePermissionFlag.create,
-    ...aggregatedOrchestratorActionsReport.rolePermissionFlag.update,
-    ///
-
-    // Permission flag definitions
     ...aggregatedOrchestratorActionsReport.permissionFlag.delete,
     ...aggregatedOrchestratorActionsReport.permissionFlag.create,
+    ...aggregatedOrchestratorActionsReport.rolePermissionFlag.create,
     ...aggregatedOrchestratorActionsReport.permissionFlag.update,
+    ...aggregatedOrchestratorActionsReport.rolePermissionFlag.update,
     ///
 
     // Agents

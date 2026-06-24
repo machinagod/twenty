@@ -19,8 +19,13 @@ export const resolveObjectMetadataStandardOverride = (
   labelKey: 'color' | 'labelPlural' | 'labelSingular' | 'description' | 'icon',
   locale: keyof typeof APP_LOCALES | undefined,
   i18nInstance: I18n,
+  isStandardApp: boolean,
 ): string => {
   const safeLocale = locale ?? SOURCE_LOCALE;
+
+  if (!isStandardApp) {
+    return objectMetadata[labelKey] ?? '';
+  }
 
   if (
     (labelKey === 'icon' || labelKey === 'color') &&

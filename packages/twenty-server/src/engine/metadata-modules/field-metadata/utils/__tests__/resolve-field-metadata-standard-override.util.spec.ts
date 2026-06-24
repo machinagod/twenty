@@ -26,6 +26,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Custom Label',
         description: 'Custom Description',
         icon: 'custom-icon',
+        isCustom: true,
         standardOverrides: undefined,
       };
 
@@ -34,9 +35,35 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Custom Label');
+    });
+
+    it('should never translate a custom label even when it matches a standard catalog entry', () => {
+      const fieldMetadata = {
+        label: 'Status',
+        description: 'Custom Description',
+        icon: 'custom-icon',
+        isCustom: true,
+        standardOverrides: undefined,
+      };
+
+      mockGenerateMessageId.mockReturnValue('status.message.id');
+      mockI18n._.mockReturnValue('Statut');
+
+      const result = resolveFieldMetadataStandardOverride(
+        fieldMetadata,
+        'label',
+        'fr-FR',
+        mockI18n,
+        !fieldMetadata.isCustom,
+      );
+
+      expect(result).toBe('Status');
+      expect(mockGenerateMessageId).not.toHaveBeenCalled();
+      expect(mockI18n._).not.toHaveBeenCalled();
     });
 
     it('should return the field value for custom description field', () => {
@@ -44,6 +71,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Custom Label',
         description: 'Custom Description',
         icon: 'custom-icon',
+        isCustom: true,
         standardOverrides: undefined,
       };
 
@@ -52,6 +80,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'description',
         undefined,
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Custom Description');
@@ -62,6 +91,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Custom Label',
         description: 'Custom Description',
         icon: 'custom-icon',
+        isCustom: true,
         standardOverrides: undefined,
       };
 
@@ -70,6 +100,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'icon',
         SOURCE_LOCALE,
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('custom-icon');
@@ -82,6 +113,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           icon: 'override-icon',
         },
@@ -92,6 +124,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'icon',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('override-icon');
@@ -104,6 +137,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           translations: {
             'fr-FR': {
@@ -120,6 +154,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
           'label',
           'fr-FR',
           mockI18n,
+          !fieldMetadata.isCustom,
         ),
       ).toBe('Libellé traduit');
       expect(
@@ -128,6 +163,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
           'description',
           'fr-FR',
           mockI18n,
+          !fieldMetadata.isCustom,
         ),
       ).toBe('Description traduite');
     });
@@ -137,6 +173,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           translations: {
             'es-ES': {
@@ -154,6 +191,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -164,6 +202,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           translations: {
             'fr-FR': {
@@ -181,6 +220,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'description',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Description');
@@ -191,6 +231,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           translations: {
             'fr-FR': {
@@ -208,6 +249,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         undefined,
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -220,6 +262,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           label: 'Overridden Label',
           description: 'Overridden Description',
@@ -233,6 +276,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
           'label',
           SOURCE_LOCALE,
           mockI18n,
+          !fieldMetadata.isCustom,
         ),
       ).toBe('Overridden Label');
       expect(
@@ -241,6 +285,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
           'description',
           SOURCE_LOCALE,
           mockI18n,
+          !fieldMetadata.isCustom,
         ),
       ).toBe('Overridden Description');
       expect(
@@ -249,6 +294,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
           'icon',
           SOURCE_LOCALE,
           mockI18n,
+          !fieldMetadata.isCustom,
         ),
       ).toBe('overridden-icon');
     });
@@ -258,6 +304,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           label: 'Overridden Label',
         },
@@ -271,6 +318,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Overridden Label');
@@ -283,6 +331,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           label: '',
         },
@@ -296,6 +345,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         SOURCE_LOCALE,
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -306,6 +356,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           label: undefined,
         },
@@ -319,6 +370,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         SOURCE_LOCALE,
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -331,6 +383,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: undefined,
       };
 
@@ -342,6 +395,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(mockGenerateMessageId).toHaveBeenCalledWith('Standard Label');
@@ -354,6 +408,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: undefined,
       };
 
@@ -367,6 +422,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Standard Label');
@@ -379,6 +435,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           label: 'Source Override',
           translations: {
@@ -394,6 +451,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'fr-FR',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Translation Override');
@@ -406,6 +464,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {
           label: 'Source Override',
         },
@@ -416,6 +475,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         SOURCE_LOCALE,
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Source Override');
@@ -428,6 +488,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         label: 'Standard Label',
         description: 'Standard Description',
         icon: 'default-icon',
+        isCustom: false,
         standardOverrides: {},
       };
 
@@ -439,6 +500,7 @@ describe('resolveFieldMetadataStandardOverride', () => {
         'label',
         'de-DE',
         mockI18n,
+        !fieldMetadata.isCustom,
       );
 
       expect(result).toBe('Auto Translated Label');

@@ -15,8 +15,13 @@ export const resolveFieldMetadataStandardOverride = (
   labelKey: 'label' | 'description' | 'icon',
   locale: keyof typeof APP_LOCALES | undefined,
   i18nInstance: I18n,
+  isStandardApp: boolean,
 ): string => {
   const safeLocale = locale ?? SOURCE_LOCALE;
+
+  if (!isStandardApp) {
+    return fieldMetadata[labelKey] ?? '';
+  }
 
   if (labelKey === 'icon' && isDefined(fieldMetadata.standardOverrides?.icon)) {
     return fieldMetadata.standardOverrides.icon;

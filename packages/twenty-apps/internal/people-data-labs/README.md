@@ -1,114 +1,77 @@
-# People Data Labs enrichment app
+# People Data Labs enrichment
 
-Enriches **Person** and **Company** records with [People Data Labs](https://www.peopledatalabs.com/) (PDL) data.
+Enriches **Person** and **Company** records with data from [People Data Labs](https://www.peopledatalabs.com/) (PDL): job and role details, location, company firmographics, funding, social profiles, and more.
 
-> **Status: data-model scaffold.** This package defines the fields, relation, indexes,
-> views, role, and manifest. The enrichment **logic function (the "mapper") is not yet
-> implemented** — see [What the mapper must do](#what-the-mapper-must-do).
+## What it does
 
----
+For each record you enrich, the app matches it against People Data Labs and writes the result back to Twenty. It fills a handful of Twenty standard fields, adds a rich set of dedicated PDL fields, and records the outcome of the last attempt.
 
-## Data-model decisions
+### Standard fields it can fill
 
-### Bundle scope
+- **Person:** name, emails, phone numbers, job title, and LinkedIn link. If the person has no company yet, the app also looks up (or creates) their current company and links it.
+- **Company:** name, domain name, LinkedIn link, and address.
 
-Only the core PDL company fields are defined. Premium / Comprehensive / specialized fields
-(`inferred_revenue`, `linkedin_follower_count`, employee growth/churn/tenure, parent /
-subsidiary, exec movement, top employers, `funding_details`, …) are **out of scope** for this app.
+Standard fields are only used to complete your existing data. By default they are filled **only when empty**, so your own values are never overwritten unless you explicitly choose to overwrite (see overwrite modes below). The existing person-to-company link is never overwritten.
 
-### Enums → SELECT / MULTI_SELECT
+### PDL fields it adds
 
-Every PDL enum that has a canonical file is a SELECT, **validated 0-missing/0-extra against
-PDL schema v34.1**:
+The app adds around 30 dedicated PDL data fields on Person and 28 on Company (plus the bookkeeping fields listed below). These are always written on a match. Highlights:
 
-| Field                                                                                                                                                                                           | Type         | Options                                    |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------ |
-| `pdlSeniority` (`job_title_levels`, array)                                                                                                                                                      | MULTI_SELECT | 10                                         |
-| `pdlFundingStages` (`funding_stages`, array)                                                                                                                                                    | MULTI_SELECT | 29                                         |
-| `pdlIndustry` / `pdlJobCompanyIndustry` (`industry`)                                                                                                                                            | SELECT       | 147                                        |
-| `pdlJobTitleSubRole` (`job_title_sub_role`)                                                                                                                                                     | SELECT       | 106                                        |
-| `pdlJobTitleClass`, `pdlInferredSalary`, `pdlSex`, `pdlCompanyType`, `pdlSizeRange`, `pdlJobCompanySize`, `pdlLatestFundingStage`, `pdlLocationContinent`, `pdlLocationMetro`, `pdlMicExchange` | SELECT       | 5 / 11 / 2 / 6 / 8 / 8 / 29 / 7 / 384 / 70 |
+- **Person:** seniority, job role, job title class and sub-role, industry, inferred salary, headline and summaries, years of experience, LinkedIn connections, birth date/year, skills, interests, education, work experience, certifications, languages, social profiles (GitHub, Twitter/X, Facebook), and a detailed PDL location.
+- **Company:** industry, company type, size range and employee count, founded year, funding stages and total funding (in USD), headline and summary, legal name, ticker and exchange, tags, alternative names and domains, NAICS/SIC classifications, employee counts by country, and social profiles.
 
-- Option `value`s are normalized to **GraphQL enum names** (`united states` → `UNITED_STATES`):
-  uppercase, accents stripped, non-alphanumeric → `_`, digit-leading prefixed.
-- Option `universalIdentifier`s are **unique per field** (shared enums like industry get a
-  separate id-set per field).
-- **Stays `TEXT`** (no canonical PDL enum file exists): `pdlIndustryDetail` (`industry_v2`),
-  `pdlJobOnetCode`, `pdlLocationRegion`.
+Each object also gets bookkeeping fields: a PDL id, the raw PDL payload, the time of the last enrichment, the match likelihood (Person), and an enrichment status.
 
-### Standard-field mapping
+Two pre-built table views named **Enriched (PDL)** are added — one on People and one on Companies — to surface the enrichment fields.
 
-`pdl*` shadows are **removed** where an equivalent standard field exists; the mapper writes
-the standard field instead:
+## How matching works
 
-| Object  | Removed shadow → standard target                                                                                                                                          |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Person  | `pdlLinkedinUrl`→`linkedinLink`, `pdlJobTitle`→`jobTitle`, `pdlFullName`→`name`, `pdlWorkEmail`/`pdlPersonalEmails`→`emails`, `pdlMobilePhone`/`pdlPhoneNumbers`→`phones` |
-| Company | `pdlLinkedinUrl`→`linkedinLink`, `pdlWebsite`→`domainName`, `pdlDisplayName`→`name`                                                                                       |
+The app matches records using the identifiers already on them, in priority order:
 
-Shadows are **kept** where no reliable standard field is available: `pdlEmployeeCount`,
-`pdlTwitterUrl`.
-_Trade-off:_ PDL's work/personal-email and mobile/other-phone distinction is dropped (folded
-into the standard bags).
+- **Person:** PDL id, LinkedIn URL, primary email, or full name paired with a company name. LinkedIn URL and email are treated as strong identifiers; a name on its own is not used.
+- **Company:** PDL id, website domain, LinkedIn URL, or company name. Website and LinkedIn are treated as strong identifiers.
 
-### Location → ADDRESS composite
+When a record has only weak signals (for example a person's name plus company, or a company name alone), the app applies a stricter confidence threshold to reduce false positives.
 
-- **Company** location → the **standard `address`** composite (street/city/state/postcode/country/geo).
-- **Person** has no standard address field → dedicated **`pdlLocation` (ADDRESS)**.
-- `pdlLocationMetro` (both) and `pdlLocationContinent` (company) stay SELECT — ADDRESS has no slot.
-  _Trade-off:_ ADDRESS `country` is free text, so the country SELECT was dropped.
+If a record has no usable identifier, it is **skipped** (and never billed).
 
-### Relation
+## Overwrite modes
 
-Dedicated **`pdlCurrentCompany`** (Person `MANY_TO_ONE` → Company) ↔ inverse
-**`pdlCurrentEmployees`** (Company `ONE_TO_MANY` → Person). Deliberately **not** the standard
-`company` relation, so PDL's detected employer can't overwrite the user's CRM account link.
+When you trigger enrichment you can choose how matched data is written back:
 
-### Enrichment metadata
+- **Yes and don't overwrite** (default): writes PDL fields and fills standard fields only where they are currently empty.
+- **Yes and overwrite**: writes PDL fields and replaces existing standard field values.
+- **No**: returns the enriched data without modifying the record.
 
-- `pdlId` — PDL record id (re-enrich by id: more precise than by email).
-- `pdlLikelihood` (Person, NUMBER) — PDL match confidence 1–10.
-- `pdlEnrichmentStatus` (SELECT: `MATCHED` / `NOT_FOUND` / `ERROR`) — distinguishes
-  "no match" from "never tried" (drives re-enrichment scheduling).
-- `pdlLastEnrichedAt` (DATE_TIME), `pdlRawPayload` (RAW_JSON, full response).
+In all cases the dedicated PDL fields are written on a match.
 
-### Other
+## Enrichment status
 
-- `pdlTotalFunding` is `CURRENCY` (mapper must convert the bare USD float → micros).
-- **Indexes**: `pdlId` and `pdlLastEnrichedAt` on both objects.
-- **Views**: a curated "People Data Labs" TABLE view per object.
-- **Role**: read/update on Person & Company (object-level; tighten to field-scoped later).
+The enrichment status field written to each record records the outcome of the last attempt, and can hold one of three values:
 
----
+- **Matched** — a confident match was found and data was written.
+- **No Match** — PDL returned no confident match.
+- **Error** — the enrichment attempt failed.
 
-## What the mapper must do
+Records that are skipped because they have no usable identifier are reported as skipped in the action's returned result and bulk summary, but no status is written back to the record (nothing is changed or billed for them).
 
-The logic function (to be built) must:
+## How to trigger it
 
-**Orchestration**
+- **Manual action:** run enrichment on a single record or on a selection of records from a People or Companies view.
+- **Workflow action:** add **Enrich Person**, **Enrich Company**, **Enrich People**, or **Enrich Companies** as a step in a workflow.
+- **AI tool:** the single-record **Enrich Person** and **Enrich Company** actions are also available to AI agents.
 
-1. Trigger via manual command-menu action / record create / batch (TBD).
-2. Call PDL Person and/or Company Enrichment with `PDL_API_KEY`; pass `min_likelihood` /
-   `required_fields` to control match quality.
-3. On `200` → write fields + set `pdlEnrichmentStatus = MATCHED`; on `404` →
-   `NOT_FOUND`; on error → `ERROR`.
-4. Respect PDL rate limits (queue / throttle on `429`).
-5. **TTL guard**: skip re-enrichment if `pdlLastEnrichedAt` is recent; prefer re-enriching by `pdlId`.
+Bulk enrichment processes records in batches and reports how many were matched, not found, skipped, or errored.
 
-**Field writing**
+## Billing
 
-6. Write **standard fields** (fill-only-if-empty to avoid overwriting user data):
-   Person `name`, `emails`, `phones`, `linkedinLink`, `jobTitle`; Company `name`,
-   `domainName`, `linkedinLink`, `address`.
-7. Write `pdl*` fields for everything else.
-8. **SELECT guard**: only write a SELECT/MULTI_SELECT value if the normalized value exists in
-   the field's option set; otherwise skip and keep it in `pdlRawPayload` (handles PDL schema
-   versions newer than v34.1). Use the same normalization as the option `value`s.
-9. **MULTI_SELECT** arrays: `job_title_levels` → `pdlSeniority`; `funding_stages` → `pdlFundingStages`.
-10. **CURRENCY**: `total_funding_raised` (USD float) → `{ amountMicros: value × 1_000_000, currencyCode: 'USD' }`.
-11. **ADDRESS**: split PDL `location.*` into the composite — Company → standard `address`,
-    Person → `pdlLocation`.
-12. **Relation**: resolve `job_company_id` → find/upsert a Company record → link `pdlCurrentCompany`.
-13. **Dates**: handle partial PDL dates (`YYYY`, `YYYY-MM`) for `job_start_date`,
-    `last_funding_date`, `birth_date`.
-14. Always set `pdlId`, `pdlLastEnrichedAt`, `pdlRawPayload`, `pdlLikelihood` (person).
+Only successful matches are billed, in Twenty credits — records that are not found, skipped, or that error are free.
+
+- **Person match:** $0.336
+- **Company match:** $0.12
+
+A match is billed based on PDL's response. In the rare case where a record matches but the write back to Twenty fails afterward, the match is still counted.
+
+## Setup
+
+Set the **`PDL_API_KEY`** server variable to your People Data Labs API key. This is required for the app to function.

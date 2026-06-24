@@ -9,10 +9,12 @@ import { type ToolRetrievalOptions } from 'src/engine/core-modules/tool-provider
 import { TOOL_PROVIDERS } from 'src/engine/core-modules/tool-provider/constants/tool-providers.token';
 import { compactToolOutput } from 'src/engine/core-modules/tool-provider/output-transforms/compact-tool-output.util';
 import { ToolExecutorService } from 'src/engine/core-modules/tool-provider/services/tool-executor.service';
+import { ToolOutputSpillService } from 'src/engine/core-modules/tool/services/tool-output-spill.service';
 import { type LearnToolsAspect } from 'src/engine/core-modules/tool-provider/tools/learn-tools.tool';
 import { type ToolContext } from 'src/engine/core-modules/tool-provider/types/tool-context.type';
 import { type ToolDescriptor } from 'src/engine/core-modules/tool-provider/types/tool-descriptor.type';
 import { type ToolIndexEntry } from 'src/engine/core-modules/tool-provider/types/tool-index-entry.type';
+import { findSimilarToolNames } from 'src/engine/core-modules/tool-provider/utils/find-similar-tool-names.util';
 import { wrapWithErrorHandler } from 'src/engine/core-modules/tool-provider/utils/tool-error.util';
 import { type ToolOutput } from 'src/engine/core-modules/tool/types/tool-output.type';
 import {
@@ -29,6 +31,7 @@ export class ToolRegistryService {
     @Inject(TOOL_PROVIDERS)
     private readonly providers: ToolProvider[],
     private readonly toolExecutorService: ToolExecutorService,
+    private readonly toolOutputSpillService: ToolOutputSpillService,
   ) {}
 
   async getCatalog(context: ToolProviderContext): Promise<ToolIndexEntry[]> {
@@ -109,11 +112,13 @@ export class ToolRegistryService {
       wrapWithErrorContext?: boolean;
       includeLoadingMessage?: boolean;
       compactOutput?: boolean;
+      spillLargeOutput?: boolean;
     },
   ): ToolSet {
     const toolSet: ToolSet = {};
     const includeLoadingMessage = options?.includeLoadingMessage ?? true;
     const compactOutput = options?.compactOutput ?? false;
+    const spillLargeOutput = options?.spillLargeOutput ?? false;
 
     for (const descriptor of descriptors) {
       const baseSchema = descriptor.inputSchema as Record<string, unknown>;
@@ -134,9 +139,17 @@ export class ToolRegistryService {
           context,
         );
 
-        return compactOutput
+        const compacted = compactOutput
           ? (compactToolOutput(result) as ToolOutput)
           : result;
+
+        return spillLargeOutput
+          ? this.toolOutputSpillService.spillIfTooLarge(
+              compacted,
+              { workspaceId: context.workspaceId },
+              { toolName: descriptor.name },
+            )
+          : compacted;
       };
 
       toolSet[descriptor.name] = {
@@ -172,6 +185,7 @@ export class ToolRegistryService {
     options?: {
       includeLoadingMessage?: boolean;
       compactOutput?: boolean;
+      spillLargeOutput?: boolean;
     },
   ): Promise<ToolSet> {
     const fullContext = this.buildContextFromToolContext(context);
@@ -196,6 +210,7 @@ export class ToolRegistryService {
     return this.hydrateToolSet(descriptors, fullContext, {
       includeLoadingMessage: options?.includeLoadingMessage,
       compactOutput: options?.compactOutput,
+      spillLargeOutput: options?.spillLargeOutput,
     });
   }
 
@@ -241,11 +256,36 @@ export class ToolRegistryService {
     });
   }
 
+  async suggestSimilarToolNames(
+    toolNames: string[],
+    context: ToolContext,
+  ): Promise<Record<string, string[]>> {
+    const fullContext = this.buildContextFromToolContext(context);
+
+    const catalog = await this.getCatalog(fullContext);
+    const candidateToolNames = catalog.map((entry) => entry.name);
+
+    const suggestionsByToolName: Record<string, string[]> = {};
+
+    for (const toolName of toolNames) {
+      const similarToolNames = findSimilarToolNames(
+        toolName,
+        candidateToolNames,
+      );
+
+      if (similarToolNames.length > 0) {
+        suggestionsByToolName[toolName] = similarToolNames;
+      }
+    }
+
+    return suggestionsByToolName;
+  }
+
   async resolveAndExecute(
     toolName: string,
     args: Record<string, unknown> | undefined,
     context: ToolContext,
-    options?: { compactOutput?: boolean },
+    options?: { compactOutput?: boolean; spillLargeOutput?: boolean },
   ): Promise<ToolOutput> {
     try {
       const fullContext = this.buildContextFromToolContext(context);
@@ -254,10 +294,19 @@ export class ToolRegistryService {
       const entry = index.find((indexEntry) => indexEntry.name === toolName);
 
       if (!entry) {
+        const similarToolNames = findSimilarToolNames(
+          toolName,
+          index.map((indexEntry) => indexEntry.name),
+        );
+        const suggestionHint =
+          similarToolNames.length > 0
+            ? ` Did you mean: ${similarToolNames.join(', ')}?`
+            : '';
+
         return {
           success: false,
           message: `Tool "${toolName}" not found`,
-          error: `Tool "${toolName}" not found. Use learn_tools to discover available tools.`,
+          error: `Tool "${toolName}" not found.${suggestionHint} Use learn_tools to discover available tools.`,
         };
       }
 
@@ -267,9 +316,17 @@ export class ToolRegistryService {
         fullContext,
       );
 
-      return options?.compactOutput
+      const compacted = options?.compactOutput
         ? (compactToolOutput(result) as ToolOutput)
         : result;
+
+      return options?.spillLargeOutput
+        ? this.toolOutputSpillService.spillIfTooLarge(
+            compacted,
+            { workspaceId: fullContext.workspaceId },
+            { toolName },
+          )
+        : compacted;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -296,6 +353,7 @@ export class ToolRegistryService {
       wrapWithErrorContext,
       includeLoadingMessage,
       compactOutput,
+      spillLargeOutput,
     } = options;
     const categorySet = categories ? new Set(categories) : undefined;
 
@@ -331,6 +389,7 @@ export class ToolRegistryService {
       wrapWithErrorContext,
       includeLoadingMessage,
       compactOutput,
+      spillLargeOutput,
     });
 
     this.logger.log(
@@ -354,6 +413,7 @@ export class ToolRegistryService {
       authContext: context.authContext,
       userId: context.userId,
       userWorkspaceId: context.userWorkspaceId,
+      threadId: context.threadId,
       onCodeExecutionUpdate: context.onCodeExecutionUpdate,
     };
   }

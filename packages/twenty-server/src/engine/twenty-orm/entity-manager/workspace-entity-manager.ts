@@ -30,6 +30,7 @@ import { FindOptionsUtils } from 'typeorm/find-options/FindOptionsUtils';
 import { EntityPersistExecutor } from 'typeorm/persistence/EntityPersistExecutor';
 import { type QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { PlainObjectToDatabaseEntityTransformer } from 'typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer';
+import { type UpdateOptions } from 'typeorm/repository/UpdateOptions';
 import { type UpsertOptions } from 'typeorm/repository/UpsertOptions';
 import { InstanceChecker } from 'typeorm/util/InstanceChecker';
 
@@ -321,7 +322,7 @@ export class WorkspaceEntityManager extends EntityManager {
       .into(target)
       .values(entities)
       .orUpdate(overwrites, conflictTargets, upsertOptions)
-      .returning(selectedColumns);
+      .returning(options.returning ?? selectedColumns);
 
     return queryBuilder.execute();
   }
@@ -339,6 +340,7 @@ export class WorkspaceEntityManager extends EntityManager {
       | ObjectId[]
       | unknown,
     partialEntity: QueryDeepPartialEntity<Entity>,
+    options?: UpdateOptions,
     permissionOptions?: PermissionOptions,
     selectedColumns: string[] | '*' = '*',
   ): Promise<UpdateResult> {
@@ -371,7 +373,7 @@ export class WorkspaceEntityManager extends EntityManager {
         .update()
         .set(partialEntity)
         .whereInIds(criteria)
-        .returning(selectedColumns)
+        .returning(options?.returning ?? selectedColumns)
         .execute();
     } else {
       return this.createQueryBuilder(
@@ -383,7 +385,7 @@ export class WorkspaceEntityManager extends EntityManager {
         .update()
         .set(partialEntity)
         .where(criteria)
-        .returning(selectedColumns)
+        .returning(options?.returning ?? selectedColumns)
         .execute();
     }
   }
@@ -439,6 +441,7 @@ export class WorkspaceEntityManager extends EntityManager {
       target,
       criteria,
       values,
+      undefined,
       permissionOptions,
       selectedColumns,
     );
@@ -1051,6 +1054,7 @@ export class WorkspaceEntityManager extends EntityManager {
       target,
       criteria,
       values,
+      undefined,
       permissionOptions,
       selectedColumns,
     );

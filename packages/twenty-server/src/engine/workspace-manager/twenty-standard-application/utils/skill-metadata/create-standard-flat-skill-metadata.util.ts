@@ -25,11 +25,12 @@ You help users create and manage automation workflows.
 - Create workflows from scratch
 - Modify existing workflows (add, remove, update steps)
 - Explain workflow structure and suggest improvements
+- Troubleshoot workflow runs (inspect status, failed steps, and execution logs)
 
 ## Key Concepts
 
 - **Triggers**: DATABASE_EVENT, MANUAL, CRON, WEBHOOK
-- **Steps**: CREATE_RECORD, SEND_EMAIL, CODE, LOGIC_FUNCTION, etc.
+- **Steps**: CREATE_RECORD, SEND_EMAIL, CODE, LOGIC_FUNCTION, PICK_RECORD, etc.
 - **Data flow**: Use {{stepId.fieldName}} to reference previous step outputs
 - **Relationships**: Use nested objects like {"company": {"id": "{{reference}}"}}
 
@@ -67,12 +68,42 @@ LOGIC_FUNCTION steps execute logic functions provided by installed applications.
    { "stepType": "LOGIC_FUNCTION", "workflowVersionId": "<version-id>", "defaultSettings": { "input": { "logicFunctionId": "<logic-function-id>" } } }
 3. Or when using \`create_complete_workflow\`, include a step with type "LOGIC_FUNCTION" and settings.input.logicFunctionId.
 
+## Troubleshooting Workflow Runs
+
+When a user reports a failing or misbehaving workflow, diagnose it with two read-only tools:
+
+- \`list_workflow_runs\`: lists runs (optional \`workflowId\`, optional \`status\`, optional \`limit\`), most recent first. Each result carries \`id\`, \`name\`, \`status\`, run-level \`error\`, \`startedAt\`, \`endedAt\`, \`workflowId\`, and \`workflowVersionId\`.
+- \`get_workflow_run\`: returns full details for one run (\`workflowRunId\`) — overall status, run-level error, every step's status/error, and the execution logs of the steps that failed.
+
+### Resolving the run when no id is given
+
+For requests like "fix my latest failed workflow" where no run or workflow id is provided, call \`list_workflow_runs\` with \`status\` "FAILED" and NO \`workflowId\` — this returns the most recent failed run across all workflows, and each result already carries \`workflowId\`, \`workflowVersionId\`, and a human-readable \`name\`, so you never need an id from the user. If the user names a specific workflow, resolve its \`workflowId\` first and pass it as a filter.
+
+### Flow
+
+1. Identify the run via \`list_workflow_runs\` (use \`limit\` 5 when no \`workflowId\` so you can detect multiple failing workflows).
+2. If results span multiple \`workflowId\`s, disambiguate by name with the user before editing anything.
+3. Call \`get_workflow_run\` on the chosen run id to read the failed step(s) and their error/logs.
+4. Map back to the workflow definition via \`get_workflow_current_version(workflowId)\`, then propose or apply a fix.
+## PICK_RECORD Steps
+
+PICK_RECORD selects one record from a candidate pool (settings.input.recordIds) and outputs it for later steps to reference — useful for assignment workflows like picking an owner. Set settings.input.strategy to RANDOM, ROUND_ROBIN, or LOAD_BALANCED; LOAD_BALANCED also needs settings.input.loadBalance.{objectNameSingular, fieldName} to pick the candidate with the fewest related records.
+
 ## Critical Notes
 
 Always rely on tool schema definitions:
 - The workflow creation tool provides comprehensive schemas with examples
 - Follow schema definitions exactly for field names, types, and structures
 - Schema includes validation rules and common patterns
+
+## Validation Strategy
+
+Build steps fully configured up front so the workflow is correct on the first try. Mutation tools (\`create_complete_workflow\`, \`update_workflow_version_step\`) return a compact validation summary (error codes, messages, suggestions) — fix any reported errors.
+
+Do NOT call \`validate_workflow\` after every change:
+- When making several step edits in a row, pass \`validate: false\` to \`update_workflow_version_step\` to skip per-edit validation.
+- Call \`validate_workflow\` exactly ONCE at the end, before activating. It returns the full report including warnings and available variable paths.
+
 
 ## Approach
 
@@ -276,38 +307,6 @@ Also create additional views for the standard objects (People, Companies, Opport
 Navigate to each view after creating it. Wait 3 seconds.
 
 Loop STEP 8 for all the custom objects
-
-STEP 9: Create a multi-tab dashboard that tells the full story of the business.
-
-Use create_complete_dashboard to create the first tab, then add_dashboard_tab + add_dashboard_widget for subsequent tabs.
-
-**Structure: 3 tabs**
-
-Tab 1 — "Overview": high-level KPIs and charts across the whole workspace
-- Row 0: 3–4 AGGREGATE_CHART widgets (KPIs) — one per key metric (e.g. total revenue from Opportunities, count of active People, count of open deals). columnSpan 3–4, rowSpan 3.
-- Row 3: 1–2 BAR_CHART or LINE_CHART widgets showing trends over time (group by a DATE_TIME field with MONTH granularity). columnSpan 6, rowSpan 7.
-- Row 3: 1 PIE_CHART showing distribution by a SELECT field (e.g. status, type). columnSpan 6, rowSpan 7.
-- Row 10: 1 STANDALONE_RICH_TEXT widget summarising the dashboard story. columnSpan 12, rowSpan 3.
-
-Tab 2 — "[Domain object] pipeline" (e.g. "Deals", "Applications", "Repairs"): focus on Opportunities enriched with domain data
-- Before adding the RECORD_TABLE widget, run this 3-step sequence:
-  1. create_view (type TABLE, name e.g. "Active Deals") → get the new viewId
-  2. create_many_view_fields on the new viewId — add 4–6 key fields (name, the new stage/status SELECT, a CURRENCY/NUMERIC field, a DATE field, linked Person or Company). Use positions 0, 1, 2… and isVisible: true.
-  3. create_many_view_filters + create_view_sort — e.g. filter out CLOSED/LOST records (SELECT IS_NOT "CLOSED"), sort by value DESC
-- Row 0: 1 RECORD_TABLE widget. Set objectMetadataId to Opportunity, configuration.viewId to the dedicated view. columnSpan 12, rowSpan 8.
-- Row 8: 1 BAR_CHART grouped by the stage SELECT field. columnSpan 6, rowSpan 7.
-- Row 8: 1 PIE_CHART or AGGREGATE_CHART on the CURRENCY field. columnSpan 6, rowSpan 7.
-
-Tab 3 — "[Domain people role] list" (e.g. "Clients", "Candidates", "Contacts"): focus on People enriched with domain data
-- Before adding the RECORD_TABLE widget, run this 3-step sequence:
-  1. create_view (type TABLE, name e.g. "All Clients") → get the new viewId
-  2. create_many_view_fields — add 4–5 key fields (name, email, the new SELECT/status field, a DATE field, linked Company)
-  3. create_view_sort — sort by createdAt DESC or by name ASC
-- Row 0: 1 RECORD_TABLE widget with the dedicated view. columnSpan 12, rowSpan 8.
-- Row 8: 2–3 AGGREGATE_CHART KPIs (count, totals). columnSpan 4, rowSpan 3.
-- Row 11: 1 BAR_CHART or LINE_CHART. columnSpan 12, rowSpan 7.
-
-After creating the dashboard, navigate to the dashboard page.
 `,
         isCustom: false,
       },
@@ -437,6 +436,10 @@ After creating a tab, use its returned tabId as pageLayoutTabId when calling add
 - When modifying a chart, confirm whether the user wants to change settings or change chart type
 - Use RECORD_TABLE widgets to give users direct access to filtered record lists without leaving the dashboard`,
         isCustom: false,
+        // Dashboard tools are temporarily disabled in AI chat / MCP because the
+        // generated dashboards are not reliable yet. Keeping the skill defined
+        // (inactive) so it can be re-enabled once the tooling is trustworthy.
+        isActive: false,
       },
     }),
 
