@@ -125,15 +125,19 @@ are **disabled at the Actions level** (`gh workflow disable …`) rather than in
 code — a disabled workflow is keyed by path, so the disable survives upstream
 syncs without a per-sync code edit.
 
-- **Preview Environment Dispatch** + **PR Review Dispatch** — disabled (they
-  dispatch to `twentyhq/ci-privileged`). No PR-preview env on the fork (see below).
-- Other `…-dispatch` workflows (PR Review, Visual Regression, Website Preview,
-  app-prod-parity) are also twentyhq-privileged; disable them too if/when they
-  start showing red on a fork PR (they're mostly path-gated and often don't fire).
-- **CI Utils / danger-js** is left ENABLED — it's a useful PR-hygiene check on
-  normal PRs. It will *time out* (5-min job cap) on a huge upstream-sync PR
-  because the diff is enormous; that red is a one-off artifact of the sync size,
-  is non-blocking (`main` is unprotected), and clears on normal PRs.
+Disabled on the fork (2026-06-24) — all target twentyhq infra/secrets the fork
+lacks: **Preview Environment Dispatch, PR Review Dispatch, CD deploy main, CD
+deploy tag, App Prod-Parity E2E Dispatch, Visual Regression Dispatch, Website
+Preview Dispatch, Post CI Comments, Auto-Draft External PRs, all six Crowdin
+translation syncs, Release: create, AI Catalog Sync, Blocked Contributors Check.**
+After each sync, re-check `gh workflow list` and disable any newly-(re)enabled
+upstream-only workflow that shows red.
+
+Also disabled: **Claude Code Review** (auto PR review). Kept ENABLED: **Build
+Railway image** (the fork's deploy), **Claude Code** (the `@claude` assistant,
+member-gated), and the CI validation suite (**CI Server/Front/Shared/UI/SDK/…**). **CI Utils / danger-js** stays enabled (useful PR-hygiene) but
+*times out* (5-min cap) on a huge sync PR — that red is a one-off, non-blocking
+(`main` is unprotected), and clears on normal PRs.
 
 ### PR previews — none for now (deliberate)
 
