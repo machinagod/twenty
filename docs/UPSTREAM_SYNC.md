@@ -6,21 +6,26 @@ This fork (`origin` = `git@github.com:machinagod/twenty.git`) tracks upstream
 
 ## Mental model
 
-The fork is **`upstream/main` + N custom commits**, nothing more. We never merge
-upstream into a long-lived fork branch (that accumulates noise and makes the
-custom surface impossible to read). Instead we **replay our custom commits on top
-of a fresh `upstream/main`** each sync, so `git log upstream/main..main` always
-shows exactly — and only — what we add.
+The fork is **the latest stable upstream release tag + N custom commits**, nothing
+more. We track **release tags** (`twenty/vX.Y.Z`), NOT `main` — releases are
+tested with predictable migrations; `main` is bleeding-edge. We never merge
+upstream into a long-lived fork branch (that accumulates noise and hides the
+custom surface). Instead we **replay our custom commits on top of a fresh release
+tag** each sync, so `git log <tag>..main` shows exactly — and only — what we add.
+
+Find the latest stable (non-prerelease) tag:
+`gh api repos/twentyhq/twenty/releases/latest --jq .tag_name`.
 
 ## The custom surface (what makes this fork the fork)
 
-As of the 2026-06-24 sync (`upstream/main` @ `269c8ef400`, 427 commits replayed):
+As of the 2026-06-24 sync (release tag **`twenty/v2.14.0`** @ `09694b2f`):
 
 | Theme | Commits | Notes |
 |-------|---------|-------|
 | **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) | The conflict risk. Hooks into `twenty-orm` query builders (`workspace-{select,update,delete,soft-delete}-query-builder.ts`), `workspace-entity-manager.ts`, `global-workspace-orm.manager.ts`, `orm-workspace-context.storage.ts`, `config-variables.ts`. Mostly self-contained new files under `record-scoping/`. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
-| **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. |
+| **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job redeploys the Railway services (needs `RAILWAY_TOKEN`). |
+| **record-scoping CI** | `ci-record-scoping.yaml` | Dedicated gate — runs the record-scoping unit + integration tests (Postgres/Redis/ClickHouse services) on PRs touching `twenty-orm` and on push to `main`. Catches a silent ORM-chokepoint regression. |
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
 custom commit until upstream shipped the same fix; at the 2026-06-24 sync it
@@ -30,27 +35,26 @@ of ours, drop it and delete its row here.
 ## Procedure
 
 ```bash
-# 0. From the worktree, clean tree. Fetch both remotes.
-git fetch upstream --tags
-git fetch origin
+# 0. Clean tree. Fetch upstream tags + origin.
+git fetch upstream --tags && git fetch origin
 
-# 1. Record the current custom surface BEFORE rebasing (SHAs change after).
-git log --oneline upstream/main..origin/main   # <- the commits to replay
+# 1. Resolve the latest stable release tag, and PREV_TAG = the tag current main
+#    was built on (from this doc's "as of" line).
+TAG=$(gh api repos/twentyhq/twenty/releases/latest --jq .tag_name)   # e.g. twenty/v2.14.0
+echo "$TAG"
 
-# 2. New branch off fresh upstream.
-git switch -c chore/upstream-update upstream/main
+# 2. Record the current custom surface BEFORE rebasing (SHAs change after).
+git log --oneline <PREV_TAG>..origin/main   # <- the commits to replay
 
-# 3. Replay our custom commits (cherry-pick the range, oldest-first).
-#    Use the SHAs from step 1. Resolve conflicts (record-scoping is the one
-#    that can drift — verify its ORM hook points still exist upstream).
-git cherry-pick <oldest>^..<newest>
-
-#    If a commit is now redundant (upstream shipped it): resolve to upstream's
-#    version, then `git cherry-pick --skip` (an empty cherry-pick won't commit).
-#    Delete that commit's row from the table above.
+# 3. Branch off the new tag and replay our customs onto it (rebase the existing
+#    custom range). Resolve conflicts (record-scoping can drift — verify its ORM
+#    hook points still exist). Drop any commit upstream has since shipped, and
+#    `git rm` upstream's claude.yml if the new tag reintroduces it.
+git switch -c chore/sync-$TAG "$TAG"
+git rebase --onto "$TAG" <PREV_TAG> <custom-tip>
 
 # 4. Verify the surface is exactly our custom commits, nothing else.
-git log --oneline upstream/main..HEAD
+git log --oneline "$TAG"..HEAD
 
 # 5. Green it on the branch (deps drift hard — yarn.lock is usually rewritten).
 corepack yarn install
