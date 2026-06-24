@@ -1,9 +1,15 @@
 name: Build Railway image
 
-# Builds the production `twenty` target (server + frontend) from our branch and
-# pushes it to GHCR so Railway can deploy it. Upstream's CD only dispatches to
-# twentyhq/twenty-infra, so this fork needs its own image build. Manual trigger
-# keeps rebuilds controlled (Railway redeploys when we repoint it at the new tag).
+# Builds the production `twenty` target (server + frontend) from our branch,
+# pushes it to GHCR, then redeploys the Railway services so the new image
+# actually goes live. Upstream's CD only dispatches to twentyhq/twenty-infra, so
+# this fork needs its own build+deploy. Manual trigger (workflow_dispatch) keeps
+# the gate: each upstream sync runs 100s of migrations on prod, so a human picks
+# the maintenance window by dispatching this — it is NOT auto-run on push to main.
+#
+# Requires repo secret RAILWAY_TOKEN: a Railway *project token* (Project Settings
+# -> Tokens) scoped to twenty-crm / production. The deploy job is skipped if the
+# secret is absent, so the build still works without it.
 
 on:
   workflow_dispatch:
@@ -63,3 +69,36 @@ jobs:
             APP_VERSION=${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Redeploys the prod services so they pull the freshly-pushed :main image.
+    # Twenty runs DB migrations on server boot — this is where the upstream
+    # migrations actually apply to prod. Skips cleanly if RAILWAY_TOKEN is unset
+    # (the build above still produces the image either way).
+    steps:
+      - name: Gate on RAILWAY_TOKEN
+        id: gate
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          if [ -z "${RAILWAY_TOKEN:-}" ]; then
+            echo "::warning::RAILWAY_TOKEN not set — image built but Railway redeploy skipped. Add the secret (Railway project token) to enable the deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Railway CLI
+        if: steps.gate.outputs.skip != 'true'
+        run: npm i -g @railway/cli
+
+      - name: Redeploy server + worker
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          # Project token is scoped to twenty-crm / production, so the CLI needs
+          # no link/login and resolves services by name within that environment.
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway redeploy --service "Twenty" --yes
+          railway redeploy --service "Twenty Worker" --yes
