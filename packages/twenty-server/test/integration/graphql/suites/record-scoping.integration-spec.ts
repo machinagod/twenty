@@ -23,6 +23,9 @@ import { WORKSPACE_MEMBER_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev
 //      so a regression here can't be masked as "everything is hidden"),
 //   3. UPDATEs are filtered too — out-of-scope writes fail closed, in-scope
 //      writes go through.
+//   4. member-relative scoping (ownerId = me) works on the `opportunity` object —
+//      this mirrors the exact rule shape running in production, so the test
+//      guards the real mechanism, not just a static-value stand-in.
 // This is the regression net that survives upstream syncs: if a future upstream
 // refactor of the query builders drops the applyRecordScoping() call, this fails.
 const ROLE_LABEL = 'Record Scoping Test Role';
@@ -31,11 +34,25 @@ const COMPANY_GQL_FIELDS = `
   name
   employees
 `;
+const OPPORTUNITY_GQL_FIELDS = `
+  id
+  name
+  ownerId
+`;
 
 describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   const inScopeCompanyId = randomUUID();
   const outOfScopeCompanyId = randomUUID();
   const testCompanyIds = [inScopeCompanyId, outOfScopeCompanyId];
+
+  // The scoped member (JONY) owns one opportunity; another member (PHIL) owns the
+  // other. The member-relative rule (ownerId = me) must hide PHIL's from JONY.
+  const ownedByScopedMemberOpportunityId = randomUUID();
+  const ownedByOtherMemberOpportunityId = randomUUID();
+  const testOpportunityIds = [
+    ownedByScopedMemberOpportunityId,
+    ownedByOtherMemberOpportunityId,
+  ];
 
   let customRoleId: string;
   let originalMemberRoleId: string;
@@ -52,10 +69,29 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       token,
     );
 
-  const namesFromResponse = (response: {
+  const findTestOpportunitiesAs = (token: string) =>
+    makeGraphqlAPIRequest(
+      findManyOperationFactory({
+        objectMetadataSingularName: 'opportunity',
+        objectMetadataPluralName: 'opportunities',
+        gqlFields: OPPORTUNITY_GQL_FIELDS,
+        filter: { id: { in: testOpportunityIds } },
+        first: 10,
+      }),
+      token,
+    );
+
+  const namesFromCompaniesResponse = (response: {
     body: { data: { companies: { edges: { node: { name: string } }[] } } };
   }) =>
     response.body.data.companies.edges
+      .map((edge) => edge.node.name)
+      .sort((a, b) => a.localeCompare(b));
+
+  const namesFromOpportunitiesResponse = (response: {
+    body: { data: { opportunities: { edges: { node: { name: string } }[] } } };
+  }) =>
+    response.body.data.opportunities.edges
       .map((edge) => edge.node.name)
       .sort((a, b) => a.localeCompare(b));
 
@@ -118,6 +154,30 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
         },
       }),
     );
+
+    await makeGraphqlAPIRequest(
+      createOneOperationFactory({
+        objectMetadataSingularName: 'opportunity',
+        gqlFields: OPPORTUNITY_GQL_FIELDS,
+        data: {
+          id: ownedByScopedMemberOpportunityId,
+          name: 'RecordScoping Owned By Scoped Member',
+          ownerId: WORKSPACE_MEMBER_DATA_SEED_IDS.JONY,
+        },
+      }),
+    );
+
+    await makeGraphqlAPIRequest(
+      createOneOperationFactory({
+        objectMetadataSingularName: 'opportunity',
+        gqlFields: OPPORTUNITY_GQL_FIELDS,
+        data: {
+          id: ownedByOtherMemberOpportunityId,
+          name: 'RecordScoping Owned By Other Member',
+          ownerId: WORKSPACE_MEMBER_DATA_SEED_IDS.PHIL,
+        },
+      }),
+    );
   });
 
   afterAll(async () => {
@@ -139,6 +199,16 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       );
     }
 
+    for (const id of testOpportunityIds) {
+      await makeGraphqlAPIRequest(
+        destroyOneOperationFactory({
+          objectMetadataSingularName: 'opportunity',
+          gqlFields: 'id',
+          recordId: id,
+        }),
+      );
+    }
+
     if (customRoleId) {
       await deleteOneRole({
         expectToFail: false,
@@ -151,14 +221,16 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     const response = await findTestCompaniesAs(APPLE_JONY_MEMBER_ACCESS_TOKEN);
 
     expect(response.body.errors).toBeUndefined();
-    expect(namesFromResponse(response)).toEqual(['RecordScoping In Scope Co']);
+    expect(namesFromCompaniesResponse(response)).toEqual([
+      'RecordScoping In Scope Co',
+    ]);
   });
 
   it('leaves an unscoped role (admin) able to read every record', async () => {
     const response = await findTestCompaniesAs(APPLE_JANE_ADMIN_ACCESS_TOKEN);
 
     expect(response.body.errors).toBeUndefined();
-    expect(namesFromResponse(response)).toEqual([
+    expect(namesFromCompaniesResponse(response)).toEqual([
       'RecordScoping In Scope Co',
       'RecordScoping Out Of Scope Co',
     ]);
@@ -200,5 +272,28 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     expect(response.body.data.updateCompany.name).toBe(
       'RecordScoping In Scope Co (edited)',
     );
+  });
+
+  it('applies member-relative scoping (ownerId = me) for the scoped role', async () => {
+    const response = await findTestOpportunitiesAs(
+      APPLE_JONY_MEMBER_ACCESS_TOKEN,
+    );
+
+    expect(response.body.errors).toBeUndefined();
+    expect(namesFromOpportunitiesResponse(response)).toEqual([
+      'RecordScoping Owned By Scoped Member',
+    ]);
+  });
+
+  it('leaves an unscoped role (admin) able to read opportunities of any owner', async () => {
+    const response = await findTestOpportunitiesAs(
+      APPLE_JANE_ADMIN_ACCESS_TOKEN,
+    );
+
+    expect(response.body.errors).toBeUndefined();
+    expect(namesFromOpportunitiesResponse(response)).toEqual([
+      'RecordScoping Owned By Other Member',
+      'RecordScoping Owned By Scoped Member',
+    ]);
   });
 });
