@@ -24,7 +24,13 @@ const StyledTimelineItemContainer = styled.div`
   color: ${themeCssVariables.font.color.primary};
   display: flex;
   gap: ${themeCssVariables.spacing[4]};
-  height: 'auto';
+  height: auto;
+  /* Skip style/layout for off-screen timeline rows. Rows are variable height, so
+     contain-intrinsic-size uses the 'auto' keyword (browser remembers the real
+     size after first render) with a small initial estimate. Cuts style-recalc +
+     forced-reflow on long activity feeds. (#5) */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 40px;
   justify-content: space-between;
   overflow: hidden;
   white-space: nowrap;
