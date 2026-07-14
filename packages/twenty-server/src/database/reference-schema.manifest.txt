@@ -1,0 +1,833 @@
+_typeorm_generated_columns_and_materialized_views|database|character varying
+_typeorm_generated_columns_and_materialized_views|name|character varying
+_typeorm_generated_columns_and_materialized_views|schema|character varying
+_typeorm_generated_columns_and_materialized_views|table|character varying
+_typeorm_generated_columns_and_materialized_views|type|character varying
+_typeorm_generated_columns_and_materialized_views|value|text
+_typeorm_migrations|id|integer
+_typeorm_migrations|name|character varying
+_typeorm_migrations|timestamp|bigint
+agent|applicationId|uuid
+agent|createdAt|timestamp with time zone
+agent|deletedAt|timestamp with time zone
+agent|description|text
+agent|evaluationInputs|ARRAY
+agent|icon|character varying
+agent|id|uuid
+agent|isCustom|boolean
+agent|label|character varying
+agent|modelConfiguration|jsonb
+agent|modelId|character varying
+agent|name|character varying
+agent|prompt|text
+agent|responseFormat|jsonb
+agent|universalIdentifier|uuid
+agent|updatedAt|timestamp with time zone
+agent|workspaceId|uuid
+agentChatThread|activeStreamId|character varying
+agentChatThread|contextWindowTokens|integer
+agentChatThread|conversationSize|integer
+agentChatThread|createdAt|timestamp with time zone
+agentChatThread|deletedAt|timestamp with time zone
+agentChatThread|id|uuid
+agentChatThread|title|character varying
+agentChatThread|totalCacheCreationTokens|bigint
+agentChatThread|totalCacheReadTokens|bigint
+agentChatThread|totalInputCredits|bigint
+agentChatThread|totalInputTokens|integer
+agentChatThread|totalOutputCredits|bigint
+agentChatThread|totalOutputTokens|integer
+agentChatThread|updatedAt|timestamp with time zone
+agentChatThread|userWorkspaceId|uuid
+agentChatThread|workspaceId|uuid
+agentMessage|agentId|uuid
+agentMessage|createdAt|timestamp with time zone
+agentMessage|id|uuid
+agentMessage|processedAt|timestamp with time zone
+agentMessage|role|USER-DEFINED
+agentMessage|status|USER-DEFINED
+agentMessage|threadId|uuid
+agentMessage|turnId|uuid
+agentMessage|workspaceId|uuid
+agentMessagePart|createdAt|timestamp with time zone
+agentMessagePart|errorDetails|jsonb
+agentMessagePart|errorMessage|text
+agentMessagePart|fileFilename|character varying
+agentMessagePart|fileId|uuid
+agentMessagePart|id|uuid
+agentMessagePart|messageId|uuid
+agentMessagePart|orderIndex|integer
+agentMessagePart|providerExecuted|boolean
+agentMessagePart|providerMetadata|jsonb
+agentMessagePart|reasoningContent|text
+agentMessagePart|sourceDocumentFilename|character varying
+agentMessagePart|sourceDocumentMediaType|character varying
+agentMessagePart|sourceDocumentSourceId|character varying
+agentMessagePart|sourceDocumentTitle|character varying
+agentMessagePart|sourceUrlSourceId|character varying
+agentMessagePart|sourceUrlTitle|character varying
+agentMessagePart|sourceUrlUrl|character varying
+agentMessagePart|state|character varying
+agentMessagePart|textContent|text
+agentMessagePart|toolCallId|character varying
+agentMessagePart|toolInput|jsonb
+agentMessagePart|toolName|character varying
+agentMessagePart|toolOutput|jsonb
+agentMessagePart|type|character varying
+agentMessagePart|workspaceId|uuid
+agentTurn|agentId|uuid
+agentTurn|createdAt|timestamp with time zone
+agentTurn|id|uuid
+agentTurn|threadId|uuid
+agentTurn|workspaceId|uuid
+agentTurnEvaluation|comment|text
+agentTurnEvaluation|createdAt|timestamp with time zone
+agentTurnEvaluation|id|uuid
+agentTurnEvaluation|score|integer
+agentTurnEvaluation|turnId|uuid
+agentTurnEvaluation|workspaceId|uuid
+apiKey|createdAt|timestamp with time zone
+apiKey|expiresAt|timestamp with time zone
+apiKey|id|uuid
+apiKey|name|character varying
+apiKey|revokedAt|timestamp with time zone
+apiKey|updatedAt|timestamp with time zone
+apiKey|workspaceId|uuid
+appToken|context|jsonb
+appToken|createdAt|timestamp with time zone
+appToken|deletedAt|timestamp with time zone
+appToken|expiresAt|timestamp with time zone
+appToken|id|uuid
+appToken|revokedAt|timestamp with time zone
+appToken|type|text
+appToken|updatedAt|timestamp with time zone
+appToken|userId|uuid
+appToken|value|text
+appToken|workspaceId|uuid
+application|applicationRegistrationId|uuid
+application|availablePackages|jsonb
+application|canBeUninstalled|boolean
+application|createdAt|timestamp with time zone
+application|defaultRoleId|uuid
+application|deletedAt|timestamp with time zone
+application|description|text
+application|id|uuid
+application|isSdkLayerStale|boolean
+application|logicFunctionLayerId|uuid
+application|logo|text
+application|name|text
+application|packageJsonChecksum|text
+application|packageJsonFileId|uuid
+application|settingsCustomTabFrontComponentId|uuid
+application|sourcePath|text
+application|sourceType|text
+application|universalIdentifier|uuid
+application|updatedAt|timestamp with time zone
+application|version|text
+application|workspaceId|uuid
+application|yarnLockChecksum|text
+application|yarnLockFileId|uuid
+applicationRegistration|createdAt|timestamp with time zone
+applicationRegistration|createdByUserId|uuid
+applicationRegistration|deletedAt|timestamp with time zone
+applicationRegistration|id|uuid
+applicationRegistration|isFeatured|boolean
+applicationRegistration|isListed|boolean
+applicationRegistration|isPreInstalled|boolean
+applicationRegistration|latestAvailableVersion|text
+applicationRegistration|manifest|jsonb
+applicationRegistration|name|text
+applicationRegistration|oAuthClientId|text
+applicationRegistration|oAuthClientSecretHash|text
+applicationRegistration|oAuthRedirectUris|ARRAY
+applicationRegistration|oAuthScopes|ARRAY
+applicationRegistration|sourcePackage|text
+applicationRegistration|sourceType|text
+applicationRegistration|tarballFileId|uuid
+applicationRegistration|universalIdentifier|uuid
+applicationRegistration|updatedAt|timestamp with time zone
+applicationRegistration|workspaceId|uuid
+applicationRegistrationVariable|applicationRegistrationId|uuid
+applicationRegistrationVariable|createdAt|timestamp with time zone
+applicationRegistrationVariable|description|text
+applicationRegistrationVariable|encryptedValue|text
+applicationRegistrationVariable|id|uuid
+applicationRegistrationVariable|isRequired|boolean
+applicationRegistrationVariable|isSecret|boolean
+applicationRegistrationVariable|key|text
+applicationRegistrationVariable|updatedAt|timestamp with time zone
+applicationVariable|applicationId|uuid
+applicationVariable|createdAt|timestamp with time zone
+applicationVariable|description|text
+applicationVariable|id|uuid
+applicationVariable|isSecret|boolean
+applicationVariable|key|text
+applicationVariable|universalIdentifier|uuid
+applicationVariable|updatedAt|timestamp with time zone
+applicationVariable|value|text
+applicationVariable|workspaceId|uuid
+approvedAccessDomain|createdAt|timestamp with time zone
+approvedAccessDomain|domain|character varying
+approvedAccessDomain|id|uuid
+approvedAccessDomain|isValidated|boolean
+approvedAccessDomain|updatedAt|timestamp with time zone
+approvedAccessDomain|workspaceId|uuid
+calendarChannel|connectedAccountId|uuid
+calendarChannel|contactAutoCreationPolicy|USER-DEFINED
+calendarChannel|createdAt|timestamp with time zone
+calendarChannel|handle|character varying
+calendarChannel|id|uuid
+calendarChannel|isContactAutoCreationEnabled|boolean
+calendarChannel|isSyncEnabled|boolean
+calendarChannel|syncCursor|character varying
+calendarChannel|syncStage|USER-DEFINED
+calendarChannel|syncStageStartedAt|timestamp with time zone
+calendarChannel|syncStatus|USER-DEFINED
+calendarChannel|syncedAt|timestamp with time zone
+calendarChannel|throttleFailureCount|integer
+calendarChannel|updatedAt|timestamp with time zone
+calendarChannel|visibility|USER-DEFINED
+calendarChannel|workspaceId|uuid
+commandMenuItem|applicationId|uuid
+commandMenuItem|availabilityObjectMetadataId|uuid
+commandMenuItem|availabilityType|USER-DEFINED
+commandMenuItem|conditionalAvailabilityExpression|character varying
+commandMenuItem|createdAt|timestamp with time zone
+commandMenuItem|engineComponentKey|character varying
+commandMenuItem|frontComponentId|uuid
+commandMenuItem|hotKeys|ARRAY
+commandMenuItem|icon|character varying
+commandMenuItem|id|uuid
+commandMenuItem|isPinned|boolean
+commandMenuItem|label|character varying
+commandMenuItem|pageLayoutId|uuid
+commandMenuItem|payload|jsonb
+commandMenuItem|position|double precision
+commandMenuItem|shortLabel|character varying
+commandMenuItem|universalIdentifier|uuid
+commandMenuItem|updatedAt|timestamp with time zone
+commandMenuItem|workflowVersionId|uuid
+commandMenuItem|workspaceId|uuid
+connectedAccount|accessToken|character varying
+connectedAccount|applicationId|uuid
+connectedAccount|authFailedAt|timestamp with time zone
+connectedAccount|connectionParameters|jsonb
+connectedAccount|connectionProviderId|uuid
+connectedAccount|createdAt|timestamp with time zone
+connectedAccount|handle|character varying
+connectedAccount|handleAliases|ARRAY
+connectedAccount|id|uuid
+connectedAccount|lastCredentialsRefreshedAt|timestamp with time zone
+connectedAccount|lastSignedInAt|timestamp with time zone
+connectedAccount|name|character varying
+connectedAccount|oidcTokenClaims|jsonb
+connectedAccount|provider|character varying
+connectedAccount|refreshToken|character varying
+connectedAccount|scopes|ARRAY
+connectedAccount|updatedAt|timestamp with time zone
+connectedAccount|userWorkspaceId|uuid
+connectedAccount|visibility|character varying
+connectedAccount|workspaceId|uuid
+connectionProvider|applicationId|uuid
+connectionProvider|createdAt|timestamp with time zone
+connectionProvider|displayName|character varying
+connectionProvider|id|uuid
+connectionProvider|name|character varying
+connectionProvider|oauthConfig|jsonb
+connectionProvider|type|character varying
+connectionProvider|universalIdentifier|uuid
+connectionProvider|updatedAt|timestamp with time zone
+connectionProvider|workspaceId|uuid
+dataSource|createdAt|timestamp with time zone
+dataSource|id|uuid
+dataSource|isRemote|boolean
+dataSource|label|character varying
+dataSource|schema|character varying
+dataSource|type|USER-DEFINED
+dataSource|updatedAt|timestamp with time zone
+dataSource|url|character varying
+dataSource|workspaceId|uuid
+emailingDomain|createdAt|timestamp with time zone
+emailingDomain|domain|character varying
+emailingDomain|driver|USER-DEFINED
+emailingDomain|id|uuid
+emailingDomain|status|USER-DEFINED
+emailingDomain|tenantStatus|USER-DEFINED
+emailingDomain|updatedAt|timestamp with time zone
+emailingDomain|verificationRecords|jsonb
+emailingDomain|verifiedAt|timestamp with time zone
+emailingDomain|workspaceId|uuid
+featureFlag|createdAt|timestamp with time zone
+featureFlag|id|uuid
+featureFlag|key|text
+featureFlag|updatedAt|timestamp with time zone
+featureFlag|value|boolean
+featureFlag|workspaceId|uuid
+fieldMetadata|applicationId|uuid
+fieldMetadata|createdAt|timestamp with time zone
+fieldMetadata|defaultValue|jsonb
+fieldMetadata|description|text
+fieldMetadata|icon|character varying
+fieldMetadata|id|uuid
+fieldMetadata|isActive|boolean
+fieldMetadata|isCustom|boolean
+fieldMetadata|isLabelSyncedWithName|boolean
+fieldMetadata|isNullable|boolean
+fieldMetadata|isSystem|boolean
+fieldMetadata|isUIReadOnly|boolean
+fieldMetadata|label|character varying
+fieldMetadata|morphId|uuid
+fieldMetadata|name|character varying
+fieldMetadata|objectMetadataId|uuid
+fieldMetadata|options|jsonb
+fieldMetadata|relationTargetFieldMetadataId|uuid
+fieldMetadata|relationTargetObjectMetadataId|uuid
+fieldMetadata|settings|jsonb
+fieldMetadata|standardOverrides|jsonb
+fieldMetadata|type|character varying
+fieldMetadata|universalIdentifier|uuid
+fieldMetadata|updatedAt|timestamp with time zone
+fieldMetadata|workspaceId|uuid
+fieldPermission|applicationId|uuid
+fieldPermission|canReadFieldValue|boolean
+fieldPermission|canUpdateFieldValue|boolean
+fieldPermission|createdAt|timestamp with time zone
+fieldPermission|fieldMetadataId|uuid
+fieldPermission|id|uuid
+fieldPermission|objectMetadataId|uuid
+fieldPermission|roleId|uuid
+fieldPermission|universalIdentifier|uuid
+fieldPermission|updatedAt|timestamp with time zone
+fieldPermission|workspaceId|uuid
+file|applicationId|uuid
+file|createdAt|timestamp with time zone
+file|deletedAt|timestamp with time zone
+file|id|uuid
+file|isStaticAsset|boolean
+file|mimeType|character varying
+file|path|character varying
+file|settings|jsonb
+file|size|bigint
+file|updatedAt|timestamp with time zone
+file|workspaceId|uuid
+frontComponent|applicationId|uuid
+frontComponent|builtComponentChecksum|character varying
+frontComponent|builtComponentPath|character varying
+frontComponent|componentName|character varying
+frontComponent|createdAt|timestamp with time zone
+frontComponent|description|character varying
+frontComponent|id|uuid
+frontComponent|isHeadless|boolean
+frontComponent|name|character varying
+frontComponent|sourceComponentPath|character varying
+frontComponent|universalIdentifier|uuid
+frontComponent|updatedAt|timestamp with time zone
+frontComponent|usesSdkClient|boolean
+frontComponent|workspaceId|uuid
+indexFieldMetadata|createdAt|timestamp with time zone
+indexFieldMetadata|fieldMetadataId|uuid
+indexFieldMetadata|id|uuid
+indexFieldMetadata|indexMetadataId|uuid
+indexFieldMetadata|order|integer
+indexFieldMetadata|subFieldName|text
+indexFieldMetadata|updatedAt|timestamp with time zone
+indexFieldMetadata|workspaceId|uuid
+indexMetadata|applicationId|uuid
+indexMetadata|createdAt|timestamp with time zone
+indexMetadata|id|uuid
+indexMetadata|indexType|USER-DEFINED
+indexMetadata|indexWhereClause|text
+indexMetadata|isCustom|boolean
+indexMetadata|isUnique|boolean
+indexMetadata|name|character varying
+indexMetadata|objectMetadataId|uuid
+indexMetadata|universalIdentifier|uuid
+indexMetadata|updatedAt|timestamp with time zone
+indexMetadata|workspaceId|uuid
+keyValuePair|createdAt|timestamp with time zone
+keyValuePair|deletedAt|timestamp with time zone
+keyValuePair|id|uuid
+keyValuePair|key|text
+keyValuePair|textValueDeprecated|text
+keyValuePair|type|USER-DEFINED
+keyValuePair|updatedAt|timestamp with time zone
+keyValuePair|userId|uuid
+keyValuePair|value|jsonb
+keyValuePair|workspaceId|uuid
+logicFunction|applicationId|uuid
+logicFunction|builtHandlerPath|character varying
+logicFunction|checksum|text
+logicFunction|createdAt|timestamp with time zone
+logicFunction|cronTriggerSettings|jsonb
+logicFunction|databaseEventTriggerSettings|jsonb
+logicFunction|deletedAt|timestamp with time zone
+logicFunction|description|character varying
+logicFunction|executionMode|USER-DEFINED
+logicFunction|handlerName|character varying
+logicFunction|httpRouteTriggerSettings|jsonb
+logicFunction|id|uuid
+logicFunction|isBuildUpToDate|boolean
+logicFunction|name|character varying
+logicFunction|runtime|character varying
+logicFunction|sourceHandlerPath|character varying
+logicFunction|timeoutSeconds|integer
+logicFunction|toolTriggerSettings|jsonb
+logicFunction|universalIdentifier|uuid
+logicFunction|updatedAt|timestamp with time zone
+logicFunction|workflowActionTriggerSettings|jsonb
+logicFunction|workspaceId|uuid
+logicFunctionLayer|availablePackages|jsonb
+logicFunctionLayer|createdAt|timestamp with time zone
+logicFunctionLayer|id|uuid
+logicFunctionLayer|packageJson|jsonb
+logicFunctionLayer|packageJsonChecksum|text
+logicFunctionLayer|updatedAt|timestamp with time zone
+logicFunctionLayer|workspaceId|uuid
+logicFunctionLayer|yarnLock|text
+logicFunctionLayer|yarnLockChecksum|text
+messageChannel|connectedAccountId|uuid
+messageChannel|contactAutoCreationPolicy|USER-DEFINED
+messageChannel|createdAt|timestamp with time zone
+messageChannel|excludeGroupEmails|boolean
+messageChannel|excludeNonProfessionalEmails|boolean
+messageChannel|handle|character varying
+messageChannel|id|uuid
+messageChannel|isContactAutoCreationEnabled|boolean
+messageChannel|isSyncEnabled|boolean
+messageChannel|messageFolderImportPolicy|USER-DEFINED
+messageChannel|pendingGroupEmailsAction|USER-DEFINED
+messageChannel|syncCursor|character varying
+messageChannel|syncStage|USER-DEFINED
+messageChannel|syncStageStartedAt|timestamp with time zone
+messageChannel|syncStatus|USER-DEFINED
+messageChannel|syncedAt|timestamp with time zone
+messageChannel|throttleFailureCount|integer
+messageChannel|throttleRetryAfter|timestamp with time zone
+messageChannel|type|USER-DEFINED
+messageChannel|updatedAt|timestamp with time zone
+messageChannel|visibility|USER-DEFINED
+messageChannel|workspaceId|uuid
+messageFolder|createdAt|timestamp with time zone
+messageFolder|externalId|character varying
+messageFolder|id|uuid
+messageFolder|isSentFolder|boolean
+messageFolder|isSynced|boolean
+messageFolder|messageChannelId|uuid
+messageFolder|name|character varying
+messageFolder|parentFolderId|character varying
+messageFolder|pendingSyncAction|USER-DEFINED
+messageFolder|syncCursor|character varying
+messageFolder|updatedAt|timestamp with time zone
+messageFolder|workspaceId|uuid
+navigationMenuItem|applicationId|uuid
+navigationMenuItem|color|text
+navigationMenuItem|createdAt|timestamp with time zone
+navigationMenuItem|folderId|uuid
+navigationMenuItem|icon|text
+navigationMenuItem|id|uuid
+navigationMenuItem|link|text
+navigationMenuItem|name|text
+navigationMenuItem|pageLayoutId|uuid
+navigationMenuItem|position|double precision
+navigationMenuItem|targetObjectMetadataId|uuid
+navigationMenuItem|targetRecordId|uuid
+navigationMenuItem|type|USER-DEFINED
+navigationMenuItem|universalIdentifier|uuid
+navigationMenuItem|updatedAt|timestamp with time zone
+navigationMenuItem|userWorkspaceId|uuid
+navigationMenuItem|viewId|uuid
+navigationMenuItem|workspaceId|uuid
+objectMetadata|applicationId|uuid
+objectMetadata|color|text
+objectMetadata|createdAt|timestamp with time zone
+objectMetadata|dataSourceId|uuid
+objectMetadata|description|text
+objectMetadata|duplicateCriteria|jsonb
+objectMetadata|icon|character varying
+objectMetadata|id|uuid
+objectMetadata|imageIdentifierFieldMetadataId|uuid
+objectMetadata|isActive|boolean
+objectMetadata|isAuditLogged|boolean
+objectMetadata|isCustom|boolean
+objectMetadata|isLabelSyncedWithName|boolean
+objectMetadata|isRemote|boolean
+objectMetadata|isSearchable|boolean
+objectMetadata|isSystem|boolean
+objectMetadata|isUIReadOnly|boolean
+objectMetadata|labelIdentifierFieldMetadataId|uuid
+objectMetadata|labelPlural|character varying
+objectMetadata|labelSingular|character varying
+objectMetadata|namePlural|character varying
+objectMetadata|nameSingular|character varying
+objectMetadata|shortcut|character varying
+objectMetadata|standardOverrides|jsonb
+objectMetadata|targetTableName|character varying
+objectMetadata|universalIdentifier|uuid
+objectMetadata|updatedAt|timestamp with time zone
+objectMetadata|workspaceId|uuid
+objectPermission|applicationId|uuid
+objectPermission|canDestroyObjectRecords|boolean
+objectPermission|canReadObjectRecords|boolean
+objectPermission|canSoftDeleteObjectRecords|boolean
+objectPermission|canUpdateObjectRecords|boolean
+objectPermission|createdAt|timestamp with time zone
+objectPermission|id|uuid
+objectPermission|objectMetadataId|uuid
+objectPermission|roleId|uuid
+objectPermission|universalIdentifier|uuid
+objectPermission|updatedAt|timestamp with time zone
+objectPermission|workspaceId|uuid
+pageLayout|applicationId|uuid
+pageLayout|createdAt|timestamp with time zone
+pageLayout|defaultTabToFocusOnMobileAndSidePanelId|uuid
+pageLayout|deletedAt|timestamp with time zone
+pageLayout|id|uuid
+pageLayout|name|character varying
+pageLayout|objectMetadataId|uuid
+pageLayout|type|USER-DEFINED
+pageLayout|universalIdentifier|uuid
+pageLayout|updatedAt|timestamp with time zone
+pageLayout|workspaceId|uuid
+pageLayoutTab|applicationId|uuid
+pageLayoutTab|createdAt|timestamp with time zone
+pageLayoutTab|deletedAt|timestamp with time zone
+pageLayoutTab|icon|character varying
+pageLayoutTab|id|uuid
+pageLayoutTab|isActive|boolean
+pageLayoutTab|layoutMode|USER-DEFINED
+pageLayoutTab|overrides|jsonb
+pageLayoutTab|pageLayoutId|uuid
+pageLayoutTab|position|double precision
+pageLayoutTab|title|character varying
+pageLayoutTab|universalIdentifier|uuid
+pageLayoutTab|updatedAt|timestamp with time zone
+pageLayoutTab|workspaceId|uuid
+pageLayoutWidget|applicationId|uuid
+pageLayoutWidget|conditionalAvailabilityExpression|character varying
+pageLayoutWidget|conditionalDisplay|jsonb
+pageLayoutWidget|configuration|jsonb
+pageLayoutWidget|createdAt|timestamp with time zone
+pageLayoutWidget|deletedAt|timestamp with time zone
+pageLayoutWidget|gridPosition|jsonb
+pageLayoutWidget|id|uuid
+pageLayoutWidget|isActive|boolean
+pageLayoutWidget|objectMetadataId|uuid
+pageLayoutWidget|overrides|jsonb
+pageLayoutWidget|pageLayoutTabId|uuid
+pageLayoutWidget|position|jsonb
+pageLayoutWidget|title|character varying
+pageLayoutWidget|type|USER-DEFINED
+pageLayoutWidget|universalIdentifier|uuid
+pageLayoutWidget|updatedAt|timestamp with time zone
+pageLayoutWidget|workspaceId|uuid
+permissionFlag|applicationId|uuid
+permissionFlag|createdAt|timestamp with time zone
+permissionFlag|description|text
+permissionFlag|icon|character varying
+permissionFlag|id|uuid
+permissionFlag|key|character varying
+permissionFlag|label|character varying
+permissionFlag|permissionType|character varying
+permissionFlag|universalIdentifier|uuid
+permissionFlag|updatedAt|timestamp with time zone
+permissionFlag|workspaceId|uuid
+publicDomain|applicationId|uuid
+publicDomain|createdAt|timestamp with time zone
+publicDomain|domain|character varying
+publicDomain|id|uuid
+publicDomain|isValidated|boolean
+publicDomain|updatedAt|timestamp with time zone
+publicDomain|workspaceId|uuid
+role|applicationId|uuid
+role|canAccessAllTools|boolean
+role|canBeAssignedToAgents|boolean
+role|canBeAssignedToApiKeys|boolean
+role|canBeAssignedToUsers|boolean
+role|canDestroyAllObjectRecords|boolean
+role|canReadAllObjectRecords|boolean
+role|canSoftDeleteAllObjectRecords|boolean
+role|canUpdateAllObjectRecords|boolean
+role|canUpdateAllSettings|boolean
+role|createdAt|timestamp with time zone
+role|description|text
+role|icon|character varying
+role|id|uuid
+role|isEditable|boolean
+role|label|character varying
+role|universalIdentifier|uuid
+role|updatedAt|timestamp with time zone
+role|workspaceId|uuid
+rolePermissionFlag|applicationId|uuid
+rolePermissionFlag|createdAt|timestamp with time zone
+rolePermissionFlag|id|uuid
+rolePermissionFlag|permissionFlagId|uuid
+rolePermissionFlag|roleId|uuid
+rolePermissionFlag|universalIdentifier|uuid
+rolePermissionFlag|updatedAt|timestamp with time zone
+rolePermissionFlag|workspaceId|uuid
+roleTarget|agentId|uuid
+roleTarget|apiKeyId|uuid
+roleTarget|applicationId|uuid
+roleTarget|createdAt|timestamp with time zone
+roleTarget|id|uuid
+roleTarget|roleId|uuid
+roleTarget|universalIdentifier|uuid
+roleTarget|updatedAt|timestamp with time zone
+roleTarget|userWorkspaceId|uuid
+roleTarget|workspaceId|uuid
+rowLevelPermissionPredicate|applicationId|uuid
+rowLevelPermissionPredicate|createdAt|timestamp with time zone
+rowLevelPermissionPredicate|deletedAt|timestamp with time zone
+rowLevelPermissionPredicate|fieldMetadataId|uuid
+rowLevelPermissionPredicate|id|uuid
+rowLevelPermissionPredicate|objectMetadataId|uuid
+rowLevelPermissionPredicate|operand|USER-DEFINED
+rowLevelPermissionPredicate|positionInRowLevelPermissionPredicateGroup|double precision
+rowLevelPermissionPredicate|roleId|uuid
+rowLevelPermissionPredicate|rowLevelPermissionPredicateGroupId|uuid
+rowLevelPermissionPredicate|subFieldName|text
+rowLevelPermissionPredicate|universalIdentifier|uuid
+rowLevelPermissionPredicate|updatedAt|timestamp with time zone
+rowLevelPermissionPredicate|value|jsonb
+rowLevelPermissionPredicate|workspaceId|uuid
+rowLevelPermissionPredicate|workspaceMemberFieldMetadataId|uuid
+rowLevelPermissionPredicate|workspaceMemberSubFieldName|text
+rowLevelPermissionPredicateGroup|applicationId|uuid
+rowLevelPermissionPredicateGroup|createdAt|timestamp with time zone
+rowLevelPermissionPredicateGroup|deletedAt|timestamp with time zone
+rowLevelPermissionPredicateGroup|id|uuid
+rowLevelPermissionPredicateGroup|logicalOperator|USER-DEFINED
+rowLevelPermissionPredicateGroup|objectMetadataId|uuid
+rowLevelPermissionPredicateGroup|parentRowLevelPermissionPredicateGroupId|uuid
+rowLevelPermissionPredicateGroup|positionInRowLevelPermissionPredicateGroup|double precision
+rowLevelPermissionPredicateGroup|roleId|uuid
+rowLevelPermissionPredicateGroup|universalIdentifier|uuid
+rowLevelPermissionPredicateGroup|updatedAt|timestamp with time zone
+rowLevelPermissionPredicateGroup|workspaceId|uuid
+searchFieldMetadata|createdAt|timestamp with time zone
+searchFieldMetadata|fieldMetadataId|uuid
+searchFieldMetadata|id|uuid
+searchFieldMetadata|objectMetadataId|uuid
+searchFieldMetadata|updatedAt|timestamp with time zone
+searchFieldMetadata|workspaceId|uuid
+signingKey|createdAt|timestamp with time zone
+signingKey|id|uuid
+signingKey|isCurrent|boolean
+signingKey|privateKey|character varying
+signingKey|publicKey|character varying
+signingKey|revokedAt|timestamp with time zone
+signingKey|updatedAt|timestamp with time zone
+skill|applicationId|uuid
+skill|content|text
+skill|createdAt|timestamp with time zone
+skill|description|text
+skill|icon|character varying
+skill|id|uuid
+skill|isActive|boolean
+skill|isCustom|boolean
+skill|label|character varying
+skill|name|character varying
+skill|universalIdentifier|uuid
+skill|updatedAt|timestamp with time zone
+skill|workspaceId|uuid
+twoFactorAuthenticationMethod|createdAt|timestamp with time zone
+twoFactorAuthenticationMethod|deletedAt|timestamp with time zone
+twoFactorAuthenticationMethod|id|uuid
+twoFactorAuthenticationMethod|secret|text
+twoFactorAuthenticationMethod|status|USER-DEFINED
+twoFactorAuthenticationMethod|strategy|USER-DEFINED
+twoFactorAuthenticationMethod|updatedAt|timestamp with time zone
+twoFactorAuthenticationMethod|userWorkspaceId|uuid
+twoFactorAuthenticationMethod|workspaceId|uuid
+upgradeMigration|attempt|integer
+upgradeMigration|createdAt|timestamp with time zone
+upgradeMigration|errorMessage|text
+upgradeMigration|executedByVersion|character varying
+upgradeMigration|id|uuid
+upgradeMigration|isInitial|boolean
+upgradeMigration|name|character varying
+upgradeMigration|status|character varying
+upgradeMigration|workspaceId|uuid
+user|canAccessFullAdminPanel|boolean
+user|canImpersonate|boolean
+user|createdAt|timestamp with time zone
+user|deletedAt|timestamp with time zone
+user|disabled|boolean
+user|email|character varying
+user|firstName|character varying
+user|id|uuid
+user|isEmailVerified|boolean
+user|lastName|character varying
+user|locale|character varying
+user|passwordHash|character varying
+user|updatedAt|timestamp with time zone
+userWorkspace|createdAt|timestamp with time zone
+userWorkspace|defaultAvatarUrl|character varying
+userWorkspace|deletedAt|timestamp with time zone
+userWorkspace|id|uuid
+userWorkspace|locale|character varying
+userWorkspace|updatedAt|timestamp with time zone
+userWorkspace|userId|uuid
+userWorkspace|workspaceId|uuid
+view|anyFieldFilterValue|text
+view|applicationId|uuid
+view|calendarFieldMetadataId|uuid
+view|calendarLayout|USER-DEFINED
+view|createdAt|timestamp with time zone
+view|createdByUserWorkspaceId|uuid
+view|deletedAt|timestamp with time zone
+view|icon|text
+view|id|uuid
+view|isCompact|boolean
+view|isCustom|boolean
+view|kanbanAggregateOperation|USER-DEFINED
+view|kanbanAggregateOperationFieldMetadataId|uuid
+view|key|USER-DEFINED
+view|mainGroupByFieldMetadataId|uuid
+view|name|text
+view|objectMetadataId|uuid
+view|openRecordIn|USER-DEFINED
+view|position|double precision
+view|shouldHideEmptyGroups|boolean
+view|type|USER-DEFINED
+view|universalIdentifier|uuid
+view|updatedAt|timestamp with time zone
+view|visibility|USER-DEFINED
+view|workspaceId|uuid
+viewField|aggregateOperation|USER-DEFINED
+viewField|applicationId|uuid
+viewField|createdAt|timestamp with time zone
+viewField|deletedAt|timestamp with time zone
+viewField|fieldMetadataId|uuid
+viewField|id|uuid
+viewField|isActive|boolean
+viewField|isVisible|boolean
+viewField|overrides|jsonb
+viewField|position|double precision
+viewField|size|integer
+viewField|universalIdentifier|uuid
+viewField|updatedAt|timestamp with time zone
+viewField|viewFieldGroupId|uuid
+viewField|viewId|uuid
+viewField|workspaceId|uuid
+viewFieldGroup|applicationId|uuid
+viewFieldGroup|createdAt|timestamp with time zone
+viewFieldGroup|deletedAt|timestamp with time zone
+viewFieldGroup|id|uuid
+viewFieldGroup|isActive|boolean
+viewFieldGroup|isVisible|boolean
+viewFieldGroup|name|text
+viewFieldGroup|overrides|jsonb
+viewFieldGroup|position|double precision
+viewFieldGroup|universalIdentifier|uuid
+viewFieldGroup|updatedAt|timestamp with time zone
+viewFieldGroup|viewId|uuid
+viewFieldGroup|workspaceId|uuid
+viewFilter|applicationId|uuid
+viewFilter|createdAt|timestamp with time zone
+viewFilter|deletedAt|timestamp with time zone
+viewFilter|fieldMetadataId|uuid
+viewFilter|id|uuid
+viewFilter|operand|USER-DEFINED
+viewFilter|positionInViewFilterGroup|double precision
+viewFilter|relationTargetFieldMetadataId|uuid
+viewFilter|subFieldName|text
+viewFilter|universalIdentifier|uuid
+viewFilter|updatedAt|timestamp with time zone
+viewFilter|value|jsonb
+viewFilter|viewFilterGroupId|uuid
+viewFilter|viewId|uuid
+viewFilter|workspaceId|uuid
+viewFilterGroup|applicationId|uuid
+viewFilterGroup|createdAt|timestamp with time zone
+viewFilterGroup|deletedAt|timestamp with time zone
+viewFilterGroup|id|uuid
+viewFilterGroup|logicalOperator|USER-DEFINED
+viewFilterGroup|parentViewFilterGroupId|uuid
+viewFilterGroup|positionInViewFilterGroup|double precision
+viewFilterGroup|universalIdentifier|uuid
+viewFilterGroup|updatedAt|timestamp with time zone
+viewFilterGroup|viewId|uuid
+viewFilterGroup|workspaceId|uuid
+viewGroup|applicationId|uuid
+viewGroup|createdAt|timestamp with time zone
+viewGroup|deletedAt|timestamp with time zone
+viewGroup|fieldValue|text
+viewGroup|id|uuid
+viewGroup|isVisible|boolean
+viewGroup|position|double precision
+viewGroup|universalIdentifier|uuid
+viewGroup|updatedAt|timestamp with time zone
+viewGroup|viewId|uuid
+viewGroup|workspaceId|uuid
+viewSort|applicationId|uuid
+viewSort|createdAt|timestamp with time zone
+viewSort|deletedAt|timestamp with time zone
+viewSort|direction|USER-DEFINED
+viewSort|fieldMetadataId|uuid
+viewSort|id|uuid
+viewSort|subFieldName|character varying
+viewSort|universalIdentifier|uuid
+viewSort|updatedAt|timestamp with time zone
+viewSort|viewId|uuid
+viewSort|workspaceId|uuid
+webhook|applicationId|uuid
+webhook|createdAt|timestamp with time zone
+webhook|deletedAt|timestamp with time zone
+webhook|description|character varying
+webhook|id|uuid
+webhook|operations|ARRAY
+webhook|secret|character varying
+webhook|targetUrl|character varying
+webhook|universalIdentifier|uuid
+webhook|updatedAt|timestamp with time zone
+webhook|workspaceId|uuid
+workspace|activationStatus|USER-DEFINED
+workspace|aiAdditionalInstructions|text
+workspace|allowImpersonation|boolean
+workspace|createdAt|timestamp with time zone
+workspace|customDomain|character varying
+workspace|databaseSchema|character varying
+workspace|defaultRoleId|uuid
+workspace|deletedAt|timestamp with time zone
+workspace|displayName|character varying
+workspace|editableProfileFields|ARRAY
+workspace|enabledAiModelIds|ARRAY
+workspace|eventLogRetentionDays|integer
+workspace|fastModel|character varying
+workspace|id|uuid
+workspace|inviteHash|character varying
+workspace|isCustomDomainEnabled|boolean
+workspace|isGoogleAuthBypassEnabled|boolean
+workspace|isGoogleAuthEnabled|boolean
+workspace|isInternalMessagesImportEnabled|boolean
+workspace|isMicrosoftAuthBypassEnabled|boolean
+workspace|isMicrosoftAuthEnabled|boolean
+workspace|isPasswordAuthBypassEnabled|boolean
+workspace|isPasswordAuthEnabled|boolean
+workspace|isPublicInviteLinkEnabled|boolean
+workspace|isTwoFactorAuthenticationEnforced|boolean
+workspace|logo|character varying
+workspace|logoFileId|uuid
+workspace|metadataVersion|integer
+workspace|routerModel|character varying
+workspace|smartModel|character varying
+workspace|subdomain|character varying
+workspace|suspendedAt|timestamp with time zone
+workspace|trashRetentionDays|integer
+workspace|updatedAt|timestamp with time zone
+workspace|useRecommendedModels|boolean
+workspace|workspaceCustomApplicationId|uuid
+workspaceSSOIdentityProvider|certificate|character varying
+workspaceSSOIdentityProvider|clientID|character varying
+workspaceSSOIdentityProvider|clientSecret|character varying
+workspaceSSOIdentityProvider|createdAt|timestamp with time zone
+workspaceSSOIdentityProvider|fingerprint|character varying
+workspaceSSOIdentityProvider|id|uuid
+workspaceSSOIdentityProvider|issuer|character varying
+workspaceSSOIdentityProvider|name|character varying
+workspaceSSOIdentityProvider|ssoURL|character varying
+workspaceSSOIdentityProvider|status|USER-DEFINED
+workspaceSSOIdentityProvider|type|USER-DEFINED
+workspaceSSOIdentityProvider|updatedAt|timestamp with time zone
+workspaceSSOIdentityProvider|workspaceId|uuid
