@@ -24,7 +24,7 @@ const StyledTimelineItemContainer = styled.div`
   color: ${themeCssVariables.font.color.primary};
   display: flex;
   gap: ${themeCssVariables.spacing[4]};
-  height: 'auto';
+  height: auto;
   justify-content: space-between;
   overflow: hidden;
   white-space: nowrap;
