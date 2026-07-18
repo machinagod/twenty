@@ -18,19 +18,34 @@ Find the latest stable (non-prerelease) tag:
 
 ## The custom surface (what makes this fork the fork)
 
-As of the 2026-06-24 sync (release tag **`twenty/v2.14.0`** @ `09694b2f`):
+As of the 2026-07-15 sync (release tag **`twenty/v2.20.0`** @ `056d09fcaf`):
 
 | Theme | Commits | Notes |
 |-------|---------|-------|
-| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) | The conflict risk. Hooks into `twenty-orm` query builders (`workspace-{select,update,delete,soft-delete}-query-builder.ts`), `workspace-entity-manager.ts`, `global-workspace-orm.manager.ts`, `orm-workspace-context.storage.ts`, `config-variables.ts`. Mostly self-contained new files under `record-scoping/`. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
+| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) | The conflict risk. Hooks into `twenty-orm` query builders (`workspace-{select,update,delete,soft-delete}-query-builder.ts`), `workspace-entity-manager.ts`, `global-workspace-orm.manager.ts`, `orm-workspace-context.storage.ts`, `config-variables.ts`. Mostly self-contained new files under `record-scoping/`. At the v2.20.0 sync these hook files had **zero upstream drift** since v2.14.0, so the chokepoint patches applied clean; the only conflicts were two additive field insertions (`recordScopingRulesByRoleId` next to upstream's new `apiKeyRoleMap` in the interface + entity-manager). See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
 | **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job redeploys the Railway services (needs `RAILWAY_TOKEN`). |
 | **record-scoping CI** | `ci-record-scoping.yaml` | Dedicated gate — runs the record-scoping unit + integration tests (Postgres/Redis/ClickHouse services) on PRs touching `twenty-orm` and on push to `main`. Catches a silent ORM-chokepoint regression. |
+| **front-component decrypt** | fix (decrypt non-secret application variables before sending to the client) | Adds `SecretEncryptionModule` to `front-component.module.ts` and decrypts non-secret app vars in `strip-secret-from-application-variables.ts`. At v2.20.0 upstream renamed the decrypt API `decryptVersioned` → `decryptVersionedOrThrow` (same `(value, {workspaceId})` signature); the fix was adapted accordingly. |
+| **EventRow CSS fix** | fix (invalid quoted `height: 'auto'` → `auto`) | 1-line correctness fix in `EventRow.tsx`, salvaged from the reverted content-visibility experiments. Upstream still ships the quoted-string bug at v2.20.0. |
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
 custom commit until upstream shipped the same fix; at the 2026-06-24 sync it
-cherry-picked to an empty diff and we `--skip`ped it. When upstream supersedes one
-of ours, drop it and delete its row here.
+cherry-picked to an empty diff and we `--skip`ped it. At the 2026-07-15 (v2.20.0)
+sync the **content-visibility perf experiments** (fork PRs #6/#7, reverted by #8 as
+"measured inert") were dropped entirely — an add+revert pair nets to nothing and is
+pure conflict risk across a major upstream refactor. Only the 1-line `EventRow` CSS
+fix that survived the revert was salvaged and carried as its own commit. When
+upstream supersedes one of ours, drop it and delete its row here.
+
+**History note (2026-07-15):** the 2026-06-24 v2.14.0 sync was landed as a **merge**
+(`merge: roll fork main back to stable release twenty/v2.14.0`), not the clean
+rebase-replay this runbook prescribes — so `twenty/v2.14.0..origin/main` was polluted
+with ~12,900 old-lineage commits and the custom surface was hidden. The v2.20.0 sync
+restored the clean model: the real custom surface (16 commits) was recovered from the
+merge's first parent (`chore/sync-v2.14.0` tip), replayed onto a fresh `twenty/v2.20.0`,
+and the fork branch was **reset** to that clean line (recovery tag `pre-2.20-sync-recovery`).
+Keep future syncs rebase-only; never merge a release tag into `main`.
 
 ## Procedure
 
@@ -199,6 +214,15 @@ immutable `:<sha>` tag via the Railway API instead of redeploying `:main`.
   before deploy; smoke-test after.
 - **Cherry-pick "applied clean" ≠ "compiles."** Context matching only means the
   surrounding lines matched. Always typecheck — upstream may have renamed symbols
-  the hook lines reference.
+  the hook lines reference. *Example (v2.20.0 sync):* the front-component fix
+  cherry-picked without conflict, but typecheck caught that upstream had renamed
+  `SecretEncryptionService.decryptVersioned` → `decryptVersionedOrThrow`. The
+  ORM-chokepoint patches applied *and* compiled only because those files had zero
+  upstream drift — don't assume that holds next sync; typecheck is the gate.
+- **Never merge a release tag into `main`; rebase-replay only.** The 2026-06-24
+  sync merged `twenty/v2.14.0` in, which buried the custom surface under ~12,900
+  old-lineage commits and broke `git log <tag>..main`. Recovering the real surface
+  meant reading the merge's first parent. Always `git switch -c chore/sync-$TAG $TAG`
+  then replay — the fork branch should be `$TAG` + N custom commits, first-parent-linear.
 - **Keep this file and the custom-surface table updated every sync** — it is the
   source of truth for what we replay.
