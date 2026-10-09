@@ -18,6 +18,11 @@ on:
         description: Git ref to build
         required: false
         default: main
+      redeploy_worker:
+        description: Also redeploy Twenty Worker. Turn off for an upgrade deploy, so the worker only picks up the new image after the server has finished migrating.
+        type: boolean
+        required: false
+        default: true
 
 permissions:
   contents: read
@@ -93,7 +98,7 @@ jobs:
         if: steps.gate.outputs.skip != 'true'
         run: npm i -g @railway/cli
 
-      - name: Redeploy server + worker
+      - name: Redeploy server
         if: steps.gate.outputs.skip != 'true'
         env:
           # Project token is scoped to twenty-crm / production, so the CLI needs
@@ -101,4 +106,9 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           railway redeploy --service "Twenty" --yes
-          railway redeploy --service "Twenty Worker" --yes
+
+      - name: Redeploy worker
+        if: steps.gate.outputs.skip != 'true' && inputs.redeploy_worker
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway redeploy --service "Twenty Worker" --yes
