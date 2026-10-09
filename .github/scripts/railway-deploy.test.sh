@@ -45,7 +45,11 @@ case "$query" in
     echo '{"data":{"deploymentStop":true}}' ;;
   *serviceInstanceUpdate*)
     echo "serviceInstanceUpdate $(jq -r '.serviceId' <<<"$variables") $(jq -r '.input.healthcheckTimeout' <<<"$variables")" >>"$STUB_DIR/calls"
-    echo '{"data":{"serviceInstanceUpdate":true}}' ;;
+    if [ -n "${STUB_UPDATE_ERROR:-}" ]; then
+      echo '{"errors":[{"message":"Not Authorized"}]}'
+    else
+      echo '{"data":{"serviceInstanceUpdate":true}}'
+    fi ;;
   *serviceInstanceDeployV2*)
     service_id=$(jq -r '.serviceId' <<<"$variables")
     echo "serviceInstanceDeployV2 $service_id" >>"$STUB_DIR/calls"
@@ -75,7 +79,7 @@ setup() {
   printf 'SUCCESS\n' >"$STUB_DIR/server-statuses"
   printf 'SUCCESS\n' >"$STUB_DIR/worker-statuses"
   : >"$STUB_DIR/calls"
-  unset STUB_DEPLOY_ERROR STUB_WORKER_NAME
+  unset STUB_DEPLOY_ERROR STUB_UPDATE_ERROR STUB_WORKER_NAME
 }
 
 teardown() {
@@ -134,9 +138,9 @@ should_stop_worker_raise_healthcheck_and_restore_it_on_upgrade_success() {
   assert_exit_code upgrade-success 0 &&
     assert_calls upgrade-success "projectToken
 project
+serviceInstanceUpdate server-1 3600
 deployments worker-1
 deploymentStop worker-deployment-old
-serviceInstanceUpdate server-1 3600
 serviceInstanceDeployV2 server-1
 deployment server-1-deployment DEPLOYING
 deployment server-1-deployment DEPLOYING
@@ -153,9 +157,9 @@ should_keep_worker_stopped_and_restore_healthcheck_when_upgrade_fails() {
     assert_output_contains upgrade-failure "the worker stays stopped" &&
     assert_calls upgrade-failure "projectToken
 project
+serviceInstanceUpdate server-1 3600
 deployments worker-1
 deploymentStop worker-deployment-old
-serviceInstanceUpdate server-1 3600
 serviceInstanceDeployV2 server-1
 deployment server-1-deployment DEPLOYING
 deployment server-1-deployment FAILED
@@ -168,11 +172,21 @@ should_restore_healthcheck_when_server_deploy_request_is_rejected() {
   assert_exit_code upgrade-deploy-rejected 1 &&
     assert_calls upgrade-deploy-rejected "projectToken
 project
+serviceInstanceUpdate server-1 3600
 deployments worker-1
 deploymentStop worker-deployment-old
-serviceInstanceUpdate server-1 3600
 serviceInstanceDeployV2 server-1
 serviceInstanceUpdate server-1 300"
+}
+
+should_change_nothing_when_the_healthcheck_update_is_refused() {
+  export STUB_UPDATE_ERROR=1
+  run_deploy upgrade
+  assert_exit_code upgrade-update-refused 1 &&
+    assert_output_contains upgrade-update-refused "Not Authorized" &&
+    assert_calls upgrade-update-refused "projectToken
+project
+serviceInstanceUpdate server-1 3600"
 }
 
 should_time_out_a_server_deployment_that_never_settles() {
@@ -232,6 +246,7 @@ should_require_a_token() {
 it "upgrade: stops worker, raises then restores health check" should_stop_worker_raise_healthcheck_and_restore_it_on_upgrade_success
 it "upgrade: failed server keeps worker stopped" should_keep_worker_stopped_and_restore_healthcheck_when_upgrade_fails
 it "upgrade: rejected deploy request still restores health check" should_restore_healthcheck_when_server_deploy_request_is_rejected
+it "upgrade: refused health-check update changes nothing" should_change_nothing_when_the_healthcheck_update_is_refused
 it "upgrade: unsettled server deployment times out" should_time_out_a_server_deployment_that_never_settles
 it "routine: deploys server then worker" should_deploy_server_then_worker_without_touching_settings_on_routine
 it "routine: failed server skips worker" should_not_deploy_the_worker_when_routine_server_deploy_fails
