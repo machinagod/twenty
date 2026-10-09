@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { createOneOperationFactory } from 'test/integration/graphql/utils/create-one-operation-factory.util';
 import { destroyOneOperationFactory } from 'test/integration/graphql/utils/destroy-one-operation-factory.util';
 import { findManyOperationFactory } from 'test/integration/graphql/utils/find-many-operation-factory.util';
-import { makeGraphqlAPIRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
+import { makeGraphqlApiRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
 import { updateOneOperationFactory } from 'test/integration/graphql/utils/update-one-operation-factory.util';
 import { createOneRole } from 'test/integration/metadata/suites/role/utils/create-one-role.util';
 import { deleteOneRole } from 'test/integration/metadata/suites/role/utils/delete-one-role.util';
@@ -58,7 +58,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   let originalMemberRoleId: string;
 
   const findTestCompaniesAs = (token: string) =>
-    makeGraphqlAPIRequest(
+    makeGraphqlApiRequest(
       findManyOperationFactory({
         objectMetadataSingularName: 'company',
         objectMetadataPluralName: 'companies',
@@ -70,7 +70,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     );
 
   const findTestOpportunitiesAs = (token: string) =>
-    makeGraphqlAPIRequest(
+    makeGraphqlApiRequest(
       findManyOperationFactory({
         objectMetadataSingularName: 'opportunity',
         objectMetadataPluralName: 'opportunities',
@@ -131,7 +131,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
 
     // Seeded as admin (the default identity) so the rows exist regardless of
     // scoping; the scoped member should then only ever see the in-scope one.
-    await makeGraphqlAPIRequest(
+    await makeGraphqlApiRequest(
       createOneOperationFactory({
         objectMetadataSingularName: 'company',
         gqlFields: COMPANY_GQL_FIELDS,
@@ -143,7 +143,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       }),
     );
 
-    await makeGraphqlAPIRequest(
+    await makeGraphqlApiRequest(
       createOneOperationFactory({
         objectMetadataSingularName: 'company',
         gqlFields: COMPANY_GQL_FIELDS,
@@ -155,7 +155,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       }),
     );
 
-    await makeGraphqlAPIRequest(
+    await makeGraphqlApiRequest(
       createOneOperationFactory({
         objectMetadataSingularName: 'opportunity',
         gqlFields: OPPORTUNITY_GQL_FIELDS,
@@ -167,7 +167,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       }),
     );
 
-    await makeGraphqlAPIRequest(
+    await makeGraphqlApiRequest(
       createOneOperationFactory({
         objectMetadataSingularName: 'opportunity',
         gqlFields: OPPORTUNITY_GQL_FIELDS,
@@ -190,7 +190,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     });
 
     for (const id of testCompanyIds) {
-      await makeGraphqlAPIRequest(
+      await makeGraphqlApiRequest(
         destroyOneOperationFactory({
           objectMetadataSingularName: 'company',
           gqlFields: 'id',
@@ -200,7 +200,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     }
 
     for (const id of testOpportunityIds) {
-      await makeGraphqlAPIRequest(
+      await makeGraphqlApiRequest(
         destroyOneOperationFactory({
           objectMetadataSingularName: 'opportunity',
           gqlFields: 'id',
@@ -237,7 +237,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   });
 
   it('fails closed on UPDATEs of out-of-scope records for the scoped role', async () => {
-    await makeGraphqlAPIRequest(
+    await makeGraphqlApiRequest(
       updateOneOperationFactory({
         objectMetadataSingularName: 'company',
         gqlFields: COMPANY_GQL_FIELDS,
@@ -258,7 +258,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   });
 
   it('allows UPDATEs of in-scope records for the scoped role', async () => {
-    const response = await makeGraphqlAPIRequest(
+    const response = await makeGraphqlApiRequest(
       updateOneOperationFactory({
         objectMetadataSingularName: 'company',
         gqlFields: COMPANY_GQL_FIELDS,
