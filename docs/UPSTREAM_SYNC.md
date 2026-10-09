@@ -200,8 +200,8 @@ secret `RAILWAY_TOKEN` (a Railway *project token* scoped to twenty-crm/productio
 without it the build still runs and the deploy is skipped with a warning.
 
 - **`routine`** (default): a fresh deployment of the server, then the worker.
-- **`upgrade`** (every upstream sync): stops the worker, raises the server's
-  Railway health-check timeout to 3600s, deploys the server and waits (up to 70
+- **`upgrade`** (every upstream sync): raises the server's Railway health-check
+  timeout to 3600s, stops the worker, deploys the server and waits (up to 70
   min) for its boot upgrade, **always** puts the timeout back to 300s, then
   deploys the worker. If the server deployment fails the worker stays stopped
   and the run fails.
