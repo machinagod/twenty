@@ -11,7 +11,8 @@ setup_and_migrate_db() {
 
     # Migration DDL (e.g. adding a generated column to a large table) can take far
     # longer than the runtime query timeout, so only these commands get a longer one.
-    migration_timeout_ms="${UPGRADE_PG_DATABASE_TIMEOUT_MS:-600000}"
+    # On prod one such statement took 2000s, hence an hour.
+    migration_timeout_ms="${UPGRADE_PG_DATABASE_TIMEOUT_MS:-3600000}"
 
     # Run setup and migration scripts
     has_schema=$(psql -tAc "SELECT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'core')" ${PG_DATABASE_URL})
