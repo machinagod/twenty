@@ -19,7 +19,7 @@ on:
         required: false
         default: main
       mode:
-        description: "routine: fresh deploy of server then worker. upgrade: for an upstream sync — stops the worker, raises the server health-check timeout for the boot upgrade, deploys the server, restores the timeout, then the worker."
+        description: "routine: fresh deploy of server then worker. upgrade: for an upstream sync — raises the server health-check timeout for the boot upgrade, stops the worker, deploys the server, restores the timeout, then the worker."
         type: choice
         options: [routine, upgrade]
         required: false
