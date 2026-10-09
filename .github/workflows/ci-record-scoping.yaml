@@ -69,16 +69,17 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/yarn-install
 
-      # Unit tests first — pure logic, no services; fails fast if the rule/SQL
-      # builder regresses.
-      - name: Record-scoping unit tests
-        run: cd packages/twenty-server && npx jest record-scoping
-
-      # Deps required by database:reset + seed (they import from twenty-shared).
+      # Unit tests, reset and seed all import twenty-shared, which resolves to its
+      # built dist.
       - name: Build dependencies
         run: |
           npx nx build twenty-shared
           npx nx build twenty-emails
+
+      # Unit tests first — pure logic, no services; fails fast if the rule/SQL
+      # builder regresses.
+      - name: Record-scoping unit tests
+        run: cd packages/twenty-server && npx jest record-scoping
 
       - name: Create test DB
         run: PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d postgres -c 'CREATE DATABASE "test";'
