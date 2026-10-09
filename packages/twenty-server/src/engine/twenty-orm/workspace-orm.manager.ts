@@ -14,6 +14,9 @@ import { isDefined } from 'twenty-shared/utils';
 import { getWorkspaceAuthContext } from 'src/engine/core-modules/auth/storage/workspace-auth-context.storage';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { buildObjectIdByNameMaps } from 'src/engine/metadata-modules/flat-object-metadata/utils/build-object-id-by-name-maps.util';
+import { RecordScopingConfigService } from 'src/engine/twenty-orm/record-scoping/services/record-scoping-config.service';
+import { type RecordScopingRulesByRoleId } from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
+import { resolveRecordScopingRulesByRoleId } from 'src/engine/twenty-orm/record-scoping/utils/resolve-record-scoping-rules-by-role-id.util';
 import { ExecuteInWorkspaceContextOptions } from 'src/engine/twenty-orm/types/execute-in-workspace-context-options.type';
 import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/workspace-transaction-scope.type';
 import {
@@ -32,6 +35,7 @@ export class WorkspaceOrmManager {
   constructor(
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly workspaceDataSourceService: WorkspaceDataSourceService,
+    private readonly recordScopingConfigService: RecordScopingConfigService,
   ) {}
 
   getRepository<T extends ObjectLiteral = ObjectRecord>(
@@ -172,6 +176,9 @@ export class WorkspaceOrmManager {
         ).flatValidationRuleMaps
       : undefined;
 
+    const recordScopingRulesByRoleId =
+      await this.loadRecordScopingRulesByRoleId(workspaceId);
+
     return {
       authContext,
       flatObjectMetadataMaps,
@@ -187,7 +194,26 @@ export class WorkspaceOrmManager {
       roleIdsWithAllRecordsAccess,
       userWorkspaceRoleMap,
       apiKeyRoleMap,
+      recordScopingRulesByRoleId,
     };
+  }
+
+  private async loadRecordScopingRulesByRoleId(
+    workspaceId: string,
+  ): Promise<RecordScopingRulesByRoleId | undefined> {
+    if (!this.recordScopingConfigService.isEnabled()) {
+      return undefined;
+    }
+
+    const { flatRoleMaps } = await this.workspaceCacheService.getOrRecompute(
+      workspaceId,
+      ['flatRoleMaps'],
+    );
+
+    return resolveRecordScopingRulesByRoleId({
+      rules: this.recordScopingConfigService.getRules(),
+      flatRoleMaps,
+    }).recordScopingRulesByRoleId;
   }
 
   private async loadLiteWorkspaceContext(

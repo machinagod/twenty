@@ -116,6 +116,7 @@ import {
 } from 'src/engine/twenty-orm/repository/utils/update-event-records.util';
 import { WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
 import { compileNamedParameters } from 'src/engine/twenty-orm/sql/utils/compile-named-parameters.util';
+import { buildRecordScopingCondition } from 'src/engine/twenty-orm/record-scoping/utils/build-record-scoping-condition.util';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
 import { serializeJsonbWriteValue } from 'src/engine/twenty-orm/sql/utils/serialize-jsonb-write-value.util';
 import {
@@ -2185,6 +2186,12 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       );
     }
 
+    this.applyRecordScopingForAlias({
+      queryBuilder,
+      alias,
+      flatObjectMetadata,
+    });
+
     const policy = buildRowAccessPolicy({
       subject: this.resolveRowAccessPolicySubject(),
       environment: this.resolveRowAccessPolicyEnvironment(),
@@ -2391,6 +2398,33 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
     return `${escapeIdentifier(tableShape.schemaName)}.${escapeIdentifier(
       tableShape.tableName,
     )}`;
+  }
+
+  private applyRecordScopingForAlias({
+    queryBuilder,
+    alias,
+    flatObjectMetadata,
+  }: {
+    queryBuilder: WorkspaceSelectQueryBuilder;
+    alias: string;
+    flatObjectMetadata: FlatObjectMetadata;
+  }): void {
+    const recordScopingCondition = buildRecordScopingCondition({
+      alias,
+      objectNameSingular: flatObjectMetadata.nameSingular,
+      recordScopingRulesByRoleId:
+        this.options.internalContext.recordScopingRulesByRoleId,
+      userWorkspaceRoleMap: this.options.internalContext.userWorkspaceRoleMap,
+      authContext: this.options.authContext,
+    });
+
+    if (isDefined(recordScopingCondition)) {
+      this.addConditionForAlias({
+        queryBuilder,
+        alias,
+        ...recordScopingCondition,
+      });
+    }
   }
 
   private denyAccessForAlias({
