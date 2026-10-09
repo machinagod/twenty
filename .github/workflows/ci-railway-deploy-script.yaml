@@ -1,0 +1,32 @@
+name: CI Railway deploy script
+
+# Tests .github/scripts/railway-deploy.sh against a stub `curl`; no request
+# reaches Railway.
+
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/railway-deploy*.sh'
+      - '.github/workflows/ci-railway-deploy-script.yaml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/scripts/railway-deploy*.sh'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Shellcheck
+        run: shellcheck .github/scripts/railway-deploy.sh .github/scripts/railway-deploy.test.sh
+
+      - name: Test
+        run: .github/scripts/railway-deploy.test.sh
