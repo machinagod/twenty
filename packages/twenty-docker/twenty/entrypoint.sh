@@ -9,19 +9,30 @@ setup_and_migrate_db() {
 
     echo "Running database setup and migrations..."
 
+    # Migration DDL (e.g. adding a generated column to a large table) can take far
+    # longer than the runtime query timeout, so only these commands get a longer one.
+    migration_timeout_ms="${UPGRADE_PG_DATABASE_TIMEOUT_MS:-600000}"
+
     # Run setup and migration scripts
     has_schema=$(psql -tAc "SELECT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'core')" ${PG_DATABASE_URL})
     if [ "$has_schema" = "f" ]; then
         echo "Database appears to be empty, running migrations."
-        yarn database:init:prod
+        PG_DATABASE_PRIMARY_TIMEOUT_MS="$migration_timeout_ms" yarn database:init:prod
     fi
 
     if ! yarn command:prod cache:flush; then
         echo "Warning: Failed to flush cache before upgrade, but continuing startup..."
     fi
 
-    if ! yarn command:prod upgrade; then
-        echo "Warning: Upgrade completed with errors. Some workspaces may not be fully migrated. Check logs for details."
+    # A half-migrated database serves 500s while /healthz stays green, so a failed
+    # upgrade must stop the container and fail the deploy.
+    if ! PG_DATABASE_PRIMARY_TIMEOUT_MS="$migration_timeout_ms" yarn command:prod upgrade; then
+        if [ "${UPGRADE_CONTINUE_ON_ERROR}" = "true" ]; then
+            echo "Warning: Upgrade completed with errors. Continuing because UPGRADE_CONTINUE_ON_ERROR=true. Check logs for details."
+        else
+            echo "Error: Upgrade failed. Refusing to start on a partially migrated database. Set UPGRADE_CONTINUE_ON_ERROR=true to override."
+            exit 1
+        fi
     fi
 
     if ! yarn command:prod cache:flush; then
