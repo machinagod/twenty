@@ -7,10 +7,10 @@
 # Usage: railway-deploy.sh routine|upgrade
 #
 #   routine  fresh deployment of the server, then the worker
-#   upgrade  for an upstream sync that runs migrations on server boot: stop the
-#            worker, raise the server health-check timeout so Railway does not
-#            kill the boot upgrade, deploy the server and wait for it, always put
-#            the health-check timeout back, and only then deploy the worker
+#   upgrade  for an upstream sync that runs migrations on server boot: raise the
+#            server health-check timeout so Railway does not kill the boot
+#            upgrade, stop the worker, deploy the server and wait for it, always
+#            put the health-check timeout back, and only then deploy the worker
 #
 # Fresh deployments (serviceInstanceDeployV2) are used instead of `railway
 # redeploy`, which reuses the previous deployment's settings snapshot and so
@@ -182,12 +182,13 @@ run_routine() {
 }
 
 run_upgrade() {
-  stop_worker
-
   # Railway's default 300s health check kills the container mid-upgrade, which
   # leaves orphaned Postgres sessions holding locks that block every retry.
+  # Raised before anything else so a refused update leaves nothing changed.
   set_healthcheck_timeout "$SERVER_SERVICE_ID" "$UPGRADE_HEALTHCHECK_TIMEOUT_SECONDS"
   trap restore_server_healthcheck EXIT
+
+  stop_worker
 
   if ! deploy_and_wait server "$SERVER_SERVICE_ID" "$SERVER_DEPLOY_DEADLINE_SECONDS"; then
     fail "server upgrade deployment did not succeed; the worker stays stopped. Check the server logs for the failing upgrade step, and pg_stat_activity for orphaned upgrade queries still holding locks before retrying."
