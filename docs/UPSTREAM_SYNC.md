@@ -195,23 +195,40 @@ Merging to `main` does **not** deploy — it only updates the branch. The prod
 deploy is a **separate, manual** step (the gate): the `Build Railway image`
 workflow (`build-railway-image.yaml`) runs on `workflow_dispatch` only. One
 dispatch builds the `twenty` image, pushes `ghcr.io/machinagod/twenty:{main,<sha>}`,
-then **redeploys the `Twenty` + `Twenty Worker` Railway services** (which apply the
-migrations on boot). It needs repo secret `RAILWAY_TOKEN` (a Railway *project
+then **redeploys the `Twenty` server** (which applies the migrations on boot) and,
+unless the `redeploy_worker` input is off, `Twenty Worker`. It needs repo secret `RAILWAY_TOKEN` (a Railway *project
 token* scoped to twenty-crm/production); without it the build still runs and the
 redeploy is skipped with a warning.
 
 Redeploying runs **every upstream migration since the last sync** against the live
 prod DB. Treat it as a maintenance operation:
 
-1. **DB backup + restore-test first.** 427 commits' worth of migrations is not
-   reversible by wishing. (`pg_dump -Fc` of the `postgres` DB via the public proxy.)
-2. Maintenance window.
-3. Merge the sync PR to `main` (does not deploy), then **dispatch `Build Railway
-   image`** (Actions tab → Run workflow, ref `main`). That builds + pushes +
-   redeploys server & worker. Watch the run; verify the live image digest matches
-   the freshly-pushed `:main`.
-4. Smoke-test record-scoping (it gates every workspace query) and re-profile the
+1. **DB backup + restore-test first.** `pg_dump -Fc --no-owner --no-privileges` of
+   the prod DB via `DATABASE_PUBLIC_URL` (from `railway variables -s Postgres --json`).
+   Local `pg_dump` must be >= the server's major version (prod is PG 16); the
+   `postgres:18` test container's `pg_dump` works.
+2. **Rehearse the upgrade on a restored copy** the day before: restore into a local
+   PG 18 DB, then run `node <server>/dist/command/command upgrade` from a directory
+   holding its own `.env` (pointing at the copy, throwaway `APP_SECRET`) and a `dist`
+   symlink to the server build (entity globs resolve relative to the cwd), then
+   `upgrade:status --failed-only`. This times the upgrade and surfaces any step that
+   would hit the timeout. v2.20.0 → v2.45.0 took 531s locally; the slowest single
+   statement was the `timelineActivity.searchVector` rebuild (31s).
+3. Maintenance window.
+4. Reset `main` to the sync branch tip (see the history note: not a GitHub merge
+   button), then stop `Twenty Worker` (scale to 0) so no jobs run against a
+   half-migrated schema. The worker never migrates (`DISABLE_DB_MIGRATIONS=true`).
+5. **Dispatch `Build Railway image`** (Actions tab → Run workflow, ref `main`,
+   **`redeploy_worker` off**). That builds + pushes + redeploys only the server,
+   whose boot runs the upgrade. Watch its logs; verify the live image digest matches
+   the freshly-pushed `:main`; `yarn command:prod upgrade:status --failed-only` must
+   come back empty.
+6. Redeploy `Twenty Worker` and scale it back up.
+7. Smoke-test record-scoping (it gates every workspace query) and re-profile the
    front-end perf scenarios.
+
+For a routine deploy without migrations, dispatch with `redeploy_worker` on (the
+default) and both services redeploy in one go.
 
 First-run check: confirm `railway redeploy` actually pulled the new `:main` digest
 (compare the running deployment's image digest to the just-pushed one). If Railway
