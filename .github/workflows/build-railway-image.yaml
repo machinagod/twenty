@@ -1,8 +1,8 @@
 name: Build Railway image
 
 # Builds the production `twenty` target (server + frontend) from our branch,
-# pushes it to GHCR, then redeploys the Railway services so the new image
-# actually goes live. Upstream's CD only dispatches to twentyhq/twenty-infra, so
+# pushes it to GHCR, then deploys the Railway services so the new image
+# actually goes live (an `upgrade` mode handles upstream syncs). Upstream's CD only dispatches to twentyhq/twenty-infra, so
 # this fork needs its own build+deploy. Manual trigger (workflow_dispatch) keeps
 # the gate: each upstream sync runs 100s of migrations on prod, so a human picks
 # the maintenance window by dispatching this — it is NOT auto-run on push to main.
@@ -18,11 +18,12 @@ on:
         description: Git ref to build
         required: false
         default: main
-      redeploy_worker:
-        description: Also redeploy Twenty Worker. Turn off for an upgrade deploy, so the worker only picks up the new image after the server has finished migrating.
-        type: boolean
+      mode:
+        description: "routine: fresh deploy of server then worker. upgrade: for an upstream sync — stops the worker, raises the server health-check timeout for the boot upgrade, deploys the server, restores the timeout, then the worker."
+        type: choice
+        options: [routine, upgrade]
         required: false
-        default: true
+        default: routine
 
 permissions:
   contents: read
@@ -78,11 +79,12 @@ jobs:
   deploy:
     needs: build-push
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    # Redeploys the prod services so they pull the freshly-pushed :main image.
-    # Twenty runs DB migrations on server boot — this is where the upstream
-    # migrations actually apply to prod. Skips cleanly if RAILWAY_TOKEN is unset
-    # (the build above still produces the image either way).
+    # An upgrade deploy waits for the server's boot upgrade (70 min deadline).
+    timeout-minutes: 100
+    # Deploys the prod services from the freshly-pushed :main image through the
+    # Railway public API (.github/scripts/railway-deploy.sh). Twenty runs DB
+    # migrations on server boot — this is where upstream migrations apply to
+    # prod. Skips cleanly if RAILWAY_TOKEN is unset (the image is built anyway).
     steps:
       - name: Gate on RAILWAY_TOKEN
         id: gate
@@ -90,25 +92,22 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           if [ -z "${RAILWAY_TOKEN:-}" ]; then
-            echo "::warning::RAILWAY_TOKEN not set — image built but Railway redeploy skipped. Add the secret (Railway project token) to enable the deploy."
+            echo "::warning::RAILWAY_TOKEN not set — image built but Railway deploy skipped. Add the secret (Railway project token) to enable the deploy."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install Railway CLI
+      - name: Checkout
         if: steps.gate.outputs.skip != 'true'
-        run: npm i -g @railway/cli
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          sparse-checkout: .github/scripts
 
-      - name: Redeploy server
+      - name: Deploy (${{ inputs.mode }})
         if: steps.gate.outputs.skip != 'true'
         env:
-          # Project token is scoped to twenty-crm / production, so the CLI needs
-          # no link/login and resolves services by name within that environment.
+          # Project token scoped to twenty-crm / production; the script resolves
+          # the project, environment and services from it.
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          railway redeploy --service "Twenty" --yes
-
-      - name: Redeploy worker
-        if: steps.gate.outputs.skip != 'true' && inputs.redeploy_worker
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway redeploy --service "Twenty Worker" --yes
+          DEPLOY_MODE: ${{ inputs.mode }}
+        run: .github/scripts/railway-deploy.sh "$DEPLOY_MODE"
