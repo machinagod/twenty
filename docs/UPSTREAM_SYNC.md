@@ -25,7 +25,7 @@ As of the 2026-10-09 sync (release tag **`twenty/v2.45.0`** @ `7e1431c84a`):
 | **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the optional `recordScopingRulesByRoleId` field threaded through `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`, and `RecordScopingConfigService` in `twenty-orm.module.ts`. Everything else is self-contained under `record-scoping/`. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
 | **deploy/fail-closed upgrade** | fix (entrypoint) | `packages/twenty-docker/twenty/entrypoint.sh`: a failed boot `upgrade` exits non-zero (override `UPGRADE_CONTINUE_ON_ERROR=true`), and init/upgrade run with `UPGRADE_PG_DATABASE_TIMEOUT_MS` (default 600000) instead of the 10s runtime timeout. Fixes the v2.20.0 prod incident. Upstream closed our PR #23013 unmerged, so we carry it. |
-| **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job redeploys the Railway services (needs `RAILWAY_TOKEN`). |
+| **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix + `railway-deploy.sh` | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job runs `.github/scripts/railway-deploy.sh` in `routine` or `upgrade` mode through the Railway public API (needs `RAILWAY_TOKEN`); tested by `CI Railway deploy script`. |
 | **record-scoping CI** | `ci-record-scoping.yaml` | Dedicated gate — runs the record-scoping unit + integration tests (Postgres 18/Redis/ClickHouse services) on PRs touching `twenty-orm` and on push to `main`. Catches a silent ORM-chokepoint regression. |
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
@@ -195,45 +195,72 @@ Merging to `main` does **not** deploy — it only updates the branch. The prod
 deploy is a **separate, manual** step (the gate): the `Build Railway image`
 workflow (`build-railway-image.yaml`) runs on `workflow_dispatch` only. One
 dispatch builds the `twenty` image, pushes `ghcr.io/machinagod/twenty:{main,<sha>}`,
-then **redeploys the `Twenty` server** (which applies the migrations on boot) and,
-unless the `redeploy_worker` input is off, `Twenty Worker`. It needs repo secret `RAILWAY_TOKEN` (a Railway *project
-token* scoped to twenty-crm/production); without it the build still runs and the
-redeploy is skipped with a warning.
+then runs `.github/scripts/railway-deploy.sh` with the `mode` input. It needs repo
+secret `RAILWAY_TOKEN` (a Railway *project token* scoped to twenty-crm/production);
+without it the build still runs and the deploy is skipped with a warning.
 
-Redeploying runs **every upstream migration since the last sync** against the live
-prod DB. Treat it as a maintenance operation:
+- **`routine`** (default): a fresh deployment of the server, then the worker.
+- **`upgrade`** (every upstream sync): stops the worker, raises the server's
+  Railway health-check timeout to 3600s, deploys the server and waits (up to 70
+  min) for its boot upgrade, **always** puts the timeout back to 300s, then
+  deploys the worker. If the server deployment fails the worker stays stopped
+  and the run fails.
+
+The script drives Railway's public GraphQL API rather than the CLI on purpose:
+`railway redeploy` reuses the previous deployment's settings snapshot (a changed
+health-check timeout would be ignored), `railway environment edit` silently
+ignores `deploy.*` settings, and `railway scale <region>=0` with one region
+**moved** the worker to another region instead of stopping it. The script is
+tested against a stub API (`.github/scripts/railway-deploy.test.sh`, run by
+`CI Railway deploy script`).
+
+An upgrade deploy runs **every upstream migration since the last sync** against
+the live prod DB. Treat it as a maintenance operation:
 
 1. **DB backup + restore-test first.** `pg_dump -Fc --no-owner --no-privileges` of
    the prod DB via `DATABASE_PUBLIC_URL` (from `railway variables -s Postgres --json`).
    Local `pg_dump` must be >= the server's major version (prod is PG 16); the
-   `postgres:18` test container's `pg_dump` works.
+   `postgres:18` test container's `pg_dump` works. Note the current prod image tag
+   (GHCR `:<sha>` of the running digest) as the rollback target.
 2. **Rehearse the upgrade on a restored copy** the day before: restore into a local
    PG 18 DB, then run `node <server>/dist/command/command upgrade` from a directory
    holding its own `.env` (pointing at the copy, throwaway `APP_SECRET`) and a `dist`
    symlink to the server build (entity globs resolve relative to the cwd), then
-   `upgrade:status --failed-only`. This times the upgrade and surfaces any step that
-   would hit the timeout. v2.20.0 → v2.45.0 took 531s locally; the slowest single
-   statement was the `timelineActivity.searchVector` rebuild (31s).
-3. Maintenance window.
+   `upgrade:status --failed-only`. This finds failing steps and the heavy ones, but
+   **its timings don't transfer**: prod disk is far slower. v2.20.0 → v2.45.0 took
+   531s locally; on prod the `timelineActivity.searchVector` rebuild alone took 2000s
+   (31s locally).
+3. Maintenance window: budget at least an hour for a sync with big DDL.
 4. Reset `main` to the sync branch tip (see the history note: not a GitHub merge
-   button), then stop `Twenty Worker` (scale to 0) so no jobs run against a
-   half-migrated schema. The worker never migrates (`DISABLE_DB_MIGRATIONS=true`).
+   button).
 5. **Dispatch `Build Railway image`** (Actions tab → Run workflow, ref `main`,
-   **`redeploy_worker` off**). That builds + pushes + redeploys only the server,
-   whose boot runs the upgrade. Watch its logs; verify the live image digest matches
-   the freshly-pushed `:main`; `yarn command:prod upgrade:status --failed-only` must
-   come back empty.
-6. Redeploy `Twenty Worker` and scale it back up.
-7. Smoke-test record-scoping (it gates every workspace query) and re-profile the
-   front-end perf scenarios.
+   **mode `upgrade`**). Watch the run and the server logs (`railway logs -s Twenty`)
+   for `Successfully migrated DB!`.
+6. Verify: `railway ssh -s Twenty -- sh -c 'cd /app/packages/twenty-server && yarn command:prod upgrade:status --failed-only'`
+   must show 0 failed; `/healthz` 200; the server logs
+   `Record scoping enabled: N rule(s) loaded` on first request; the worker processes
+   jobs.
+7. Smoke-test record-scoping as a scoped user (it gates every workspace query) and
+   re-profile the front-end perf scenarios.
 
-For a routine deploy without migrations, dispatch with `redeploy_worker` on (the
-default) and both services redeploy in one go.
+### When an upgrade deploy fails
 
-First-run check: confirm `railway redeploy` actually pulled the new `:main` digest
-(compare the running deployment's image digest to the just-pushed one). If Railway
-ever reuses a stale digest, switch the deploy step to point the service at the
-immutable `:<sha>` tag via the Railway API instead of redeploying `:main`.
+The entrypoint fails closed: a failed upgrade exits instead of serving on a
+half-migrated DB, and the upgrade resumes where it stopped on the next attempt
+(batched backfills commit per batch). Before retrying:
+
+- **Look for orphaned upgrade queries.** The node-postgres query timeout is
+  client-side: when an upgrade attempt dies or times out, its statement keeps
+  running in Postgres, holding locks that make every retry wait and then fail
+  (`lock timeout`, or a 5000-row batch stuck for the whole timeout). Check
+  `pg_stat_activity` for long-running `ALTER TABLE` / `WITH rows_to_update`
+  statements from a dead container and `pg_terminate_backend()` them — their work
+  rolls back anyway.
+- If a single statement legitimately needs longer than the migration timeout
+  (`UPGRADE_PG_DATABASE_TIMEOUT_MS`, default 1h), raise it on the `Twenty` service;
+  the variable change itself triggers a fresh deployment. Keep the health-check
+  timeout at least as long (the `upgrade` mode sets 3600s).
+- Then re-dispatch with mode `upgrade`.
 
 ## Watch-items
 
