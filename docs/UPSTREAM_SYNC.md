@@ -18,16 +18,15 @@ Find the latest stable (non-prerelease) tag:
 
 ## The custom surface (what makes this fork the fork)
 
-As of the 2026-07-15 sync (release tag **`twenty/v2.20.0`** @ `056d09fcaf`):
+As of the 2026-10-09 sync (release tag **`twenty/v2.45.0`** @ `7e1431c84a`):
 
 | Theme | Commits | Notes |
 |-------|---------|-------|
-| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) | The conflict risk. Hooks into `twenty-orm` query builders (`workspace-{select,update,delete,soft-delete}-query-builder.ts`), `workspace-entity-manager.ts`, `global-workspace-orm.manager.ts`, `orm-workspace-context.storage.ts`, `config-variables.ts`. Mostly self-contained new files under `record-scoping/`. At the v2.20.0 sync these hook files had **zero upstream drift** since v2.14.0, so the chokepoint patches applied clean; the only conflicts were two additive field insertions (`recordScopingRulesByRoleId` next to upstream's new `apiKeyRoleMap` in the interface + entity-manager). See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
+| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the optional `recordScopingRulesByRoleId` field threaded through `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`, and `RecordScopingConfigService` in `twenty-orm.module.ts`. Everything else is self-contained under `record-scoping/`. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
+| **deploy/fail-closed upgrade** | fix (entrypoint) | `packages/twenty-docker/twenty/entrypoint.sh`: a failed boot `upgrade` exits non-zero (override `UPGRADE_CONTINUE_ON_ERROR=true`), and init/upgrade run with `UPGRADE_PG_DATABASE_TIMEOUT_MS` (default 600000) instead of the 10s runtime timeout. Fixes the v2.20.0 prod incident. Upstream closed our PR #23013 unmerged, so we carry it. |
 | **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job redeploys the Railway services (needs `RAILWAY_TOKEN`). |
-| **record-scoping CI** | `ci-record-scoping.yaml` | Dedicated gate — runs the record-scoping unit + integration tests (Postgres/Redis/ClickHouse services) on PRs touching `twenty-orm` and on push to `main`. Catches a silent ORM-chokepoint regression. |
-| **front-component decrypt** | fix (decrypt non-secret application variables before sending to the client) | Adds `SecretEncryptionModule` to `front-component.module.ts` and decrypts non-secret app vars in `strip-secret-from-application-variables.ts`. At v2.20.0 upstream renamed the decrypt API `decryptVersioned` → `decryptVersionedOrThrow` (same `(value, {workspaceId})` signature); the fix was adapted accordingly. |
-| **EventRow CSS fix** | fix (invalid quoted `height: 'auto'` → `auto`) | 1-line correctness fix in `EventRow.tsx`, salvaged from the reverted content-visibility experiments. Upstream still ships the quoted-string bug at v2.20.0. |
+| **record-scoping CI** | `ci-record-scoping.yaml` | Dedicated gate — runs the record-scoping unit + integration tests (Postgres 18/Redis/ClickHouse services) on PRs touching `twenty-orm` and on push to `main`. Catches a silent ORM-chokepoint regression. |
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
 custom commit until upstream shipped the same fix; at the 2026-06-24 sync it
@@ -37,6 +36,11 @@ sync the **content-visibility perf experiments** (fork PRs #6/#7, reverted by #8
 pure conflict risk across a major upstream refactor. Only the 1-line `EventRow` CSS
 fix that survived the revert was salvaged and carried as its own commit. When
 upstream supersedes one of ours, drop it and delete its row here.
+
+At the 2026-10-09 (v2.45.0) sync three more were dropped because upstream shipped
+them: the **front-component decrypt** fix (upstream #23494, `getPublicEnvVariables`),
+the **EventRow** `height: 'auto'` fix, and the **local logic-function IPC flush**
+fix + its regression test (our upstream PR #22920, merged).
 
 **History note (2026-07-15):** the 2026-06-24 v2.14.0 sync was landed as a **merge**
 (`merge: roll fork main back to stable release twenty/v2.14.0`), not the clean
@@ -84,7 +88,7 @@ npx nx build twenty-server && npx nx build twenty-front
 #    test/integration/graphql/suites/record-scoping.integration-spec.ts
 
 # 6. Push. NO prod touch yet — review before any deploy/migration.
-git push -u origin chore/upstream-update
+git push -u origin chore/sync-$TAG
 ```
 
 ## Record-scoping integration test
@@ -114,8 +118,13 @@ running user-context queries, revisit.)
 Local run (services + seeded `test` DB required — mirrors CI's `with-db-reset`):
 
 ```bash
-# Services (CI uses postgres:18 / redis / clickhouse:25.8.8). Postgres is usually
-# already local; Redis + ClickHouse via Docker:
+# Services (CI uses postgres:18 / redis / clickhouse:25.8.8). Postgres must be
+# >= 15 (2.34 upgrade uses NULLS NOT DISTINCT). If the local server is older, run
+# 18 on a side port and point .env.test at it for the run (it is loaded with
+# override: true, so an env var can't redirect it). Don't commit that edit.
+docker run -d --name twenty-test-pg18 -e POSTGRES_PASSWORD=postgres -p 5433:5432 postgres:18
+docker exec twenty-test-pg18 psql -U postgres -c 'create database test'
+# Redis is required; ClickHouse is optional (ECONNREFUSED :8123 is audit noise).
 docker run -d --name twenty-test-redis -p 6379:6379 redis
 docker run -d --name twenty-test-clickhouse -e CLICKHOUSE_PASSWORD=clickhousePassword \
   -p 8123:8123 -p 9000:9000 clickhouse/clickhouse-server:25.8.8
@@ -128,7 +137,9 @@ NODE_ENV=test NODE_OPTIONS="--import tsx/esm" npx nx database:reset
 
 # Run just this spec. NOTE: `nx jest` drops --config; call jest via yarn instead.
 # (ClickHouse 'twenty' DB-missing errors in the log are unrelated audit noise.)
-NODE_ENV=test corepack yarn jest --config ./jest-integration.config.ts \
+# Needs a bigger heap than the default or jest OOMs before any test runs.
+NODE_ENV=test NODE_OPTIONS="--max-old-space-size=8192" corepack yarn jest \
+  --config ./jest-integration.config.ts \
   test/integration/graphql/suites/record-scoping.integration-spec.ts
 ```
 
@@ -224,5 +235,19 @@ immutable `:<sha>` tag via the Railway API instead of redeploying `:main`.
   old-lineage commits and broke `git log <tag>..main`. Recovering the real surface
   meant reading the merge's first parent. Always `git switch -c chore/sync-$TAG $TAG`
   then replay — the fork branch should be `$TAG` + N custom commits, first-parent-linear.
+- **Upstream can rewrite the hook site outright.** v2.45.0 deleted every file the
+  record-scoping hook lived in (TypeORM query builders, entity manager, datasource
+  module) and moved row access into `WorkspaceRepository`. When the hook files show
+  as `DU` (deleted upstream), don't resurrect them: take upstream's version, find
+  where upstream applies its own row-level predicates, and hook in next to it.
+- **The integration test is proven to catch a missing hook.** At v2.45.0, removing
+  the `applyRecordScopingForAlias` call made 3 of its 6 cases fail (the scoped
+  ones); the admin/in-scope cases keep passing, as they should.
+- **Prod Postgres must be >= 15** from v2.34 on (`NULLS NOT DISTINCT`). Check the
+  Railway Postgres version before deploying a sync that crosses 2.34.
+- **Stale `tsgo` build info can crash typecheck** with a Go `stack overflow` in
+  `affectedfileshandler.go` after a big jump. Delete
+  `packages/twenty-server/dist/packages/twenty-server/tsconfig.tsbuildinfo` and rerun.
+  Also rebuild `twenty-emails` if typecheck reports missing `renderEmail` exports.
 - **Keep this file and the custom-surface table updated every sync** — it is the
   source of truth for what we replay.
