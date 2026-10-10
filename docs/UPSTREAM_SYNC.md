@@ -22,11 +22,30 @@ As of the 2026-10-09 sync (release tag **`twenty/v2.45.0`** @ `7e1431c84a`):
 
 | Theme | Commits | Notes |
 |-------|---------|-------|
-| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + settings UI + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the `recordScopingRulesByRoleId` cache key read in `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`. Rules live in `core.recordScopingRule` (`metadata-modules/record-scoping-rule/`, registered in `metadata-engine.module.ts`, its cache module in `twenty-orm.module.ts`, the entity in `all-workspace-cache-entity-by-name.constant.ts` and the key in `workspace-cache-key.type.ts`). Front: our `record-scoping/` section replaces the Enterprise one in `SettingsRolePermissionsObjectLevelObjectForm.tsx`; on a sync, re-apply that swap if upstream edits the form. That leaves upstream's Enterprise `record-level-permissions/` UI unreferenced; it stays untouched (clean-room) and `knip.json` ignores that folder so the unused-files rule doesn't fail. 2.45 adds two fork commands (`add-record-scoping-rule` instance, `import-record-scoping-rules-from-env` workspace). See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
+| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + settings UI + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the `recordScopingRulesByRoleId` cache key read in `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`. Rules live in `core.recordScopingRule` (`metadata-modules/record-scoping-rule/`, registered in `metadata-engine.module.ts`, its cache module in `twenty-orm.module.ts`, the entity in `all-workspace-cache-entity-by-name.constant.ts` and the key in `workspace-cache-key.type.ts`). Front: our `record-scoping/` section replaces the Enterprise one in `SettingsRolePermissionsObjectLevelObjectForm.tsx`; on a sync, re-apply that swap if upstream edits the form. That leaves upstream's Enterprise `record-level-permissions/` UI unreferenced; it stays untouched (clean-room) and `knip.json` ignores that folder so the unused-files rule doesn't fail. The fork sits on its own patch version **2.45.1** (`TWENTY_CURRENT_VERSION`), which holds the `add-record-scoping-rule` instance command and the `copy-record-scoping-rules-from-env` workspace command; the 2.45.0 `import-record-scoping-rules-from-env` command is a kept no-op (see "Fork upgrade commands" below). See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
 | **deploy/fail-closed upgrade** | fix (entrypoint) | `packages/twenty-docker/twenty/entrypoint.sh`: a failed boot `upgrade` exits non-zero (override `UPGRADE_CONTINUE_ON_ERROR=true`), and init/upgrade run with `UPGRADE_PG_DATABASE_TIMEOUT_MS` (default 600000) instead of the 10s runtime timeout. Fixes the v2.20.0 prod incident. Upstream closed our PR #23013 unmerged, so we carry it. |
 | **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix + `railway-deploy.sh` | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job runs `.github/scripts/railway-deploy.sh` in `routine` or `upgrade` mode through the Railway public API (needs `RAILWAY_TOKEN`); tested by `CI Railway deploy script`. |
 | **record-scoping CI** | `ci-record-scoping.yaml` | Dedicated gate — runs the record-scoping unit + integration tests (Postgres 18/Redis/ClickHouse services) on PRs touching `twenty-orm` and on push to `main`. Catches a silent ORM-chokepoint regression. |
+
+### Fork upgrade commands
+
+Never add a command to a version prod has already upgraded through. Within a
+version the sequence is fast instance, then slow instance, then workspace
+commands, and the cursor is a single position, so a new instance command in an
+applied version sorts behind it and is silently skipped, while a new workspace
+command after it still runs. That is how the 2026-10-10 deploy took prod down: the
+2.45.0 `add-record-scoping-rule` table command never ran, the import that followed
+it failed on the missing table, and the fail-closed entrypoint refused to boot.
+
+Put fork commands in a fork patch version instead (`npx tsx
+packages/twenty-server/scripts/bump-version.ts 2.45.1`; the folder stays `2-45`).
+A whole version always runs after the previous one, and upstream's next minor
+(2.46.0) still sorts after it. Once a command name has been attempted in prod,
+keep it registered (as a no-op if superseded): the cursor is resolved by name and
+an unknown name aborts the upgrade. So at the next sync keep `2.45.1` in
+`TWENTY_PREVIOUS_VERSIONS` and its commands registered when replaying onto
+upstream's tag, since prod's cursor will point at them.
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
 custom commit until upstream shipped the same fix; at the 2026-06-24 sync it
