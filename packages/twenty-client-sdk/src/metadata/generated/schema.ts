@@ -3364,6 +3364,7 @@ export interface MinimalMetadata {
 
 export interface RecordScopingRelatedRecords {
     objectMetadataId: Scalars['UUID']
+    matchColumn?: Scalars['String']
     logicalOperator: Scalars['String']
     conditions: RecordScopingCondition[]
     __typename: 'RecordScopingRelatedRecords'
@@ -7328,6 +7329,7 @@ export interface MinimalMetadataGenqlSelection{
 
 export interface RecordScopingRelatedRecordsGenqlSelection{
     objectMetadataId?: boolean | number
+    matchColumn?: boolean | number
     logicalOperator?: boolean | number
     conditions?: RecordScopingConditionGenqlSelection
     __typename?: boolean | number
@@ -8222,7 +8224,7 @@ export interface UpsertRecordScopingRuleInput {roleId: Scalars['UUID'],objectMet
 
 export interface RecordScopingConditionInput {column: Scalars['String'],operator: Scalars['String'],staticValue?: (Scalars['JSON'] | null),currentWorkspaceMemberField?: (Scalars['String'] | null),relatedRecords?: (RecordScopingRelatedRecordsInput | null)}
 
-export interface RecordScopingRelatedRecordsInput {objectMetadataId: Scalars['UUID'],logicalOperator: Scalars['String'],conditions: RecordScopingConditionInput[]}
+export interface RecordScopingRelatedRecordsInput {objectMetadataId: Scalars['UUID'],matchColumn?: (Scalars['String'] | null),logicalOperator: Scalars['String'],conditions: RecordScopingConditionInput[]}
 
 export interface DeleteRecordScopingRuleInput {roleId: Scalars['UUID'],objectMetadataId: Scalars['UUID']}
 

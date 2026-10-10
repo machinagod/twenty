@@ -7507,6 +7507,9 @@ export default {
             "objectMetadataId": [
                 3
             ],
+            "matchColumn": [
+                1
+            ],
             "logicalOperator": [
                 1
             ],
@@ -14159,6 +14162,9 @@ export default {
         "RecordScopingRelatedRecordsInput": {
             "objectMetadataId": [
                 3
+            ],
+            "matchColumn": [
+                1
             ],
             "logicalOperator": [
                 1
