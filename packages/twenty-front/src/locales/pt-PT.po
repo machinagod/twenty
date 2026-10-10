@@ -25530,3 +25530,63 @@ msgstr "Ampliar"
 #: src/modules/settings/data-model/graph-overview/components/SettingsDataModelOverview.tsx
 msgid "Zoom out"
 msgstr "Reduzir"
+
+#. js-lingui-id: ADCve+
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "Add condition"
+msgstr "Adicionar condição"
+
+#. js-lingui-id: AQ/ifz
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
+msgid "Comma-separated values"
+msgstr "Valores separados por vírgulas"
+
+#. js-lingui-id: RPm4Rj
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
+msgid "Is any of"
+msgstr "É um de"
+
+#. js-lingui-id: 3W3Pn/
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "Match all conditions"
+msgstr "Cumprir todas as condições"
+
+#. js-lingui-id: 4yoWeE
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "Match any condition"
+msgstr "Cumprir qualquer condição"
+
+#. js-lingui-id: ZJXwCE
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
+msgid "My email"
+msgstr "O meu email"
+
+#. js-lingui-id: +10Neo
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "No record-level rule: this role sees every record it can read."
+msgstr "Sem regra de nível de registo: esta função vê todos os registos que pode ler."
+
+#. js-lingui-id: Qylm2x
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "Record-level rule removed"
+msgstr "Regra de nível de registo removida"
+
+#. js-lingui-id: 3SYYmo
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "Record-level rule saved"
+msgstr "Regra de nível de registo guardada"
+
+#. js-lingui-id: sR6lTH
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
+msgid "Remove condition"
+msgstr "Remover condição"
+
+#. js-lingui-id: 6KYDeP
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingRuleForm.tsx
+msgid "Save rule"
+msgstr "Guardar regra"
+
+#. js-lingui-id: yILZ1q
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingSection.tsx
+msgid "Save the role before adding record-level rules."
+msgstr "Guarde a função antes de adicionar regras de nível de registo."
