@@ -32,7 +32,7 @@ const VALUE_KINDS_BY_MEMBER_FIELD: Record<
   RecordScopingColumnValueKind[]
 > = {
   id: ['WORKSPACE_MEMBER', 'UUID'],
-  userEmail: ['TEXT'],
+  userEmail: ['TEXT', 'EMAILS'],
 };
 
 export type RecordScopingConditionInput = {
@@ -74,6 +74,8 @@ const isScalarOfKind = (
       return typeof value === 'string' && isValidUuid(value);
     case 'TEXT':
       return typeof value === 'string';
+    case 'EMAILS':
+      return false;
   }
 };
 
@@ -228,6 +230,21 @@ export const validateRecordScopingConditions = ({
       return invalid(
         `${location}: "in" needs a list of values, not the current member`,
       );
+    }
+
+    if (column.valueKind === 'EMAILS') {
+      if (operator !== 'eq') {
+        return invalid(
+          `${location}: email lists only support "eq" (the member's email is one of them)`,
+        );
+      }
+
+      return {
+        column: column.column,
+        operator,
+        currentWorkspaceMemberField: memberField,
+        columnKind: 'EMAILS',
+      };
     }
 
     return {

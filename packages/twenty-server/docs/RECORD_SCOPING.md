@@ -53,8 +53,28 @@ a field of the signed-in member:
 | `NUMBER`, `NUMERIC` | `employees` | number, or `in` a list |
 | `BOOLEAN` | `isClient` | `true` / `false` |
 | `SELECT` | `stage` | one of the field's options |
+| `EMAILS` | `emails` | only `eq` with `currentWorkspaceMemberField: "userEmail"` |
 
 Operators are `eq`, `neq` and `in`; a member value can't be used with `in`.
+
+An `EMAILS` condition keeps the record when the member's email is the primary
+email or any of the additional ones, compared trimmed and case-insensitively. It
+renders to `LOWER(TRIM(<col>PrimaryEmail)) = :email OR EXISTS (SELECT 1 FROM
+jsonb_array_elements_text(<col>AdditionalEmails) ...)`. This is how several
+members share one record, e.g. a salesman (`comercial`) whose emails list every
+person working under it, so the customers reached through it are shared too:
+
+```json
+{ "column": "comercialId", "operator": "in",
+  "relatedRecords": { "objectMetadataId": "<comercial>", "logicalOperator": "AND",
+    "conditions": [{ "column": "emails", "operator": "eq", "currentWorkspaceMemberField": "userEmail" }] } }
+```
+
+The validator stores `columnKind: "EMAILS"` on the condition so enforcement knows
+how to render it without loading field metadata per query; clients never send it.
+Anything else on an `EMAILS` column (a static value, `neq`, `in`, the member id)
+is rejected, and a stored condition that is somehow not `eq` against a string
+email matches nothing. Settings > Roles offers it as "My email".
 
 A many-to-one relation can also match **related records**: the scoped record is
 kept when its join column points at a record of the related object that matches
@@ -207,7 +227,8 @@ Coverage:
   no value source), no-op.
 - `utils/__tests__/build-record-scoping-condition.util.spec.ts` — role/auth gating,
   alias-qualified SQL + parameters, `neq`/`in`, OR within a rule, AND across rules,
-  per-alias parameter names, fail-closed `1 = 0`.
+  per-alias parameter names, fail-closed `1 = 0`, email lists (primary or
+  additional, nested in related records, fail-closed).
 - `utils/__tests__/record-scoping-sql.spec.ts` — drives the **real** workspace
   select/mutation builders: scoped SELECT (an `orWhere` cannot escape it), count,
   DELETE, and a joined relation scoped on its ON clause.

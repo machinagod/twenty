@@ -51,6 +51,12 @@ describe('getRecordScopingColumnOptions', () => {
       }),
       field({ name: 'label', type: FieldMetadataType.SELECT, options: null }),
       field({ name: 'closeDate', type: FieldMetadataType.DATE_TIME }),
+      field({ name: 'emails', type: FieldMetadataType.EMAILS }),
+      field({
+        name: 'systemEmails',
+        type: FieldMetadataType.EMAILS,
+        isSystem: true,
+      }),
       field({
         name: 'position',
         type: FieldMetadataType.NUMBER,
@@ -69,6 +75,7 @@ describe('getRecordScopingColumnOptions', () => {
       ['amount', 'NUMBER'],
       ['companyId', 'UUID'],
       ['createdByWorkspaceMemberId', 'WORKSPACE_MEMBER'],
+      ['emails', 'EMAILS'],
       ['isWon', 'BOOLEAN'],
       ['label', 'SELECT'],
       ['name', 'TEXT'],

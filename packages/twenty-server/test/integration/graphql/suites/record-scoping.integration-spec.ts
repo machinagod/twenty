@@ -32,7 +32,9 @@ import { WORKSPACE_MEMBER_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev
 //   5. editing rules needs the Roles permission, invalid rules are rejected,
 //      and removing a rule lifts the scope without a restart,
 //   6. a rule can keep records that related records point back at (companies
-//      with an opportunity owned by the member).
+//      with an opportunity owned by the member),
+//   7. an email list matches when the member's email is the primary or any
+//      additional one, also from inside related records.
 // This is the regression net that survives upstream syncs: if a future upstream
 // refactor of the query builders drops the record scoping call, this fails.
 const ROLE_LABEL = 'Record Scoping Test Role';
@@ -71,6 +73,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   const inScopePersonId = randomUUID();
   const outOfScopePersonId = randomUUID();
   const testPersonIds = [inScopePersonId, outOfScopePersonId];
+  const emailPersonIds: string[] = [];
 
   const findTestCompaniesAs = (token: string) =>
     makeGraphqlApiRequest(
@@ -286,7 +289,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       );
     }
 
-    for (const id of testPersonIds) {
+    for (const id of [...testPersonIds, ...emailPersonIds]) {
       await makeGraphqlApiRequest(
         destroyOneOperationFactory({
           objectMetadataSingularName: 'person',
@@ -555,5 +558,189 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     });
 
     expect(response.body.errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT');
+  });
+
+  describe('email lists', () => {
+    const primaryMatchId = randomUUID();
+    const additionalMatchId = randomUUID();
+    const noMatchId = randomUUID();
+    let personObjectMetadataId: string;
+
+    const meByEmail = {
+      column: 'emails',
+      operator: 'eq',
+      currentWorkspaceMemberField: 'userEmail',
+    };
+
+    const findPeopleAs = (token: string) =>
+      makeGraphqlApiRequest(
+        findManyOperationFactory({
+          objectMetadataSingularName: 'person',
+          objectMetadataPluralName: 'people',
+          gqlFields: 'id name { firstName }',
+          filter: {
+            id: { in: [primaryMatchId, additionalMatchId, noMatchId] },
+          },
+          first: 10,
+        }),
+        token,
+      );
+
+    const firstNames = (response: {
+      body: {
+        data: {
+          people: { edges: { node: { name: { firstName: string } } }[] };
+        };
+      };
+    }) =>
+      response.body.data.people.edges
+        .map((edge) => edge.node.name.firstName)
+        .sort((a, b) => a.localeCompare(b));
+
+    beforeAll(async () => {
+      const { objects } = await findManyObjectMetadata({
+        input: { filter: {}, paging: { first: 1000 } },
+        gqlFields: 'id nameSingular',
+        expectToFail: false,
+      });
+      const personObject = objects.find(
+        (item) => item.nameSingular === 'person',
+      );
+
+      jestExpectToBeDefined(personObject);
+      personObjectMetadataId = personObject.id;
+
+      const people = [
+        {
+          id: primaryMatchId,
+          firstName: 'RecordScopingEmailPrimary',
+          emails: {
+            primaryEmail: 'Jony.Ive@Apple.dev',
+            additionalEmails: [],
+          },
+        },
+        {
+          id: additionalMatchId,
+          firstName: 'RecordScopingEmailAdditional',
+          emails: {
+            primaryEmail: 'someone.else@apple.dev',
+            additionalEmails: ['other@apple.dev', 'JONY.IVE@apple.dev'],
+          },
+        },
+        {
+          id: noMatchId,
+          firstName: 'RecordScopingEmailNone',
+          emails: {
+            primaryEmail: 'phil.schiler@apple.dev',
+            additionalEmails: ['jony.ive@apple.dev.example'],
+          },
+        },
+      ];
+
+      for (const { id, firstName, emails } of people) {
+        emailPersonIds.push(id);
+
+        const response = await makeGraphqlApiRequest(
+          createOneOperationFactory({
+            objectMetadataSingularName: 'person',
+            gqlFields: 'id',
+            data: { id, emails, name: { firstName, lastName: 'Person' } },
+          }),
+        );
+
+        expect(response.body.errors).toBeUndefined();
+      }
+    });
+
+    it('keeps records listing the member email as primary or additional', async () => {
+      const upsertResponse = await upsertRecordScopingRule({
+        roleId: customRoleId,
+        objectMetadataId: personObjectMetadataId,
+        logicalOperator: 'AND',
+        conditions: [meByEmail],
+      });
+
+      expect(upsertResponse.body.errors).toBeUndefined();
+
+      const scoped = await findPeopleAs(APPLE_JONY_MEMBER_ACCESS_TOKEN);
+
+      expect(scoped.body.errors).toBeUndefined();
+      expect(firstNames(scoped)).toEqual([
+        'RecordScopingEmailAdditional',
+        'RecordScopingEmailPrimary',
+      ]);
+      expect(
+        firstNames(await findPeopleAs(APPLE_JANE_ADMIN_ACCESS_TOKEN)),
+      ).toEqual([
+        'RecordScopingEmailAdditional',
+        'RecordScopingEmailNone',
+        'RecordScopingEmailPrimary',
+      ]);
+    });
+
+    it('matches the member email from inside related records', async () => {
+      for (const [opportunityId, pointOfContactId] of [
+        [ownedByOtherMemberOpportunityId, primaryMatchId],
+        [ownedByScopedMemberOpportunityId, noMatchId],
+      ]) {
+        const response = await makeGraphqlApiRequest(
+          updateOneOperationFactory({
+            objectMetadataSingularName: 'opportunity',
+            gqlFields: 'id',
+            recordId: opportunityId,
+            data: { pointOfContactId },
+          }),
+        );
+
+        expect(response.body.errors).toBeUndefined();
+      }
+
+      const upsertResponse = await upsertRecordScopingRule({
+        roleId: customRoleId,
+        objectMetadataId: opportunityObjectMetadataId,
+        logicalOperator: 'AND',
+        conditions: [
+          {
+            column: 'pointOfContactId',
+            operator: 'in',
+            relatedRecords: {
+              objectMetadataId: personObjectMetadataId,
+              logicalOperator: 'AND',
+              conditions: [meByEmail],
+            },
+          },
+        ],
+      });
+
+      expect(upsertResponse.body.errors).toBeUndefined();
+
+      const scoped = await findTestOpportunitiesAs(
+        APPLE_JONY_MEMBER_ACCESS_TOKEN,
+      );
+
+      expect(scoped.body.errors).toBeUndefined();
+      expect(namesFromOpportunitiesResponse(scoped)).toEqual([
+        'RecordScoping Owned By Other Member',
+      ]);
+    });
+
+    it.each([
+      [
+        'a static value',
+        { column: 'emails', operator: 'eq', staticValue: 'jony.ive@apple.dev' },
+      ],
+      ['"is not"', { ...meByEmail, operator: 'neq' }],
+    ])('rejects an email list compared with %s', async (_label, condition) => {
+      const response = await upsertRecordScopingRule({
+        roleId: customRoleId,
+        objectMetadataId: personObjectMetadataId,
+        logicalOperator: 'AND',
+        conditions: [condition],
+      });
+
+      expect(response.body.errors?.[0]?.extensions?.code).toBe(
+        'BAD_USER_INPUT',
+      );
+    });
   });
 });

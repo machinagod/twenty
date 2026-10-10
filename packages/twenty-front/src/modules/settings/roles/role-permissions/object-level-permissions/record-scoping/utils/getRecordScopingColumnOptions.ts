@@ -83,6 +83,18 @@ export const getRecordScopingColumnOptions = (
       continue;
     }
 
+    // An email list matches when the signed-in member's email is any of them.
+    if (field.type === FieldMetadataType.EMAILS && field.isSystem !== true) {
+      options.push({
+        key: field.name,
+        column: field.name,
+        label: field.label,
+        icon: field.icon,
+        valueKind: 'EMAILS',
+      });
+      continue;
+    }
+
     if (field.type === FieldMetadataType.ACTOR) {
       const column = `${field.name}WorkspaceMemberId`;
 

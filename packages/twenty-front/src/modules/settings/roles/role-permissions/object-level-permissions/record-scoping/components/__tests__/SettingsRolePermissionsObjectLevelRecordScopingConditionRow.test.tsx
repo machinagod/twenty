@@ -32,6 +32,7 @@ const COLUMNS: RecordScopingColumnOption[] = [
     valueKind: 'WORKSPACE_MEMBER',
   },
   { key: 'city', column: 'city', label: 'City', valueKind: 'TEXT' },
+  { key: 'emails', column: 'emails', label: 'Emails', valueKind: 'EMAILS' },
   {
     key: 'employees',
     column: 'employees',
@@ -161,6 +162,13 @@ describe('SettingsRolePermissionsObjectLevelRecordScopingConditionRow', () => {
     renderRow(draft({ column: 'ownerId', valueSource: 'CURRENT_MEMBER' }));
 
     expect(screen.getByText('Me')).toBeInTheDocument();
+  });
+
+  it('always compares email lists to the signed-in member email', () => {
+    renderRow(draft({ column: 'emails', valueSource: 'CURRENT_MEMBER' }));
+
+    expect(screen.getByText('My email')).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Enter value')).toBeNull();
   });
 
   it('resets the value when the column changes', async () => {

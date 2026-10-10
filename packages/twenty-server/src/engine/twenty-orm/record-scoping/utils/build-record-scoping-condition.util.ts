@@ -109,7 +109,9 @@ const renderConditionGroup = ({
 
     if (!('related' in condition)) {
       renderedConditions.push(
-        renderValueCondition({ condition, column, parameterKey }),
+        condition.columnKind === 'EMAILS'
+          ? renderEmailsCondition({ alias, condition, parameterKey })
+          : renderValueCondition({ condition, column, parameterKey }),
       );
       continue;
     }
@@ -155,6 +157,31 @@ const renderConditionGroup = ({
       {},
       ...renderedConditions.map(({ parameters }) => parameters),
     ),
+  };
+};
+
+// The validator only stores EMAILS conditions as "eq the member's email"; the
+// primary and each additional email are compared trimmed and case-insensitively.
+const renderEmailsCondition = ({
+  alias,
+  condition,
+  parameterKey,
+}: {
+  alias: string;
+  condition: ResolvedRecordScopingValueCondition;
+  parameterKey: string;
+}): SqlCondition => {
+  if (condition.operator !== 'eq' || typeof condition.value !== 'string') {
+    return MATCH_NOTHING;
+  }
+
+  const primaryEmail = `${escapeIdentifier(alias)}.${escapeIdentifier(`${condition.column}PrimaryEmail`)}`;
+  const additionalEmails = `${escapeIdentifier(alias)}.${escapeIdentifier(`${condition.column}AdditionalEmails`)}`;
+  const elementAlias = escapeIdentifier(`${parameterKey}_email`);
+
+  return {
+    sql: `(LOWER(TRIM(${primaryEmail})) = :${parameterKey} OR EXISTS (SELECT 1 FROM jsonb_array_elements_text(COALESCE(${additionalEmails}, '[]'::jsonb)) AS ${elementAlias}(value) WHERE LOWER(TRIM(${elementAlias}.value)) = :${parameterKey}))`,
+    parameters: { [parameterKey]: condition.value.trim().toLowerCase() },
   };
 };
 

@@ -44,10 +44,15 @@ const LIST_VALUE_KINDS: RecordScopingColumnOption['valueKind'][] = [
 
 export const getRecordScopingOperators = (
   column: RecordScopingColumnOption,
-): RecordScopingOperator[] =>
-  LIST_VALUE_KINDS.includes(column.valueKind)
+): RecordScopingOperator[] => {
+  if (column.valueKind === 'EMAILS') {
+    return ['eq'];
+  }
+
+  return LIST_VALUE_KINDS.includes(column.valueKind)
     ? ['eq', 'neq', 'in']
     : ['eq', 'neq'];
+};
 
 // Which field of the signed-in member a column can be compared to, if any.
 export const getCurrentMemberFieldForColumn = (
@@ -57,6 +62,7 @@ export const getCurrentMemberFieldForColumn = (
     case 'WORKSPACE_MEMBER':
       return 'id';
     case 'TEXT':
+    case 'EMAILS':
       return 'userEmail';
     default:
       return undefined;
@@ -91,7 +97,9 @@ export const createRecordScopingConditionDraft = (
     column: column.key,
     operator: 'eq',
     valueSource:
-      column.valueKind === 'WORKSPACE_MEMBER' ? 'CURRENT_MEMBER' : 'STATIC',
+      column.valueKind === 'WORKSPACE_MEMBER' || column.valueKind === 'EMAILS'
+        ? 'CURRENT_MEMBER'
+        : 'STATIC',
     staticValue:
       column.valueKind === 'BOOLEAN'
         ? 'true'
@@ -155,6 +163,8 @@ const parseScalar = (
     case 'UUID':
     case 'WORKSPACE_MEMBER':
       return isValidUuid(trimmed) ? trimmed : undefined;
+    case 'EMAILS':
+      return undefined;
     case 'TEXT':
       return trimmed === '' ? undefined : trimmed;
   }

@@ -100,6 +100,45 @@ describe('validateRecordScopingConditions', () => {
     ]);
   });
 
+  it('accepts the member email against an email list and tags its kind', () => {
+    expect(
+      validate([
+        {
+          column: 'emails',
+          operator: 'eq',
+          currentWorkspaceMemberField: 'userEmail',
+          columnKind: 'TEXT',
+        } as RecordScopingConditionInput,
+      ]),
+    ).toEqual([
+      {
+        column: 'emails',
+        operator: 'eq',
+        currentWorkspaceMemberField: 'userEmail',
+        columnKind: 'EMAILS',
+      },
+    ]);
+  });
+
+  it('never tags other columns with a kind', () => {
+    expect(
+      validate([
+        {
+          column: 'name',
+          operator: 'eq',
+          currentWorkspaceMemberField: 'userEmail',
+          columnKind: 'EMAILS',
+        } as RecordScopingConditionInput,
+      ]),
+    ).toEqual([
+      {
+        column: 'name',
+        operator: 'eq',
+        currentWorkspaceMemberField: 'userEmail',
+      },
+    ]);
+  });
+
   it.each([
     ['stage', 'eq', 'WON'],
     ['stage', 'in', ['NEW', 'WON']],
@@ -215,6 +254,45 @@ describe('validateRecordScopingConditions', () => {
       'not a valid value',
     ],
     [[{ column: 'name', operator: 'eq', staticValue: 3 }], 'not a valid value'],
+    [
+      [{ column: 'emails', operator: 'eq', staticValue: 'a@b.pt' }],
+      'not a valid value',
+    ],
+    [
+      [
+        {
+          column: 'emails',
+          operator: 'neq',
+          currentWorkspaceMemberField: 'userEmail',
+        },
+      ],
+      'email lists only support "eq"',
+    ],
+    [
+      [
+        {
+          column: 'emails',
+          operator: 'in',
+          currentWorkspaceMemberField: 'userEmail',
+        },
+      ],
+      'not the current member',
+    ],
+    [
+      [{ column: 'emails', operator: 'eq', currentWorkspaceMemberField: 'id' }],
+      "the current member's id cannot be compared",
+    ],
+    [[{ ...companyOwnedByMe(), column: 'emails' }], 'is not a relation'],
+    [
+      [
+        {
+          column: 'systemEmails',
+          operator: 'eq',
+          currentWorkspaceMemberField: 'userEmail',
+        },
+      ],
+      'not a column this rule can filter on',
+    ],
   ])('rejects %j', (conditions, message) => {
     expect(() => validate(conditions as RecordScopingConditionInput[])).toThrow(
       RecordScopingRuleException,

@@ -12,6 +12,11 @@ export type RecordScopingOperator = 'eq' | 'neq' | 'in';
 
 export type RecordScopingScalar = string | number | boolean;
 
+// EMAILS columns are composite (primaryEmail + additionalEmails); a condition on
+// one matches when the compared email is the primary or any additional one. The
+// validator stamps the kind so the applier knows how to render the column.
+export type RecordScopingColumnKind = 'EMAILS';
+
 // Records of another object, selected by their own conditions. A condition with
 // relatedRecords keeps the scoped record when its join column points at one of
 // them, e.g. people whose company's account owner is the current member. With
@@ -42,6 +47,7 @@ export type RecordScopingCondition = {
   // Only with operator 'in', on a many-to-one join column, or on 'id' when the
   // related records carry a matchColumn.
   relatedRecords?: RecordScopingRelatedRecords;
+  columnKind?: RecordScopingColumnKind;
 };
 
 export type RecordScopingLogicalOperator = 'AND' | 'OR';
@@ -80,6 +86,7 @@ export type ResolvedRecordScopingValueCondition = {
   column: string;
   operator: RecordScopingOperator;
   value: RecordScopingScalar | RecordScopingScalar[];
+  columnKind?: RecordScopingColumnKind;
 };
 
 export type ResolvedRecordScopingRelatedCondition = {

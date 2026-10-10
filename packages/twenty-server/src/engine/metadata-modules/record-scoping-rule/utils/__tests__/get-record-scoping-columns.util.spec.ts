@@ -47,10 +47,19 @@ describe('getRecordScopingColumns', () => {
     });
   });
 
+  it('keeps non-system email lists', () => {
+    expect(columns.get('emails')).toEqual({
+      column: 'emails',
+      valueKind: 'EMAILS',
+    });
+    expect(columns.has('systemEmails')).toBe(false);
+  });
+
   it('drops one-to-many relations, unsupported types and system scalars', () => {
     expect([...columns.keys()].sort()).toEqual([
       'companyId',
       'createdByWorkspaceMemberId',
+      'emails',
       'externalId',
       'isWon',
       'name',

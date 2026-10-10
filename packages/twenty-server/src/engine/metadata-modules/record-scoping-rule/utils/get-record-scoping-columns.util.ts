@@ -15,7 +15,8 @@ export type RecordScopingColumnValueKind =
   | 'TEXT'
   | 'NUMBER'
   | 'BOOLEAN'
-  | 'SELECT';
+  | 'SELECT'
+  | 'EMAILS';
 
 export type RecordScopingColumn = {
   column: string;
@@ -74,6 +75,13 @@ export const getRecordScopingColumns = ({
           ? { targetObjectMetadataId: field.relationTargetObjectMetadataId }
           : {}),
       });
+      continue;
+    }
+
+    // Composite: matched as a whole (primary or any additional email), only
+    // against the current member's email.
+    if (field.type === FieldMetadataType.EMAILS && !field.isSystem) {
+      columns.set(field.name, { column: field.name, valueKind: 'EMAILS' });
       continue;
     }
 
