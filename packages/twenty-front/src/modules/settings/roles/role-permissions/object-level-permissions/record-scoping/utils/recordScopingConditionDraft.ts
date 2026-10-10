@@ -15,6 +15,7 @@ export type RecordScopingConditionValue = {
   currentWorkspaceMemberField?: string | null;
   relatedRecords?: {
     objectMetadataId: string;
+    matchColumn?: string | null;
     logicalOperator: string;
     conditions: RecordScopingConditionValue[];
   } | null;
@@ -24,6 +25,13 @@ export type RecordScopingConditionValue = {
 export type GetRecordScopingColumns = (
   objectMetadataId: string,
 ) => RecordScopingColumnOption[] | undefined;
+
+// The option key of a condition: options matching related records that point
+// back at the object all sit on its id, so they are told apart by matchColumn.
+export const getRecordScopingColumnKey = (
+  column: string,
+  matchColumn?: string | null,
+) => (isDefined(matchColumn) ? `${column}:${matchColumn}` : column);
 
 // Matches the server limit: a rule may hop through at most three related objects.
 export const MAX_RECORD_SCOPING_RELATED_DEPTH = 3;
@@ -59,7 +67,7 @@ export const canMatchRelatedRecords = (column: RecordScopingColumnOption) =>
   column.valueKind === 'UUID' && isDefined(column.targetObjectMetadataId);
 
 // An owner-style relation is the most common rule; actor columns (created by /
-// updated by) come next.
+// updated by) come next, and related records pointing back come last.
 export const getDefaultRecordScopingColumn = (
   columns: RecordScopingColumnOption[],
 ): RecordScopingColumnOption | undefined =>
@@ -69,21 +77,31 @@ export const getDefaultRecordScopingColumn = (
       !column.column.endsWith('WorkspaceMemberId'),
   ) ??
   columns.find((column) => column.valueKind === 'WORKSPACE_MEMBER') ??
+  columns.find((column) => !isDefined(column.matchColumn)) ??
   columns[0];
 
+// A condition on related records pointing back can only match those records,
+// so it starts as "matching records" when `getColumns` is given.
 export const createRecordScopingConditionDraft = (
   column: RecordScopingColumnOption,
-): RecordScopingConditionDraft => ({
-  key: v4(),
-  column: column.column,
-  operator: 'eq',
-  valueSource:
-    column.valueKind === 'WORKSPACE_MEMBER' ? 'CURRENT_MEMBER' : 'STATIC',
-  staticValue:
-    column.valueKind === 'BOOLEAN'
-      ? 'true'
-      : (column.selectOptions?.[0]?.value ?? ''),
-});
+  getColumns?: GetRecordScopingColumns,
+): RecordScopingConditionDraft => {
+  const draft: RecordScopingConditionDraft = {
+    key: v4(),
+    column: column.key,
+    operator: 'eq',
+    valueSource:
+      column.valueKind === 'WORKSPACE_MEMBER' ? 'CURRENT_MEMBER' : 'STATIC',
+    staticValue:
+      column.valueKind === 'BOOLEAN'
+        ? 'true'
+        : (column.selectOptions?.[0]?.value ?? ''),
+  };
+
+  return isDefined(column.matchColumn) && isDefined(getColumns)
+    ? toRelatedRecordScopingConditionDraft(draft, column, getColumns)
+    : draft;
+};
 
 // Switches a relation condition to "matching records", seeded with the
 // related object's default condition.
@@ -151,7 +169,7 @@ export const toRecordScopingConditionInputs = (
   const inputs = drafts.map((draft) =>
     toRecordScopingConditionInput(
       draft,
-      columns.find((column) => column.column === draft.column),
+      columns.find((column) => column.key === draft.column),
       getColumns,
     ),
   );
@@ -190,10 +208,13 @@ export const toRecordScopingConditionInput = (
 
     return isDefined(relatedInputs)
       ? {
-          column: draft.column,
+          column: column.column,
           operator: 'in',
           relatedRecords: {
             objectMetadataId: draft.related.objectMetadataId,
+            ...(isDefined(column.matchColumn)
+              ? { matchColumn: column.matchColumn }
+              : {}),
             logicalOperator: draft.related.logicalOperator,
             conditions: relatedInputs,
           },
@@ -201,12 +222,16 @@ export const toRecordScopingConditionInput = (
       : undefined;
   }
 
+  if (isDefined(column.matchColumn)) {
+    return undefined;
+  }
+
   if (draft.valueSource === 'CURRENT_MEMBER') {
     const memberField = getCurrentMemberFieldForColumn(column);
 
     return isDefined(memberField) && draft.operator !== 'in'
       ? {
-          column: draft.column,
+          column: column.column,
           operator: draft.operator,
           currentWorkspaceMemberField: memberField,
         }
@@ -220,14 +245,14 @@ export const toRecordScopingConditionInput = (
       .map((item) => parseScalar(item, column));
 
     return values.length > 0 && values.every(isDefined)
-      ? { column: draft.column, operator: 'in', staticValue: values }
+      ? { column: column.column, operator: 'in', staticValue: values }
       : undefined;
   }
 
   const value = parseScalar(draft.staticValue, column);
 
   return isDefined(value)
-    ? { column: draft.column, operator: draft.operator, staticValue: value }
+    ? { column: column.column, operator: draft.operator, staticValue: value }
     : undefined;
 };
 
@@ -237,7 +262,10 @@ export const fromRecordScopingCondition = (
   if (isDefined(condition.relatedRecords)) {
     return {
       key: v4(),
-      column: condition.column,
+      column: getRecordScopingColumnKey(
+        condition.column,
+        condition.relatedRecords.matchColumn,
+      ),
       operator: 'in',
       valueSource: 'RELATED',
       staticValue: '',

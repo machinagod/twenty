@@ -6,6 +6,7 @@ import {
   fromRecordScopingCondition,
   getCurrentMemberFieldForColumn,
   getDefaultRecordScopingColumn,
+  getRecordScopingColumnKey,
   getRecordScopingOperators,
   toRecordScopingConditionInput,
   toRecordScopingConditionInputs,
@@ -24,6 +25,7 @@ const column = (
   label: 'Col',
   valueKind,
   ...overrides,
+  key: overrides.key ?? overrides.column ?? 'col',
 });
 
 const stage = column('SELECT', {
@@ -360,6 +362,82 @@ describe('related records', () => {
     expect(
       toRecordScopingConditionInput(conditionDraft, columnOption, getColumns),
     ).toBeUndefined();
+  });
+
+  describe('pointing back at the scoped record', () => {
+    const linesColumn = column('UUID', {
+      key: 'id:companyId',
+      column: 'id',
+      label: 'Any of people',
+      targetObjectMetadataId: 'company-id',
+      matchColumn: 'companyId',
+    });
+    const input = {
+      column: 'id',
+      operator: 'in',
+      relatedRecords: {
+        objectMetadataId: 'company-id',
+        matchColumn: 'companyId',
+        logicalOperator: 'AND',
+        conditions: [
+          {
+            column: 'accountOwnerId',
+            operator: 'eq',
+            currentWorkspaceMemberField: 'id',
+          },
+        ],
+      },
+    };
+
+    it('keys the option by its match column', () => {
+      expect(getRecordScopingColumnKey('id', 'companyId')).toBe('id:companyId');
+      expect(getRecordScopingColumnKey('name')).toBe('name');
+      expect(getRecordScopingColumnKey('name', null)).toBe('name');
+    });
+
+    it('starts as matching records when the related columns are known', () => {
+      expect(
+        createRecordScopingConditionDraft(linesColumn, getColumns),
+      ).toMatchObject({
+        column: 'id:companyId',
+        valueSource: 'RELATED',
+        related: { objectMetadataId: 'company-id' },
+      });
+      expect(createRecordScopingConditionDraft(linesColumn)).toMatchObject({
+        column: 'id:companyId',
+        valueSource: 'STATIC',
+      });
+    });
+
+    it('round-trips through the API shape with its match column', () => {
+      const relatedDraft = fromRecordScopingCondition(input);
+
+      expect(relatedDraft.column).toBe('id:companyId');
+      expect(
+        toRecordScopingConditionInputs(
+          [relatedDraft],
+          [...companyColumns, linesColumn],
+          getColumns,
+        ),
+      ).toEqual([input]);
+    });
+
+    it('is undefined unless it matches related records', () => {
+      expect(
+        toRecordScopingConditionInput(
+          draft({ column: 'id:companyId', valueSource: 'CURRENT_MEMBER' }),
+          linesColumn,
+          getColumns,
+        ),
+      ).toBeUndefined();
+    });
+
+    it('is the default column only when nothing else is offered', () => {
+      const text = column('TEXT', { column: 'name' });
+
+      expect(getDefaultRecordScopingColumn([linesColumn, text])).toBe(text);
+      expect(getDefaultRecordScopingColumn([linesColumn])).toBe(linesColumn);
+    });
   });
 
   it('converts a list only when every draft is complete', () => {

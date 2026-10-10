@@ -61,7 +61,7 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionList = ({
     if (isDefined(defaultColumn)) {
       onDraftsChange([
         ...drafts,
-        createRecordScopingConditionDraft(defaultColumn),
+        createRecordScopingConditionDraft(defaultColumn, getColumns),
       ]);
     }
   };

@@ -85,4 +85,71 @@ describe('getRecordScopingColumnOptions', () => {
       options.find((option) => option.column === 'label')?.selectOptions,
     ).toEqual([]);
   });
+
+  describe('one-to-many relations', () => {
+    const oneToMany = (
+      name: string,
+      targetFieldId: string,
+      overrides: Record<string, unknown> = {},
+    ) =>
+      field({
+        name,
+        type: FieldMetadataType.RELATION,
+        relation: {
+          ...relationTo('line', RelationType.ONE_TO_MANY),
+          targetFieldMetadata: { id: targetFieldId, name: 'unused' },
+        },
+        ...overrides,
+      });
+
+    const lineObject = {
+      id: 'line',
+      fields: [
+        field({
+          name: 'route',
+          id: 'line-route',
+          type: FieldMetadataType.RELATION,
+        }),
+        field({
+          name: 'target',
+          id: 'line-target',
+          type: FieldMetadataType.MORPH_RELATION,
+        }),
+      ],
+    } as never;
+
+    it('offers any related record pointing back through a plain join column', () => {
+      expect(
+        getRecordScopingColumnOptions(
+          {
+            fields: [
+              oneToMany('lines', 'line-route'),
+              oneToMany('targets', 'line-target'),
+              oneToMany('hiddenLines', 'line-route', { isSystem: true }),
+              oneToMany('unknown', 'missing-field'),
+            ],
+          },
+          [lineObject],
+        ),
+      ).toEqual([
+        {
+          key: 'id:routeId',
+          column: 'id',
+          label: 'Any of lines',
+          icon: 'IconCircle',
+          valueKind: 'UUID',
+          targetObjectMetadataId: 'line',
+          matchColumn: 'routeId',
+        },
+      ]);
+    });
+
+    it('skips them when the related object is unknown', () => {
+      expect(
+        getRecordScopingColumnOptions({
+          fields: [oneToMany('lines', 'line-route')],
+        }),
+      ).toEqual([]);
+    });
+  });
 });

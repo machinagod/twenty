@@ -25601,3 +25601,8 @@ msgstr "{0} que cumprem"
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
 msgid "Matching records"
 msgstr "Registos correspondentes"
+
+#. js-lingui-id: mwPHZ/
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/utils/getRecordScopingColumnOptions.ts
+msgid "Any of {fieldLabel}"
+msgstr "Qualquer de {fieldLabel}"
