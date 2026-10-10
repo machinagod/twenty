@@ -72,8 +72,9 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
   const { objectMetadataItems } = useObjectMetadataItems();
 
   const columns = useMemo(
-    () => getRecordScopingColumnOptions(objectMetadataItem),
-    [objectMetadataItem],
+    () =>
+      getRecordScopingColumnOptions(objectMetadataItem, objectMetadataItems),
+    [objectMetadataItem, objectMetadataItems],
   );
 
   const getColumns = (objectMetadataId: string) => {
@@ -82,7 +83,10 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
     );
 
     return isDefined(relatedObjectMetadataItem)
-      ? getRecordScopingColumnOptions(relatedObjectMetadataItem)
+      ? getRecordScopingColumnOptions(
+          relatedObjectMetadataItem,
+          objectMetadataItems,
+        )
       : undefined;
   };
 
@@ -134,7 +138,7 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
     const defaultColumn = getDefaultRecordScopingColumn(columns);
 
     if (isDefined(defaultColumn)) {
-      setDrafts([createRecordScopingConditionDraft(defaultColumn)]);
+      setDrafts([createRecordScopingConditionDraft(defaultColumn, getColumns)]);
     }
   };
 

@@ -10,6 +10,7 @@ import { type RecordScopingConditionDraft } from '@/settings/roles/role-permissi
 
 const COMPANY_COLUMNS: RecordScopingColumnOption[] = [
   {
+    key: 'accountOwnerId',
     column: 'accountOwnerId',
     label: 'Account owner',
     valueKind: 'WORKSPACE_MEMBER',
@@ -18,16 +19,41 @@ const COMPANY_COLUMNS: RecordScopingColumnOption[] = [
 
 const COLUMNS: RecordScopingColumnOption[] = [
   {
+    key: 'companyId',
     column: 'companyId',
     label: 'Company',
     valueKind: 'UUID',
     targetObjectMetadataId: 'company-id',
   },
-  { column: 'ownerId', label: 'Owner', valueKind: 'WORKSPACE_MEMBER' },
-  { column: 'city', label: 'City', valueKind: 'TEXT' },
-  { column: 'employees', label: 'Employees', valueKind: 'NUMBER' },
-  { column: 'isClient', label: 'Client', valueKind: 'BOOLEAN' },
   {
+    key: 'ownerId',
+    column: 'ownerId',
+    label: 'Owner',
+    valueKind: 'WORKSPACE_MEMBER',
+  },
+  { key: 'city', column: 'city', label: 'City', valueKind: 'TEXT' },
+  {
+    key: 'employees',
+    column: 'employees',
+    label: 'Employees',
+    valueKind: 'NUMBER',
+  },
+  {
+    key: 'isClient',
+    column: 'isClient',
+    label: 'Client',
+    valueKind: 'BOOLEAN',
+  },
+  {
+    key: 'id:ownerId',
+    column: 'id',
+    label: 'Any of companies',
+    valueKind: 'UUID',
+    targetObjectMetadataId: 'company-id',
+    matchColumn: 'ownerId',
+  },
+  {
+    key: 'stage',
     column: 'stage',
     label: 'Stage',
     valueKind: 'SELECT',
@@ -302,5 +328,50 @@ describe('SettingsRolePermissionsObjectLevelRecordScopingConditionRow', () => {
 
     expect(screen.queryByText('Value')).toBeNull();
     expect(screen.getByPlaceholderText('Enter value')).toBeInTheDocument();
+  });
+
+  it('starts related records pointing back as matching records', async () => {
+    const { onChange } = renderRow(draft({}));
+
+    await userEvent.click(screen.getByText('City'));
+    await userEvent.click(await screen.findByText('Any of companies'));
+
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        key: 'key-1',
+        column: 'id:ownerId',
+        operator: 'in',
+        valueSource: 'RELATED',
+        related: expect.objectContaining({ objectMetadataId: 'company-id' }),
+      }),
+    );
+  });
+
+  it('only matches records for related records pointing back', () => {
+    renderRow(
+      draft({
+        column: 'id:ownerId',
+        operator: 'in',
+        valueSource: 'RELATED',
+        related: {
+          objectMetadataId: 'company-id',
+          logicalOperator: 'AND',
+          conditions: [],
+        },
+      }),
+    );
+
+    expect(screen.getByText('Matching records')).toBeInTheDocument();
+    expect(screen.queryByText('Value')).toBeNull();
+    expect(screen.getByText('Companies matching')).toBeInTheDocument();
+  });
+
+  it('stops offering related records pointing back at the maximum depth', async () => {
+    renderRow(draft({}), 3);
+
+    await userEvent.click(screen.getByText('City'));
+
+    expect(await screen.findByText('Stage')).toBeInTheDocument();
+    expect(screen.queryByText('Any of companies')).toBeNull();
   });
 });

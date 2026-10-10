@@ -77,7 +77,7 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
   onChange,
   onRemove,
 }: SettingsRolePermissionsObjectLevelRecordScopingConditionRowProps) => {
-  const column = columns.find((option) => option.column === draft.column);
+  const column = columns.find((option) => option.key === draft.column);
 
   const operatorLabels: Record<RecordScopingOperator, string> = {
     eq: t`Is`,
@@ -86,11 +86,11 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
   };
 
   const handleColumnChange = (columnName: string) => {
-    const nextColumn = columns.find((option) => option.column === columnName);
+    const nextColumn = columns.find((option) => option.key === columnName);
 
     if (isDefined(nextColumn)) {
       onChange({
-        ...createRecordScopingConditionDraft(nextColumn),
+        ...createRecordScopingConditionDraft(nextColumn, getColumns),
         key: draft.key,
       });
     }
@@ -130,6 +130,18 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
   const renderValueInput = () => {
     if (!isDefined(column)) {
       return null;
+    }
+
+    if (isDefined(column.matchColumn)) {
+      return (
+        <Select
+          dropdownId={`${instanceId}-value-source`}
+          fullWidth
+          disabled
+          options={[{ value: 'RELATED', label: t`Matching records` }]}
+          value="RELATED"
+        />
+      );
     }
 
     if (canUseRelatedRecords) {
@@ -241,10 +253,16 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
           dropdownId={`${instanceId}-column`}
           fullWidth
           withSearchInput
-          options={columns.map((option) => ({
-            value: option.column,
-            label: option.label,
-          }))}
+          options={columns
+            .filter(
+              (option) =>
+                !isDefined(option.matchColumn) ||
+                depth < MAX_RECORD_SCOPING_RELATED_DEPTH,
+            )
+            .map((option) => ({
+              value: option.key,
+              label: option.label,
+            }))}
           value={draft.column}
           onChange={handleColumnChange}
         />

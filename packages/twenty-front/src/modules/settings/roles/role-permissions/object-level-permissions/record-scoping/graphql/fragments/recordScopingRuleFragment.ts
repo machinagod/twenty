@@ -12,16 +12,19 @@ export const RECORD_SCOPING_RULE_FRAGMENT = gql`
       ...RecordScopingConditionFields
       relatedRecords {
         objectMetadataId
+        matchColumn
         logicalOperator
         conditions {
           ...RecordScopingConditionFields
           relatedRecords {
             objectMetadataId
+            matchColumn
             logicalOperator
             conditions {
               ...RecordScopingConditionFields
               relatedRecords {
                 objectMetadataId
+                matchColumn
                 logicalOperator
                 conditions {
                   ...RecordScopingConditionFields
