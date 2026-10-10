@@ -350,4 +350,112 @@ describe('buildRecordScopingCondition', () => {
       ).toEqual(['wm-current']);
     });
   });
+
+  describe('email lists', () => {
+    const emailsRule = (
+      condition: Partial<RecordScopingRule['conditions'][number]> = {},
+    ): RecordScopingRulesByRoleId => ({
+      'role-1': [
+        {
+          objectMetadataId: 'opportunity-id',
+          logicalOperator: 'AND',
+          conditions: [
+            {
+              column: 'emails',
+              operator: 'eq',
+              currentWorkspaceMemberField: 'userEmail',
+              columnKind: 'EMAILS',
+              ...condition,
+            },
+          ],
+        },
+      ],
+    });
+    const withEmail = (userEmail: unknown) =>
+      ({
+        ...userAuthContext,
+        workspaceMember: { id: 'wm-current', userEmail },
+      }) as unknown as WorkspaceAuthContext;
+
+    it('should match the primary or any additional email, trimmed and case-insensitively', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: emailsRule(),
+          authContext: withEmail('  Augusto@Example.PT '),
+        }),
+      ).toEqual({
+        sql: `((LOWER(TRIM("opportunity"."emailsPrimaryEmail")) = :recordScoping_opportunity_0 OR EXISTS (SELECT 1 FROM jsonb_array_elements_text(COALESCE("opportunity"."emailsAdditionalEmails", '[]'::jsonb)) AS "recordScoping_opportunity_0_email"(value) WHERE LOWER(TRIM("recordScoping_opportunity_0_email".value)) = :recordScoping_opportunity_0)))`,
+        parameters: { recordScoping_opportunity_0: 'augusto@example.pt' },
+      });
+    });
+
+    it('should work inside related records', () => {
+      const condition = buildForOpportunity({
+        recordScopingRulesByRoleId: {
+          'role-1': [
+            {
+              objectMetadataId: 'opportunity-id',
+              logicalOperator: 'AND',
+              conditions: [
+                {
+                  column: 'companyId',
+                  operator: 'in',
+                  relatedRecords: {
+                    objectMetadataId: 'company-id',
+                    logicalOperator: 'AND',
+                    conditions: emailsRule()['role-1'][0].conditions,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        authContext: withEmail('augusto@example.pt'),
+      });
+
+      expect(condition?.sql).toContain(
+        'LOWER(TRIM("recordScoping_opportunity_0"."emailsPrimaryEmail")) = :recordScoping_opportunity_0_0',
+      );
+      expect(condition?.parameters).toEqual({
+        recordScoping_opportunity_0_0: 'augusto@example.pt',
+      });
+      expect(
+        compileNamedParameters(condition!.sql, condition!.parameters).values,
+      ).toEqual(['augusto@example.pt']);
+    });
+
+    it('should fail closed when the member has no email', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: emailsRule(),
+          authContext: withEmail(undefined),
+        }),
+      ).toEqual({ sql: '1 = 0', parameters: {} });
+    });
+
+    it.each([
+      ['a non-string email', withEmail(42), {}],
+      [
+        'an operator other than eq',
+        withEmail('a@b.pt'),
+        { operator: 'neq' as const },
+      ],
+      [
+        'a list value',
+        withEmail('a@b.pt'),
+        {
+          operator: 'in' as const,
+          currentWorkspaceMemberField: undefined,
+          staticValue: ['a@b.pt'],
+        },
+      ],
+    ])('should match nothing on %s', (_label, authContext, condition) => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: emailsRule(condition),
+          authContext,
+        }),
+      ).toEqual({ sql: '(1 = 0)', parameters: {} });
+    });
+  });
 });

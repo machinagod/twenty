@@ -70,6 +70,10 @@ describe('getRecordScopingOperators', () => {
       'neq',
     ]);
   });
+
+  it('only offers "is" for email lists', () => {
+    expect(getRecordScopingOperators(column('EMAILS'))).toEqual(['eq']);
+  });
 });
 
 describe('getCurrentMemberFieldForColumn', () => {
@@ -78,6 +82,7 @@ describe('getCurrentMemberFieldForColumn', () => {
       'id',
     );
     expect(getCurrentMemberFieldForColumn(column('TEXT'))).toBe('userEmail');
+    expect(getCurrentMemberFieldForColumn(column('EMAILS'))).toBe('userEmail');
     expect(getCurrentMemberFieldForColumn(column('NUMBER'))).toBeUndefined();
   });
 });
@@ -88,6 +93,13 @@ describe('createRecordScopingConditionDraft', () => {
       createRecordScopingConditionDraft(column('WORKSPACE_MEMBER')),
     ).toMatchObject({
       column: 'col',
+      operator: 'eq',
+      valueSource: 'CURRENT_MEMBER',
+    });
+  });
+
+  it('defaults email lists to the current member email', () => {
+    expect(createRecordScopingConditionDraft(column('EMAILS'))).toMatchObject({
       operator: 'eq',
       valueSource: 'CURRENT_MEMBER',
     });
@@ -117,6 +129,30 @@ describe('toRecordScopingConditionInput', () => {
       operator: 'eq',
       currentWorkspaceMemberField: 'id',
     });
+  });
+
+  it('matches an email list against the member email', () => {
+    expect(
+      toRecordScopingConditionInput(
+        draft({ valueSource: 'CURRENT_MEMBER' }),
+        column('EMAILS'),
+        noColumns,
+      ),
+    ).toEqual({
+      column: 'col',
+      operator: 'eq',
+      currentWorkspaceMemberField: 'userEmail',
+    });
+  });
+
+  it('never sends a typed value for an email list', () => {
+    expect(
+      toRecordScopingConditionInput(
+        draft({ staticValue: 'a@b.pt' }),
+        column('EMAILS'),
+        noColumns,
+      ),
+    ).toBeUndefined();
   });
 
   it.each([

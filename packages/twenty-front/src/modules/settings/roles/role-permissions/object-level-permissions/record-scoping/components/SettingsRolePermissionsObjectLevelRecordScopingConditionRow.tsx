@@ -186,6 +186,18 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
       );
     }
 
+    if (column.valueKind === 'EMAILS') {
+      return (
+        <Select
+          dropdownId={`${instanceId}-value`}
+          fullWidth
+          disabled
+          options={[{ value: 'CURRENT_MEMBER', label: t`My email` }]}
+          value="CURRENT_MEMBER"
+        />
+      );
+    }
+
     if (column.valueKind === 'SELECT' || column.valueKind === 'BOOLEAN') {
       const options =
         column.valueKind === 'BOOLEAN'

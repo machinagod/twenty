@@ -53,6 +53,8 @@ export const OPPORTUNITY_FIELDS: FlatFieldMetadata[] = [
   } as never),
   field('tags', FieldMetadataType.MULTI_SELECT),
   field('closeDate', FieldMetadataType.DATE_TIME),
+  field('emails', FieldMetadataType.EMAILS),
+  field('systemEmails', FieldMetadataType.EMAILS, { isSystem: true }),
   field('position', FieldMetadataType.POSITION, { isSystem: true }),
   field('searchRank', FieldMetadataType.NUMBER, { isSystem: true }),
 ];

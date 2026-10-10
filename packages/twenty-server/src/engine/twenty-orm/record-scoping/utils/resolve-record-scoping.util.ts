@@ -100,9 +100,18 @@ const resolveCondition = ({
 
   const value = resolveConditionValue({ condition, currentWorkspaceMember });
 
-  return isDefined(value)
-    ? { column: condition.column, operator: condition.operator, value }
-    : undefined;
+  if (!isDefined(value)) {
+    return undefined;
+  }
+
+  return {
+    column: condition.column,
+    operator: condition.operator,
+    value,
+    ...(isDefined(condition.columnKind)
+      ? { columnKind: condition.columnKind }
+      : {}),
+  };
 };
 
 const resolveConditionValue = ({

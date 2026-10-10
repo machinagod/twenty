@@ -4,7 +4,8 @@ type RecordScopingColumnValueKind =
   | 'TEXT'
   | 'NUMBER'
   | 'BOOLEAN'
-  | 'SELECT';
+  | 'SELECT'
+  | 'EMAILS';
 
 export type RecordScopingColumnOption = {
   // Unique among an object's options: the column, or `id:<matchColumn>` for the

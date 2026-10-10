@@ -27,6 +27,38 @@ describe('resolveRecordScoping', () => {
     });
   });
 
+  it('should keep the column kind of an email-list condition', () => {
+    expect(
+      resolveRecordScoping({
+        rules: [
+          {
+            ...ownerRule,
+            conditions: [
+              {
+                column: 'emails',
+                operator: 'eq',
+                currentWorkspaceMemberField: 'userEmail',
+                columnKind: 'EMAILS',
+              },
+            ],
+          },
+        ],
+        currentWorkspaceMember: { id: 'wm-current', userEmail: 'a@b.pt' },
+      }),
+    ).toEqual({
+      kind: 'conditions',
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          column: 'emails',
+          operator: 'eq',
+          value: 'a@b.pt',
+          columnKind: 'EMAILS',
+        },
+      ],
+    });
+  });
+
   it('should resolve a static-value rule', () => {
     const result = resolveRecordScoping({
       rules: [
