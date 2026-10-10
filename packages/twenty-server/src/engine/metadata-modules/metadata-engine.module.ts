@@ -31,6 +31,7 @@ import { PermissionFlagModule } from 'src/engine/metadata-modules/permission-fla
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
 import { MinimalMetadataModule } from 'src/engine/metadata-modules/minimal-metadata/minimal-metadata.module';
 import { ServerRouteTriggerModule } from 'src/engine/core-modules/server-route-trigger/server-route-trigger.module';
+import { RecordScopingRuleModule } from 'src/engine/metadata-modules/record-scoping-rule/record-scoping-rule.module';
 import { RoleModule } from 'src/engine/metadata-modules/role/role.module';
 import { RouteTriggerModule } from 'src/engine/metadata-modules/route-trigger/route-trigger.module';
 import { SearchFieldMetadataModule } from 'src/engine/metadata-modules/search-field-metadata/search-field-metadata.module';
@@ -66,6 +67,7 @@ import { WorkspaceMetadataVersionModule } from 'src/engine/metadata-modules/work
     MinimalMetadataModule,
     ViewModule,
     WorkspaceMetadataVersionModule,
+    RecordScopingRuleModule,
     RoleModule,
     PermissionsModule,
     PermissionFlagModule,

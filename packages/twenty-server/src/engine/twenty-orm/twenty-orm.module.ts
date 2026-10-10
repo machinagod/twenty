@@ -11,8 +11,8 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
 import { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadata/object-metadata.entity';
+import { WorkspaceRecordScopingRulesCacheModule } from 'src/engine/metadata-modules/record-scoping-rule/workspace-record-scoping-rules-cache.module';
 import { WorkspaceFeatureFlagsMapCacheModule } from 'src/engine/metadata-modules/workspace-feature-flags-map-cache/workspace-feature-flags-map-cache.module';
-import { RecordScopingConfigService } from 'src/engine/twenty-orm/record-scoping/services/record-scoping-config.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceORMEntityMetadatasCacheService } from 'src/engine/twenty-orm/workspace-orm-entity-metadatas-cache.service';
 import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/provide-workspace-scoped-repository';
@@ -35,6 +35,7 @@ import { WorkspaceEventEmitterModule } from 'src/engine/workspace-event-emitter/
     WorkspaceCacheStorageModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
     WorkspaceFeatureFlagsMapCacheModule,
+    WorkspaceRecordScopingRulesCacheModule,
     WorkspaceBillingEntitlementsCacheModule,
     TwentyConfigModule,
     UsageLimitModule,
@@ -45,7 +46,6 @@ import { WorkspaceEventEmitterModule } from 'src/engine/workspace-event-emitter/
     WorkspaceOrmManager,
     WorkspaceDataSourceService,
     WorkspaceORMEntityMetadatasCacheService,
-    RecordScopingConfigService,
     provideWorkspaceScopedRepository(FeatureFlagEntity),
   ],
   exports: [WorkspaceOrmManager],

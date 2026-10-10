@@ -26,56 +26,56 @@ This feature therefore:
 
 ## 2. Configuration
 
-Rules are deploy-time configuration (infra-as-code, reviewable, no migration),
-set via the `RECORD_SCOPING_RULES` config variable as a JSON array. Empty disables
-the feature.
+Rules are edited per workspace in **Settings > Roles > (role) > object permissions >
+Record-level**, the slot where upstream shows its locked Enterprise section. Each
+rule belongs to one (role, object) pair and holds conditions combined with AND or
+OR. Rules apply as soon as they are saved, with no restart.
 
-```jsonc
-[
-  {
-    "roleLabel": "Member",            // matched against the workspace role label
-    "objectNameSingular": "opportunity",
-    "logicalOperator": "AND",          // AND | OR between the conditions
-    "conditions": [
-      {
-        "column": "assigneeId",        // physical column on the object's table
-        "operator": "eq",              // eq | neq | in
-        "currentWorkspaceMemberField": "id"  // value taken from the current member
-      }
-    ]
-  },
-  {
-    "roleLabel": "Member",
-    "objectNameSingular": "opportunity",
-    "logicalOperator": "AND",
-    "conditions": [
-      { "column": "stage", "operator": "in", "staticValue": ["NEW", "WON"] }
-    ]
-  }
-]
+Rules are stored in `core.recordScopingRule` (one row per role and object, deleted
+with the role or object) and managed through the metadata GraphQL API, which needs
+the **Roles** settings permission:
+
+```graphql
+query { recordScopingRules(roleId: "...") { id objectMetadataId logicalOperator conditions { column operator staticValue currentWorkspaceMemberField } } }
+mutation { upsertRecordScopingRule(input: { roleId: "...", objectMetadataId: "...", logicalOperator: "AND",
+  conditions: [{ column: "ownerId", operator: "eq", currentWorkspaceMemberField: "id" }] }) { id } }
+mutation { deleteRecordScopingRule(input: { roleId: "...", objectMetadataId: "..." }) { id } }
 ```
 
-Each condition sets **exactly one** of `staticValue` or
-`currentWorkspaceMemberField`. Multiple rules for the same `(role, object)` are
-ANDed together. Conditions target **direct table columns** (no relation traversal),
-which keeps the injected WHERE valid for SELECT, UPDATE and DELETE alike.
+A condition compares a **direct column** of the object to either a static value or
+a field of the signed-in member:
 
-Malformed config does not crash boot: it is logged as an error and the feature is
-treated as disabled until fixed (see `RecordScopingConfigService`).
+| Column | Example | Values |
+|---|---|---|
+| many-to-one relation to a workspace member, or an actor's member | `ownerId`, `createdByWorkspaceMemberId` | `currentWorkspaceMemberField: "id"` |
+| other many-to-one relation, `UUID` | `companyId` | UUID, or `in` a list |
+| `TEXT` | `email` | text, `in` a list, or `currentWorkspaceMemberField: "userEmail"` |
+| `NUMBER`, `NUMERIC` | `employees` | number, or `in` a list |
+| `BOOLEAN` | `isClient` | `true` / `false` |
+| `SELECT` | `stage` | one of the field's options |
+
+Operators are `eq`, `neq` and `in`; a member value can't be used with `in`. The
+server validates every condition against the object's metadata
+(`record-scoping-rule/utils/validate-record-scoping-conditions.util.ts`), so a
+stored rule can always be rendered to a valid WHERE.
+
+Until 2026-10 the rules lived in the `RECORD_SCOPING_RULES` env var (authored by
+role label and object name). The `upgrade:2-45:import-record-scoping-rules-from-env`
+command copied them into the table on the first boot of that release; the env var
+is no longer read and can be removed.
 
 ## 3. Architecture
 
 ### Data flow
 
-1. **Parse** — `RecordScopingConfigService` reads `RECORD_SCOPING_RULES` once and
-   validates it (`config/parse-record-scoping-rules.util.ts`).
-2. **Resolve roles** — when a workspace ORM context is loaded
-   (`workspace-orm.manager.ts`), rule `roleLabel`s are resolved to the workspace's
-   role IDs via the cached `flatRoleMaps`
-   (`utils/resolve-record-scoping-rules-by-role-id.util.ts`). Role maps are only
-   loaded when rules are configured. The result, `recordScopingRulesByRoleId`, is
-   stored on `ORMWorkspaceContext` and copied onto `WorkspaceInternalContext` by
-   `WorkspaceDataSourceService`. Lite contexts carry no roles and are not scoped.
+1. **Store** — `RecordScopingRuleService` (`metadata-modules/record-scoping-rule/`)
+   validates and upserts rules, then invalidates the workspace cache key
+   `recordScopingRulesByRoleId`.
+2. **Cache** — `WorkspaceRecordScopingRulesCacheService` groups the workspace's
+   rows by role ID. `workspace-orm.manager.ts` reads that key with the other
+   permission maps when a workspace ORM context is loaded, stores it on
+   `ORMWorkspaceContext`, and `WorkspaceDataSourceService` copies it onto
+   `WorkspaceInternalContext`. Lite contexts carry no roles and are not scoped.
 3. **Resolve values** — at query time, `utils/resolve-record-scoping.util.ts` turns
    the current role's rules + the current workspace member into concrete conditions.
 4. **Build** — `utils/build-record-scoping-condition.util.ts` renders them to one
@@ -115,9 +115,8 @@ via `applyRecordScopingForAlias()`:
 
 - Direct columns only (`eq`/`neq`/`in`). Relation-traversal predicates would need a
   join-aware applier (and are invalid in UPDATE/DELETE).
-- Rules are process-level config (one set for the instance). A per-workspace,
-  DB-backed management UI is a possible future iteration; the enforcement layer is
-  unchanged by that choice.
+- One rule per (role, object). Mixing AND and OR needs two rules on different
+  objects, not nested groups.
 - Lite workspace contexts (`executeInWorkspaceContext(..., { lite: true })`, used by
   calendar/messaging sync) carry no roles and are not scoped.
 
@@ -131,20 +130,23 @@ cd packages/twenty-server && npx jest record-scoping
 
 Coverage:
 
-- `config/__tests__/parse-record-scoping-rules.util.spec.ts` — valid/empty/invalid
-  config, operator validation, exactly-one-value-source, defaults.
 - `utils/__tests__/resolve-record-scoping.util.spec.ts` — owner=me, static, AND/OR,
-  multi-rule AND, fail-closed (missing member / no member), no-op.
-- `utils/__tests__/resolve-record-scoping-rules-by-role-id.util.spec.ts` — label→id
-  mapping, grouping, unmatched labels.
+  multi-rule AND, list member values, fail-closed (missing member / no member /
+  no value source), no-op.
 - `utils/__tests__/build-record-scoping-condition.util.spec.ts` — role/auth gating,
   alias-qualified SQL + parameters, `neq`/`in`, OR within a rule, AND across rules,
   per-alias parameter names, fail-closed `1 = 0`.
 - `utils/__tests__/record-scoping-sql.spec.ts` — drives the **real** workspace
   select/mutation builders: scoped SELECT (an `orWhere` cannot escape it), count,
   DELETE, and a joined relation scoped on its ON clause.
-- `twenty-orm/__tests__/workspace-orm.manager.spec.ts` — rules resolved onto the
-  workspace context; no role-map load when disabled or for lite contexts.
+- `twenty-orm/__tests__/workspace-orm.manager.spec.ts` — cached rules exposed on a
+  full context, not loaded for lite contexts.
+- `metadata-modules/record-scoping-rule/**/__tests__` — scopable columns, condition
+  validation, the cache provider, the service, the resolver and the error filter.
+- `upgrade-version-command/2-45/utils/__tests__` — the env import (parsing,
+  label/name resolution, merging, the command itself) and the table migration.
+- Front: `settings/roles/role-permissions/object-level-permissions/record-scoping`
+  — column options, draft conversion, the condition row and the section.
 
 The integration spec
 `test/integration/graphql/suites/record-scoping.integration-spec.ts` is the gate
@@ -154,8 +156,8 @@ that proves the repository actually calls the hook (see `docs/UPSTREAM_SYNC.md`)
 
 To verify against a live database:
 
-1. Set `RECORD_SCOPING_RULES` to a rule scoping an object to `assigneeId = me`
-   (using a real column on that object), then start the server.
+1. In Settings > Roles, open a non-admin role, pick an object, and add a
+   record-level condition such as Owner is Me. Save the rule.
 2. As workspace member A (role `Member`), create records assigned to A and to B.
 3. Confirm A's `findMany`/REST list returns only A's records, and that A's
    update/delete of B's record affects 0 rows. Repeat as B.

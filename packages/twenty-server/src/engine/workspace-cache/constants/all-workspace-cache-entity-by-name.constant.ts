@@ -5,6 +5,7 @@ import { FeatureFlagEntity } from 'src/engine/core-modules/feature-flag/feature-
 import { UsageLimitEntity } from 'src/engine/core-modules/usage-limit/usage-limit.entity';
 import { ALL_METADATA_ENTITY_BY_METADATA_NAME } from 'src/engine/metadata-modules/flat-entity/constant/all-metadata-entity-by-metadata-name.constant';
 import { IndexFieldMetadataEntity } from 'src/engine/metadata-modules/index-metadata/index-field-metadata.entity';
+import { RecordScopingRuleEntity } from 'src/engine/metadata-modules/record-scoping-rule/record-scoping-rule.entity';
 
 export const ALL_WORKSPACE_CACHE_ENTITY_BY_NAME = {
   ...ALL_METADATA_ENTITY_BY_METADATA_NAME,
@@ -14,4 +15,5 @@ export const ALL_WORKSPACE_CACHE_ENTITY_BY_NAME = {
   featureFlag: FeatureFlagEntity,
   billingEntitlement: BillingEntitlementEntity,
   usageLimit: UsageLimitEntity,
+  recordScopingRule: RecordScopingRuleEntity,
 } as const;

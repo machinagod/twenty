@@ -4,8 +4,7 @@ import { resolveRecordScoping } from 'src/engine/twenty-orm/record-scoping/utils
 const currentWorkspaceMember = { id: 'wm-current', region: 'EMEA' };
 
 const ownerRule: RecordScopingRule = {
-  roleLabel: 'Member',
-  objectNameSingular: 'opportunity',
+  objectMetadataId: 'opportunity-id',
   logicalOperator: 'AND',
   conditions: [
     { column: 'assigneeId', operator: 'eq', currentWorkspaceMemberField: 'id' },
@@ -142,5 +141,48 @@ describe('resolveRecordScoping', () => {
     });
 
     expect(result).toEqual({ kind: 'none' });
+  });
+  it('should resolve a list member value and fail closed on an empty list', () => {
+    const listRule = {
+      ...ownerRule,
+      conditions: [
+        {
+          column: 'teamId',
+          operator: 'in' as const,
+          currentWorkspaceMemberField: 'teamIds',
+        },
+      ],
+    };
+
+    expect(
+      resolveRecordScoping({
+        rules: [listRule],
+        currentWorkspaceMember: {
+          ...currentWorkspaceMember,
+          teamIds: ['a', 'b'],
+        },
+      }),
+    ).toEqual({
+      kind: 'conditions',
+      logicalOperator: 'AND',
+      conditions: [{ column: 'teamId', operator: 'in', value: ['a', 'b'] }],
+    });
+    expect(
+      resolveRecordScoping({
+        rules: [listRule],
+        currentWorkspaceMember: { ...currentWorkspaceMember, teamIds: [] },
+      }),
+    ).toEqual({ kind: 'match-nothing' });
+  });
+
+  it('should fail closed on a condition with no value source', () => {
+    expect(
+      resolveRecordScoping({
+        rules: [
+          { ...ownerRule, conditions: [{ column: 'stage', operator: 'eq' }] },
+        ],
+        currentWorkspaceMember,
+      }),
+    ).toEqual({ kind: 'match-nothing' });
   });
 });

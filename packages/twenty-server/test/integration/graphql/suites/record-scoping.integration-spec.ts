@@ -5,6 +5,12 @@ import { destroyOneOperationFactory } from 'test/integration/graphql/utils/destr
 import { findManyOperationFactory } from 'test/integration/graphql/utils/find-many-operation-factory.util';
 import { makeGraphqlApiRequest } from 'test/integration/graphql/utils/make-graphql-api-request.util';
 import { updateOneOperationFactory } from 'test/integration/graphql/utils/update-one-operation-factory.util';
+import { findManyObjectMetadata } from 'test/integration/metadata/suites/object-metadata/utils/find-many-object-metadata.util';
+import {
+  deleteRecordScopingRule,
+  findRecordScopingRules,
+  upsertRecordScopingRule,
+} from 'test/integration/metadata/suites/record-scoping-rule/utils/record-scoping-rule-requests.util';
 import { createOneRole } from 'test/integration/metadata/suites/role/utils/create-one-role.util';
 import { deleteOneRole } from 'test/integration/metadata/suites/role/utils/delete-one-role.util';
 import { findOneRoleByLabel } from 'test/integration/metadata/suites/role/utils/find-one-role-by-label.util';
@@ -13,21 +19,20 @@ import { jestExpectToBeDefined } from 'test/utils/jest-expect-to-be-defined.util
 
 import { WORKSPACE_MEMBER_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev-seeder/data/constants/workspace-member-data-seeds.constant';
 
-// This suite is paired with the RECORD_SCOPING_RULES entry in .env.test, which
-// scopes the `company` object for the role labelled "Record Scoping Test Role" to
-// records with `employees = 42`. It proves the clean-room record-scoping feature
-// is actually wired into the workspace ORM chokepoint end-to-end — not just that
-// the pure utils generate the right SQL (covered by unit tests), but that:
+// Proves the clean-room record scoping is wired end-to-end: rules created through
+// the metadata API (as Settings > Roles does) reach the workspace ORM chokepoint.
+// The company rule scopes the test role to `employees = 42`; the opportunity
+// rule is the production shape (ownerId = me). It checks that:
 //   1. SELECTs through the real query builder are filtered for a scoped role,
 //   2. an unscoped role (admin) still sees everything (scoping is role-specific,
 //      so a regression here can't be masked as "everything is hidden"),
-//   3. UPDATEs are filtered too — out-of-scope writes fail closed, in-scope
-//      writes go through.
-//   4. member-relative scoping (ownerId = me) works on the `opportunity` object —
-//      this mirrors the exact rule shape running in production, so the test
-//      guards the real mechanism, not just a static-value stand-in.
+//   3. UPDATEs are filtered too: out-of-scope writes fail closed, in-scope
+//      writes go through,
+//   4. member-relative scoping works on `opportunity`,
+//   5. editing rules needs the Roles permission, invalid rules are rejected,
+//      and removing a rule lifts the scope without a restart.
 // This is the regression net that survives upstream syncs: if a future upstream
-// refactor of the query builders drops the applyRecordScoping() call, this fails.
+// refactor of the query builders drops the record scoping call, this fails.
 const ROLE_LABEL = 'Record Scoping Test Role';
 const COMPANY_GQL_FIELDS = `
   id
@@ -56,6 +61,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
 
   let customRoleId: string;
   let originalMemberRoleId: string;
+  let companyObjectMetadataId: string;
 
   const findTestCompaniesAs = (token: string) =>
     makeGraphqlApiRequest(
@@ -120,6 +126,46 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
 
     customRoleId = roleData?.createOneRole?.id;
     jestExpectToBeDefined(customRoleId);
+
+    const { objects } = await findManyObjectMetadata({
+      input: { filter: {}, paging: { first: 1000 } },
+      gqlFields: 'id nameSingular',
+      expectToFail: false,
+    });
+    const objectId = (nameSingular: string) => {
+      const object = objects.find((item) => item.nameSingular === nameSingular);
+
+      jestExpectToBeDefined(object);
+
+      return object.id;
+    };
+
+    companyObjectMetadataId = objectId('company');
+
+    for (const rule of [
+      {
+        objectMetadataId: companyObjectMetadataId,
+        conditions: [{ column: 'employees', operator: 'eq', staticValue: 42 }],
+      },
+      {
+        objectMetadataId: objectId('opportunity'),
+        conditions: [
+          {
+            column: 'ownerId',
+            operator: 'eq',
+            currentWorkspaceMemberField: 'id',
+          },
+        ],
+      },
+    ]) {
+      const response = await upsertRecordScopingRule({
+        roleId: customRoleId,
+        logicalOperator: 'AND',
+        ...rule,
+      });
+
+      expect(response.body.errors).toBeUndefined();
+    }
 
     await updateWorkspaceMemberRole({
       input: {
@@ -294,6 +340,66 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     expect(namesFromOpportunitiesResponse(response)).toEqual([
       'RecordScoping Owned By Other Member',
       'RecordScoping Owned By Scoped Member',
+    ]);
+  });
+  it('lists the role rules through the metadata API', async () => {
+    const response = await findRecordScopingRules(customRoleId);
+
+    expect(response.body.errors).toBeUndefined();
+    expect(response.body.data.recordScopingRules).toHaveLength(2);
+    expect(response.body.data.recordScopingRules[0]).toMatchObject({
+      roleId: customRoleId,
+      objectMetadataId: companyObjectMetadataId,
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          column: 'employees',
+          operator: 'eq',
+          staticValue: 42,
+          currentWorkspaceMemberField: null,
+        },
+      ],
+    });
+  });
+
+  it('refuses rule edits from a member without the Roles permission', async () => {
+    const response = await upsertRecordScopingRule(
+      {
+        roleId: customRoleId,
+        objectMetadataId: companyObjectMetadataId,
+        logicalOperator: 'AND',
+        conditions: [{ column: 'employees', operator: 'eq', staticValue: 7 }],
+      },
+      APPLE_JONY_MEMBER_ACCESS_TOKEN,
+    );
+
+    expect(response.body.errors?.[0]?.extensions?.code).toBe('FORBIDDEN');
+  });
+
+  it('rejects a rule on a column it cannot enforce', async () => {
+    const response = await upsertRecordScopingRule({
+      roleId: customRoleId,
+      objectMetadataId: companyObjectMetadataId,
+      logicalOperator: 'AND',
+      conditions: [{ column: 'address', operator: 'eq', staticValue: 'x' }],
+    });
+
+    expect(response.body.errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT');
+  });
+
+  it('lifts the scope as soon as the rule is deleted', async () => {
+    const deleteResponse = await deleteRecordScopingRule({
+      roleId: customRoleId,
+      objectMetadataId: companyObjectMetadataId,
+    });
+
+    expect(deleteResponse.body.errors).toBeUndefined();
+
+    const response = await findTestCompaniesAs(APPLE_JONY_MEMBER_ACCESS_TOKEN);
+
+    expect(namesFromCompaniesResponse(response)).toEqual([
+      'RecordScoping In Scope Co (edited)',
+      'RecordScoping Out Of Scope Co',
     ]);
   });
 });

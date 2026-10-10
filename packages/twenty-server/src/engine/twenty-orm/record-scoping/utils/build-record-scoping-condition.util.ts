@@ -18,13 +18,13 @@ const MATCH_NOTHING_CONDITION = '1 = 0';
 // joined aliases get the condition on their ON clause.
 export const buildRecordScopingCondition = ({
   alias,
-  objectNameSingular,
+  objectMetadataId,
   recordScopingRulesByRoleId,
   userWorkspaceRoleMap,
   authContext,
 }: {
   alias: string;
-  objectNameSingular: string;
+  objectMetadataId: string;
   recordScopingRulesByRoleId: RecordScopingRulesByRoleId | undefined;
   userWorkspaceRoleMap: UserWorkspaceRoleMap;
   authContext: WorkspaceAuthContext;
@@ -46,7 +46,7 @@ export const buildRecordScopingCondition = ({
   }
 
   const rulesForObject = (recordScopingRulesByRoleId[roleId] ?? []).filter(
-    (rule) => rule.objectNameSingular === objectNameSingular,
+    (rule) => rule.objectMetadataId === objectMetadataId,
   );
 
   if (rulesForObject.length === 0) {

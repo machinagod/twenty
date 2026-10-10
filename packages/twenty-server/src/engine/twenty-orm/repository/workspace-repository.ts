@@ -2411,7 +2411,7 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
   }): void {
     const recordScopingCondition = buildRecordScopingCondition({
       alias,
-      objectNameSingular: flatObjectMetadata.nameSingular,
+      objectMetadataId: flatObjectMetadata.id,
       recordScopingRulesByRoleId:
         this.options.internalContext.recordScopingRulesByRoleId,
       userWorkspaceRoleMap: this.options.internalContext.userWorkspaceRoleMap,

@@ -22,7 +22,7 @@ As of the 2026-10-09 sync (release tag **`twenty/v2.45.0`** @ `7e1431c84a`):
 
 | Theme | Commits | Notes |
 |-------|---------|-------|
-| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the optional `recordScopingRulesByRoleId` field threaded through `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`, and `RecordScopingConfigService` in `twenty-orm.module.ts`. Everything else is self-contained under `record-scoping/`. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
+| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + settings UI + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the `recordScopingRulesByRoleId` cache key read in `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`. Rules live in `core.recordScopingRule` (`metadata-modules/record-scoping-rule/`, registered in `metadata-engine.module.ts`, its cache module in `twenty-orm.module.ts`, the entity in `all-workspace-cache-entity-by-name.constant.ts` and the key in `workspace-cache-key.type.ts`). Front: our `record-scoping/` section replaces the Enterprise one in `SettingsRolePermissionsObjectLevelObjectForm.tsx`; on a sync, re-apply that swap if upstream edits the form. 2.45 adds two fork commands (`add-record-scoping-rule` instance, `import-record-scoping-rules-from-env` workspace). See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
 | **deploy/fail-closed upgrade** | fix (entrypoint) | `packages/twenty-docker/twenty/entrypoint.sh`: a failed boot `upgrade` exits non-zero (override `UPGRADE_CONTINUE_ON_ERROR=true`), and init/upgrade run with `UPGRADE_PG_DATABASE_TIMEOUT_MS` (default 600000) instead of the 10s runtime timeout. Fixes the v2.20.0 prod incident. Upstream closed our PR #23013 unmerged, so we carry it. |
 | **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix + `railway-deploy.sh` | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job runs `.github/scripts/railway-deploy.sh` in `routine` or `upgrade` mode through the Railway public API (needs `RAILWAY_TOKEN`); tested by `CI Railway deploy script`. |
@@ -96,24 +96,24 @@ git push -u origin chore/sync-$TAG
 `record-scoping.integration-spec.ts` proves the clean-room scoping feature is
 wired into the workspace ORM (filters SELECTs/UPDATEs for a scoped role; admin
 still sees all). It's the regression net that catches an upstream refactor
-silently dropping the `applyRecordScoping()` call. It's driven by the
-`RECORD_SCOPING_RULES` entry in `.env.test` (rules scoped to a custom role
-label, inert for every other suite) and covers both value sources: static-value
-(company / employees) and member-relative (opportunity / `ownerId = me`).
+silently dropping the `applyRecordScoping()` call. It creates its rules through
+the metadata API on a custom role (inert for every other suite), covers both
+value sources, static-value (company / employees) and member-relative
+(opportunity / `ownerId = me`), and checks the Roles permission, validation and
+that deleting a rule lifts the scope without a restart.
 
-### Prod config (as of 2026-06-24)
+### Prod config
 
-Record scoping is **live in prod**. `RECORD_SCOPING_RULES` on the **Twenty**
-(server) Railway service scopes the `Member` role on `opportunity` to
-`ownerId = me` (members see/edit only opportunities they own). The test's
-member-relative case mirrors this exact shape, so a wiring regression is caught
-before deploy.
+Record scoping is **live in prod**. Since 2026-10 the rules are edited in
+Settings > Roles and stored in `core.recordScopingRule`; the 2.45 upgrade
+imported the old `RECORD_SCOPING_RULES` value (the `Member` role on
+`opportunity`, `ownerId = me`). The env var is no longer read; remove it from
+the Twenty service once the import is confirmed. The test's member-relative case
+mirrors that rule, so a wiring regression is caught before deploy.
 
-It is **deliberately NOT set on the Twenty Worker** service: worker jobs run in a
-system context (`shouldBypassPermissionChecks = true`), so scoping is bypassed
-there regardless and the var would be inert. This is by design, not config drift
-— don't "fix" it by copying the var to the worker. (If a worker path ever starts
-running user-context queries, revisit.)
+Worker jobs run in a system context (`shouldBypassPermissionChecks = true`), so
+scoping never applies there. (If a worker path ever starts running user-context
+queries, revisit.)
 
 Local run (services + seeded `test` DB required — mirrors CI's `with-db-reset`):
 

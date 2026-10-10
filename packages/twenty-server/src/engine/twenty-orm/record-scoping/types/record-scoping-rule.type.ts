@@ -29,11 +29,9 @@ export type RecordScopingCondition = {
 export type RecordScopingLogicalOperator = 'AND' | 'OR';
 
 // All conditions for one (role, object) pair, combined with a logical operator.
-// Rules are authored by role *label* (stable, human-readable) and resolved to a
-// roleId when the workspace context is loaded.
+// Stored in core.recordScopingRule and edited from Settings > Roles.
 export type RecordScopingRule = {
-  roleLabel: string;
-  objectNameSingular: string;
+  objectMetadataId: string;
   logicalOperator: RecordScopingLogicalOperator;
   conditions: RecordScopingCondition[];
 };
