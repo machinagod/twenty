@@ -11,6 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { ADD_RECORD_SCOPING_RULE_UPGRADE_COMMAND_NAME } from 'src/database/commands/upgrade-version-command/2-45/add-record-scoping-rule-upgrade-command-name.constant';
+import { WasIntroducedInUpgrade } from 'src/engine/core-modules/upgrade/decorators/was-introduced-in-upgrade.decorator';
 import type { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadata/object-metadata.entity';
 import type { RoleEntity } from 'src/engine/metadata-modules/role/role.entity';
 import {
@@ -23,6 +25,9 @@ import { WorkspaceRelatedEntity } from 'src/engine/workspace-manager/types/works
 // (role, object), edited from Settings > Roles. Independent of the Enterprise
 // rowLevelPermissionPredicate tables.
 @Entity({ name: 'recordScopingRule', schema: 'core' })
+@WasIntroducedInUpgrade({
+  upgradeCommandName: ADD_RECORD_SCOPING_RULE_UPGRADE_COMMAND_NAME,
+})
 @Unique('IDX_RECORD_SCOPING_RULE_ROLE_OBJECT_UNIQUE', [
   'workspaceId',
   'roleId',
