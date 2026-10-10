@@ -13,7 +13,9 @@ const authContext = {
   workspaceMember: { id: 'wm-current' },
 } as unknown as WorkspaceAuthContext;
 
-const recordScopingRulesByRoleId: RecordScopingRulesByRoleId = {
+let recordScopingRulesByRoleId: RecordScopingRulesByRoleId;
+
+const OWNER_RULES: RecordScopingRulesByRoleId = {
   'role-1': ['person-id', 'company-id'].map((objectMetadataId) => ({
     objectMetadataId,
     logicalOperator: 'AND',
@@ -48,6 +50,10 @@ const applyRecordScoping = (queryBuilder: WorkspaceSelectQueryBuilder) => {
       recordScopingRulesByRoleId,
       userWorkspaceRoleMap: { 'uw-1': 'role-1' },
       authContext,
+      getRelatedTableName: (relatedObjectMetadataId) =>
+        relatedObjectMetadataId === 'company-id'
+          ? `"${SCHEMA_NAME}"."company"`
+          : undefined,
     });
 
     if (!condition) {
@@ -72,6 +78,10 @@ const buildScopedQueryBuilder = () => {
 };
 
 describe('record scoping on workspace query builders', () => {
+  beforeEach(() => {
+    recordScopingRulesByRoleId = OWNER_RULES;
+  });
+
   it('should scope a SELECT and keep an orWhere inside the guarded expression', async () => {
     const { queryBuilder, executedStatements } = buildScopedQueryBuilder();
 
@@ -121,5 +131,55 @@ describe('record scoping on workspace query builders', () => {
       'WHERE ((("person"."ownerId" = $2)))',
     );
     expect(executedStatements[0].values).toEqual(['wm-current', 'wm-current']);
+  });
+  describe('with a related-record rule', () => {
+    beforeEach(() => {
+      recordScopingRulesByRoleId = {
+        'role-1': [
+          {
+            objectMetadataId: 'person-id',
+            logicalOperator: 'AND',
+            conditions: [
+              {
+                column: 'companyId',
+                operator: 'in',
+                relatedRecords: {
+                  objectMetadataId: 'company-id',
+                  logicalOperator: 'AND',
+                  conditions: [
+                    {
+                      column: 'accountOwnerId',
+                      operator: 'eq',
+                      currentWorkspaceMemberField: 'id',
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      };
+    });
+
+    it('should scope a SELECT through a subquery on the related table', async () => {
+      const { queryBuilder, executedStatements } = buildScopedQueryBuilder();
+
+      await queryBuilder.where('"person"."id" = :a', { a: 1 }).getMany();
+
+      expect(executedStatements[0].text).toContain(
+        `AND (("person"."companyId" IN (SELECT "recordScoping_person_0"."id" FROM "${SCHEMA_NAME}"."company" "recordScoping_person_0" WHERE ("recordScoping_person_0"."accountOwnerId" = $2))))`,
+      );
+      expect(executedStatements[0].values).toEqual([1, 'wm-current']);
+    });
+
+    it('should scope a DELETE through the same subquery', () => {
+      const { queryBuilder } = buildScopedQueryBuilder();
+
+      expect(
+        queryBuilder.applyRowLevelPermissions().delete().getQuery(),
+      ).toContain(
+        `WHERE (("person"."companyId" IN (SELECT "recordScoping_person_0"."id" FROM "${SCHEMA_NAME}"."company" "recordScoping_person_0" WHERE ("recordScoping_person_0"."accountOwnerId" = :recordScoping_person_0_0))))`,
+      );
+    });
   });
 });

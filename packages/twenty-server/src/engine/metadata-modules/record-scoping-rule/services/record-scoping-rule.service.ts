@@ -93,6 +93,21 @@ export class RecordScopingRuleService {
       (objectMetadata) => objectMetadata?.nameSingular === 'workspaceMember',
     )?.id;
 
+    const getColumnsForObject = (objectMetadataId: string) => {
+      const objectMetadata = findFlatEntityByIdInFlatEntityMaps({
+        flatEntityMaps: flatObjectMetadataMaps,
+        flatEntityId: objectMetadataId,
+      });
+
+      return isDefined(objectMetadata)
+        ? getRecordScopingColumns({
+            flatObjectMetadata: objectMetadata,
+            flatFieldMetadataMaps,
+            workspaceMemberObjectMetadataId,
+          })
+        : undefined;
+    };
+
     const conditions = validateRecordScopingConditions({
       conditions: input.conditions,
       columns: getRecordScopingColumns({
@@ -100,6 +115,7 @@ export class RecordScopingRuleService {
         flatFieldMetadataMaps,
         workspaceMemberObjectMetadataId,
       }),
+      getColumnsForObject,
     });
 
     const rule = await this.recordScopingRuleRepository.upsertAndReturnOne(

@@ -54,7 +54,25 @@ a field of the signed-in member:
 | `BOOLEAN` | `isClient` | `true` / `false` |
 | `SELECT` | `stage` | one of the field's options |
 
-Operators are `eq`, `neq` and `in`; a member value can't be used with `in`. The
+Operators are `eq`, `neq` and `in`; a member value can't be used with `in`.
+
+A many-to-one relation can also match **related records**: the scoped record is
+kept when its join column points at a record of the related object that matches
+its own conditions. This is how a rule follows relations, e.g. people of the
+companies the member owns:
+
+```json
+{ "column": "companyId", "operator": "in",
+  "relatedRecords": { "objectMetadataId": "<company>", "logicalOperator": "AND",
+    "conditions": [{ "column": "accountOwnerId", "operator": "eq", "currentWorkspaceMemberField": "id" }] } }
+```
+
+It renders to `"person"."companyId" IN (SELECT "id" FROM <company table> WHERE
+...)`, which is valid in SELECT, UPDATE and DELETE. Related records nest up to
+three levels (e.g. document lines -> documents -> companies). The subquery reads
+the related table directly, so the related object's own scoping does not apply
+inside it; the rule states the condition explicitly. If the related object no
+longer exists, the rule fails closed. The
 server validates every condition against the object's metadata
 (`record-scoping-rule/utils/validate-record-scoping-conditions.util.ts`), so a
 stored rule can always be rendered to a valid WHERE.
@@ -113,8 +131,9 @@ via `applyRecordScopingForAlias()`:
 
 ### Known limitations / next steps
 
-- Direct columns only (`eq`/`neq`/`in`). Relation-traversal predicates would need a
-  join-aware applier (and are invalid in UPDATE/DELETE).
+- Relations are followed through related-record subqueries (many-to-one only,
+  three levels deep); one-to-many conditions ("companies with an open
+  opportunity") are not supported.
 - One rule per (role, object). Mixing AND and OR needs two rules on different
   objects, not nested groups.
 - Lite workspace contexts (`executeInWorkspaceContext(..., { lite: true })`, used by

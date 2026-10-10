@@ -1,14 +1,20 @@
 import { type RecordScopingColumnOption } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingColumnOption';
 import { type RecordScopingConditionDraft } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingConditionDraft';
 import {
+  canMatchRelatedRecords,
   createRecordScopingConditionDraft,
   fromRecordScopingCondition,
   getCurrentMemberFieldForColumn,
+  getDefaultRecordScopingColumn,
   getRecordScopingOperators,
   toRecordScopingConditionInput,
+  toRecordScopingConditionInputs,
+  toRelatedRecordScopingConditionDraft,
 } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/utils/recordScopingConditionDraft';
 
 const MEMBER_ID = '6a8d895c-c231-468c-9fed-01ca754a1a8d';
+
+const noColumns = () => undefined;
 
 const column = (
   valueKind: RecordScopingColumnOption['valueKind'],
@@ -102,6 +108,7 @@ describe('toRecordScopingConditionInput', () => {
       toRecordScopingConditionInput(
         draft({ valueSource: 'CURRENT_MEMBER' }),
         column('WORKSPACE_MEMBER'),
+        noColumns,
       ),
     ).toEqual({
       column: 'col',
@@ -119,7 +126,11 @@ describe('toRecordScopingConditionInput', () => {
     [column('TEXT'), ' Lisboa ', 'Lisboa'],
   ])('parses a static value', (columnOption, staticValue, expected) => {
     expect(
-      toRecordScopingConditionInput(draft({ staticValue }), columnOption),
+      toRecordScopingConditionInput(
+        draft({ staticValue }),
+        columnOption,
+        noColumns,
+      ),
     ).toEqual({
       column: 'col',
       operator: 'eq',
@@ -132,6 +143,7 @@ describe('toRecordScopingConditionInput', () => {
       toRecordScopingConditionInput(
         draft({ operator: 'in', staticValue: '1, 2,,3' }),
         column('NUMBER'),
+        noColumns,
       ),
     ).toEqual({ column: 'col', operator: 'in', staticValue: [1, 2, 3] });
   });
@@ -176,7 +188,7 @@ describe('toRecordScopingConditionInput', () => {
     ],
   ])('is undefined for %s', (_label, conditionDraft, columnOption) => {
     expect(
-      toRecordScopingConditionInput(conditionDraft, columnOption),
+      toRecordScopingConditionInput(conditionDraft, columnOption, noColumns),
     ).toBeUndefined();
   });
 });
@@ -215,5 +227,166 @@ describe('fromRecordScopingCondition', () => {
       operator: 'neq',
       staticValue: 'false',
     });
+  });
+});
+
+describe('related records', () => {
+  const companyColumn = column('UUID', {
+    column: 'companyId',
+    label: 'Company',
+    targetObjectMetadataId: 'company-id',
+  });
+  const companyColumns = [
+    column('TEXT', { column: 'name', label: 'Name' }),
+    column('WORKSPACE_MEMBER', {
+      column: 'accountOwnerId',
+      label: 'Account owner',
+      targetObjectMetadataId: 'wm-id',
+    }),
+  ];
+  const getColumns = (objectMetadataId: string) =>
+    objectMetadataId === 'company-id' ? companyColumns : undefined;
+
+  it('only lets relations to other objects match related records', () => {
+    expect(canMatchRelatedRecords(companyColumn)).toBe(true);
+    expect(canMatchRelatedRecords(column('UUID'))).toBe(false);
+    expect(
+      canMatchRelatedRecords(
+        column('WORKSPACE_MEMBER', { targetObjectMetadataId: 'wm-id' }),
+      ),
+    ).toBe(false);
+  });
+
+  it('seeds the related records with the default related condition', () => {
+    const related = toRelatedRecordScopingConditionDraft(
+      draft({ column: 'companyId', staticValue: 'x' }),
+      companyColumn,
+      getColumns,
+    );
+
+    expect(related).toMatchObject({
+      operator: 'in',
+      valueSource: 'RELATED',
+      staticValue: '',
+      related: {
+        objectMetadataId: 'company-id',
+        logicalOperator: 'AND',
+        conditions: [
+          { column: 'accountOwnerId', valueSource: 'CURRENT_MEMBER' },
+        ],
+      },
+    });
+    expect(
+      toRelatedRecordScopingConditionDraft(
+        draft({}),
+        companyColumn,
+        () => undefined,
+      ).related?.conditions,
+    ).toEqual([]);
+  });
+
+  it('round-trips a related condition through the API shape', () => {
+    const input = {
+      column: 'companyId',
+      operator: 'in',
+      relatedRecords: {
+        objectMetadataId: 'company-id',
+        logicalOperator: 'OR',
+        conditions: [
+          {
+            column: 'accountOwnerId',
+            operator: 'eq',
+            currentWorkspaceMemberField: 'id',
+          },
+        ],
+      },
+    };
+    const relatedDraft = fromRecordScopingCondition(input);
+
+    expect(relatedDraft).toMatchObject({
+      valueSource: 'RELATED',
+      related: { logicalOperator: 'OR' },
+    });
+    expect(
+      toRecordScopingConditionInput(relatedDraft, companyColumn, getColumns),
+    ).toEqual(input);
+    expect(
+      fromRecordScopingCondition({
+        ...input,
+        relatedRecords: { ...input.relatedRecords, logicalOperator: 'AND' },
+      }).related?.logicalOperator,
+    ).toBe('AND');
+  });
+
+  it.each([
+    ['no related records', draft({ valueSource: 'RELATED' }), companyColumn],
+    [
+      'an unknown related object',
+      draft({
+        valueSource: 'RELATED',
+        related: {
+          objectMetadataId: 'ghost',
+          logicalOperator: 'AND',
+          conditions: [],
+        },
+      }),
+      companyColumn,
+    ],
+    [
+      'a column that cannot match related records',
+      draft({
+        valueSource: 'RELATED',
+        related: {
+          objectMetadataId: 'company-id',
+          logicalOperator: 'AND',
+          conditions: [],
+        },
+      }),
+      column('UUID'),
+    ],
+    [
+      'an incomplete related condition',
+      draft({
+        valueSource: 'RELATED',
+        related: {
+          objectMetadataId: 'company-id',
+          logicalOperator: 'AND',
+          conditions: [draft({ column: 'name', staticValue: ' ' })],
+        },
+      }),
+      companyColumn,
+    ],
+  ])('is undefined for %s', (_label, conditionDraft, columnOption) => {
+    expect(
+      toRecordScopingConditionInput(conditionDraft, columnOption, getColumns),
+    ).toBeUndefined();
+  });
+
+  it('converts a list only when every draft is complete', () => {
+    expect(
+      toRecordScopingConditionInputs([], companyColumns, getColumns),
+    ).toBeUndefined();
+    expect(
+      toRecordScopingConditionInputs(
+        [draft({ column: 'name', staticValue: 'Acme' })],
+        companyColumns,
+        getColumns,
+      ),
+    ).toEqual([{ column: 'name', operator: 'eq', staticValue: 'Acme' }]);
+  });
+});
+
+describe('getDefaultRecordScopingColumn', () => {
+  it('prefers an owner relation, then an actor, then the first column', () => {
+    const text = column('TEXT', { column: 'name' });
+    const actor = column('WORKSPACE_MEMBER', {
+      column: 'createdByWorkspaceMemberId',
+    });
+    const owner = column('WORKSPACE_MEMBER', { column: 'ownerId' });
+
+    expect(getDefaultRecordScopingColumn([text, actor, owner])).toBe(owner);
+    expect(getDefaultRecordScopingColumn([text, actor])).toBe(actor);
+    expect(getDefaultRecordScopingColumn([text])).toBe(text);
+    expect(getDefaultRecordScopingColumn([])).toBeUndefined();
   });
 });

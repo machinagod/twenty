@@ -2,12 +2,16 @@ import { RecordScopingRuleException } from 'src/engine/metadata-modules/record-s
 import { getRecordScopingColumns } from 'src/engine/metadata-modules/record-scoping-rule/utils/get-record-scoping-columns.util';
 import {
   MAX_RECORD_SCOPING_CONDITIONS,
+  MAX_RECORD_SCOPING_RELATED_DEPTH,
   type RecordScopingConditionInput,
   validateRecordScopingConditions,
 } from 'src/engine/metadata-modules/record-scoping-rule/utils/validate-record-scoping-conditions.util';
 
 import {
   buildFlatEntityMaps,
+  COMPANY_FIELDS,
+  COMPANY_ID,
+  COMPANY_OBJECT,
   OPPORTUNITY_FIELDS,
   OPPORTUNITY_OBJECT,
   WORKSPACE_MEMBER_ID,
@@ -19,8 +23,38 @@ const columns = getRecordScopingColumns({
   workspaceMemberObjectMetadataId: WORKSPACE_MEMBER_ID,
 });
 
+const companyColumns = getRecordScopingColumns({
+  flatObjectMetadata: COMPANY_OBJECT,
+  flatFieldMetadataMaps: buildFlatEntityMaps(COMPANY_FIELDS),
+  workspaceMemberObjectMetadataId: WORKSPACE_MEMBER_ID,
+});
+
+const getColumnsForObject = (objectMetadataId: string) =>
+  objectMetadataId === COMPANY_ID ? companyColumns : undefined;
+
 const validate = (conditions: RecordScopingConditionInput[]) =>
-  validateRecordScopingConditions({ conditions, columns });
+  validateRecordScopingConditions({ conditions, columns, getColumnsForObject });
+
+const companyOwnedByMe = (
+  overrides: Partial<
+    NonNullable<RecordScopingConditionInput['relatedRecords']>
+  > = {},
+): RecordScopingConditionInput => ({
+  column: 'companyId',
+  operator: 'in',
+  relatedRecords: {
+    objectMetadataId: COMPANY_ID,
+    logicalOperator: 'AND',
+    conditions: [
+      {
+        column: 'accountOwnerId',
+        operator: 'eq',
+        currentWorkspaceMemberField: 'id',
+      },
+    ],
+    ...overrides,
+  },
+});
 
 const MEMBER_UUID = '6a8d895c-c231-468c-9fed-01ca754a1a8d';
 
@@ -81,6 +115,23 @@ describe('validateRecordScopingConditions', () => {
         staticValue: 'x',
       })),
       `at most ${MAX_RECORD_SCOPING_CONDITIONS} conditions`,
+    ],
+    [[{ ...companyOwnedByMe(), staticValue: 'x' }], 'exactly one of'],
+    [[{ ...companyOwnedByMe(), column: 'name' }], 'is not a relation'],
+    [
+      [{ ...companyOwnedByMe(), column: 'ownerId' }],
+      'does not point at object',
+    ],
+    [[{ ...companyOwnedByMe(), operator: 'eq' }], 'need the "in" operator'],
+    [[companyOwnedByMe({ logicalOperator: 'XOR' })], 'logicalOperator must be'],
+    [[companyOwnedByMe({ conditions: [] })], 'at least one condition'],
+    [
+      [
+        companyOwnedByMe({
+          conditions: [{ column: 'nope', operator: 'eq', staticValue: 'x' }],
+        }),
+      ],
+      'conditions[0].relatedRecords.conditions[0]: "nope" is not a column',
     ],
     [
       [{ column: 'closeDate', operator: 'eq', staticValue: 'x' }],
@@ -163,5 +214,45 @@ describe('validateRecordScopingConditions', () => {
     expect(() => validate(conditions as RecordScopingConditionInput[])).toThrow(
       message,
     );
+  });
+  it('accepts related records and keeps them normalized', () => {
+    expect(validate([companyOwnedByMe()])).toEqual([
+      {
+        column: 'companyId',
+        operator: 'in',
+        relatedRecords: {
+          objectMetadataId: COMPANY_ID,
+          logicalOperator: 'AND',
+          conditions: [
+            {
+              column: 'accountOwnerId',
+              operator: 'eq',
+              currentWorkspaceMemberField: 'id',
+            },
+          ],
+        },
+      },
+    ]);
+  });
+
+  it('rejects related records on an object it cannot find', () => {
+    expect(() =>
+      validateRecordScopingConditions({
+        conditions: [companyOwnedByMe()],
+        columns,
+        getColumnsForObject: () => undefined,
+      }),
+    ).toThrow('not found');
+  });
+
+  it('limits how deep related records nest', () => {
+    expect(() =>
+      validateRecordScopingConditions({
+        conditions: [companyOwnedByMe()],
+        columns,
+        getColumnsForObject,
+        depth: MAX_RECORD_SCOPING_RELATED_DEPTH,
+      }),
+    ).toThrow('nested at most');
   });
 });

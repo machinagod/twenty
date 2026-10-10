@@ -3362,11 +3362,19 @@ export interface MinimalMetadata {
     __typename: 'MinimalMetadata'
 }
 
+export interface RecordScopingRelatedRecords {
+    objectMetadataId: Scalars['UUID']
+    logicalOperator: Scalars['String']
+    conditions: RecordScopingCondition[]
+    __typename: 'RecordScopingRelatedRecords'
+}
+
 export interface RecordScopingCondition {
     column: Scalars['String']
     operator: Scalars['String']
     staticValue?: Scalars['JSON']
     currentWorkspaceMemberField?: Scalars['String']
+    relatedRecords?: RecordScopingRelatedRecords
     __typename: 'RecordScopingCondition'
 }
 
@@ -7318,11 +7326,20 @@ export interface MinimalMetadataGenqlSelection{
     __scalar?: boolean | number
 }
 
+export interface RecordScopingRelatedRecordsGenqlSelection{
+    objectMetadataId?: boolean | number
+    logicalOperator?: boolean | number
+    conditions?: RecordScopingConditionGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface RecordScopingConditionGenqlSelection{
     column?: boolean | number
     operator?: boolean | number
     staticValue?: boolean | number
     currentWorkspaceMemberField?: boolean | number
+    relatedRecords?: RecordScopingRelatedRecordsGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -8203,7 +8220,9 @@ export interface UpdateCalendarChannelInputUpdates {visibility?: (CalendarChanne
 
 export interface UpsertRecordScopingRuleInput {roleId: Scalars['UUID'],objectMetadataId: Scalars['UUID'],logicalOperator: Scalars['String'],conditions: RecordScopingConditionInput[]}
 
-export interface RecordScopingConditionInput {column: Scalars['String'],operator: Scalars['String'],staticValue?: (Scalars['JSON'] | null),currentWorkspaceMemberField?: (Scalars['String'] | null)}
+export interface RecordScopingConditionInput {column: Scalars['String'],operator: Scalars['String'],staticValue?: (Scalars['JSON'] | null),currentWorkspaceMemberField?: (Scalars['String'] | null),relatedRecords?: (RecordScopingRelatedRecordsInput | null)}
+
+export interface RecordScopingRelatedRecordsInput {objectMetadataId: Scalars['UUID'],logicalOperator: Scalars['String'],conditions: RecordScopingConditionInput[]}
 
 export interface DeleteRecordScopingRuleInput {roleId: Scalars['UUID'],objectMetadataId: Scalars['UUID']}
 
@@ -10776,6 +10795,14 @@ export interface CreateRecordExportInput {objectMetadataId: Scalars['UUID'],fiel
     export const isMinimalMetadata = (obj?: { __typename?: any } | null): obj is MinimalMetadata => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isMinimalMetadata"')
       return MinimalMetadata_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RecordScopingRelatedRecords_possibleTypes: string[] = ['RecordScopingRelatedRecords']
+    export const isRecordScopingRelatedRecords = (obj?: { __typename?: any } | null): obj is RecordScopingRelatedRecords => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRecordScopingRelatedRecords"')
+      return RecordScopingRelatedRecords_possibleTypes.includes(obj.__typename)
     }
     
 

@@ -116,6 +116,9 @@ import {
 } from 'src/engine/twenty-orm/repository/utils/update-event-records.util';
 import { WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
 import { compileNamedParameters } from 'src/engine/twenty-orm/sql/utils/compile-named-parameters.util';
+import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
+import { computeObjectTargetTable } from 'src/engine/utils/compute-object-target-table.util';
 import { buildRecordScopingCondition } from 'src/engine/twenty-orm/record-scoping/utils/build-record-scoping-condition.util';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
 import { serializeJsonbWriteValue } from 'src/engine/twenty-orm/sql/utils/serialize-jsonb-write-value.util';
@@ -2416,6 +2419,16 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
         this.options.internalContext.recordScopingRulesByRoleId,
       userWorkspaceRoleMap: this.options.internalContext.userWorkspaceRoleMap,
       authContext: this.options.authContext,
+      getRelatedTableName: (relatedObjectMetadataId) => {
+        const relatedObjectMetadata = findFlatEntityByIdInFlatEntityMaps({
+          flatEntityMaps: this.options.internalContext.flatObjectMetadataMaps,
+          flatEntityId: relatedObjectMetadataId,
+        });
+
+        return isDefined(relatedObjectMetadata)
+          ? `${escapeIdentifier(getWorkspaceSchemaName(this.options.internalContext.workspaceId))}.${escapeIdentifier(computeObjectTargetTable(relatedObjectMetadata))}`
+          : undefined;
+      },
     });
 
     if (isDefined(recordScopingCondition)) {

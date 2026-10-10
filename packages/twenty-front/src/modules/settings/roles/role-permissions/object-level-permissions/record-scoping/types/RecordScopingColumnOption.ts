@@ -12,4 +12,6 @@ export type RecordScopingColumnOption = {
   icon?: string | null;
   valueKind: RecordScopingColumnValueKind;
   selectOptions?: Array<{ value: string; label: string }>;
+  // Set on many-to-one relation columns: the object the column points at.
+  targetObjectMetadataId?: string;
 };

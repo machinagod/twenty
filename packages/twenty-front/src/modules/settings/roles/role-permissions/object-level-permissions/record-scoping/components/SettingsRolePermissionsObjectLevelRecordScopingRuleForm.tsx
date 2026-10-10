@@ -1,14 +1,18 @@
 import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsFromError';
+import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
-import { SettingsRolePermissionsObjectLevelRecordScopingConditionRow } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow';
-import { type RecordScopingConditionDraft } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingConditionDraft';
+import { SettingsRolePermissionsObjectLevelRecordScopingConditionList } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionList';
+import {
+  type RecordScopingConditionDraft,
+  type RecordScopingLogicalOperator,
+} from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingConditionDraft';
 import { getRecordScopingColumnOptions } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/utils/getRecordScopingColumnOptions';
 import {
   createRecordScopingConditionDraft,
   fromRecordScopingCondition,
-  toRecordScopingConditionInput,
+  getDefaultRecordScopingColumn,
+  toRecordScopingConditionInputs,
 } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/utils/recordScopingConditionDraft';
-import { Select } from '@/ui/input/components/Select';
 import { useMutation } from '@apollo/client/react';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
@@ -52,8 +56,6 @@ const StyledFooterGroup = styled.div`
   gap: ${themeCssVariables.spacing[2]};
 `;
 
-type LogicalOperator = 'AND' | 'OR';
-
 type SettingsRolePermissionsObjectLevelRecordScopingRuleFormProps = {
   roleId: string;
   objectMetadataItem: EnrichedObjectMetadataItem;
@@ -67,17 +69,34 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
 }: SettingsRolePermissionsObjectLevelRecordScopingRuleFormProps) => {
   const { enqueueToast } = useToast();
 
+  const { objectMetadataItems } = useObjectMetadataItems();
+
   const columns = useMemo(
     () => getRecordScopingColumnOptions(objectMetadataItem),
     [objectMetadataItem],
   );
 
+  const getColumns = (objectMetadataId: string) => {
+    const relatedObjectMetadataItem = objectMetadataItems.find(
+      (item) => item.id === objectMetadataId,
+    );
+
+    return isDefined(relatedObjectMetadataItem)
+      ? getRecordScopingColumnOptions(relatedObjectMetadataItem)
+      : undefined;
+  };
+
+  const getObjectLabel = (objectMetadataId: string) =>
+    objectMetadataItems.find((item) => item.id === objectMetadataId)
+      ?.labelPlural ?? '';
+
   const [drafts, setDrafts] = useState<RecordScopingConditionDraft[]>(
     () => rule?.conditions.map(fromRecordScopingCondition) ?? [],
   );
-  const [logicalOperator, setLogicalOperator] = useState<LogicalOperator>(() =>
-    rule?.logicalOperator === 'OR' ? 'OR' : 'AND',
-  );
+  const [logicalOperator, setLogicalOperator] =
+    useState<RecordScopingLogicalOperator>(() =>
+      rule?.logicalOperator === 'OR' ? 'OR' : 'AND',
+    );
 
   const refetchQueries = [
     { query: FindRecordScopingRulesDocument, variables: { roleId } },
@@ -91,57 +110,32 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
     { refetchQueries },
   );
 
-  const conditionInputs = drafts.map((draft) =>
-    toRecordScopingConditionInput(
-      draft,
-      columns.find((column) => column.column === draft.column),
-    ),
+  const conditionInputs = toRecordScopingConditionInputs(
+    drafts,
+    columns,
+    getColumns,
   );
-  const isValid =
-    conditionInputs.length > 0 && conditionInputs.every(isDefined);
+  const isValid = isDefined(conditionInputs);
 
   const savedState = JSON.stringify({
     logicalOperator: rule?.logicalOperator ?? 'AND',
     conditions:
-      rule?.conditions.map((condition) =>
-        toRecordScopingConditionInput(
-          fromRecordScopingCondition(condition),
-          columns.find((column) => column.column === condition.column),
-        ),
+      toRecordScopingConditionInputs(
+        rule?.conditions.map(fromRecordScopingCondition) ?? [],
+        columns,
+        getColumns,
       ) ?? [],
   });
   const isDirty =
     JSON.stringify({ logicalOperator, conditions: conditionInputs }) !==
     savedState;
 
-  const handleAddCondition = () => {
-    // An owner-style relation is the most common rule; actor columns
-    // (created by / updated by) come next.
-    const defaultColumn =
-      columns.find(
-        (column) =>
-          column.valueKind === 'WORKSPACE_MEMBER' &&
-          !column.column.endsWith('WorkspaceMemberId'),
-      ) ??
-      columns.find((column) => column.valueKind === 'WORKSPACE_MEMBER') ??
-      columns[0];
+  const handleAddFirstCondition = () => {
+    const defaultColumn = getDefaultRecordScopingColumn(columns);
 
     if (isDefined(defaultColumn)) {
-      setDrafts((current) => [
-        ...current,
-        createRecordScopingConditionDraft(defaultColumn),
-      ]);
+      setDrafts([createRecordScopingConditionDraft(defaultColumn)]);
     }
-  };
-
-  const handleConditionChange = (nextDraft: RecordScopingConditionDraft) => {
-    setDrafts((current) =>
-      current.map((draft) => (draft.key === nextDraft.key ? nextDraft : draft)),
-    );
-  };
-
-  const handleConditionRemove = (key: string) => {
-    setDrafts((current) => current.filter((draft) => draft.key !== key));
   };
 
   const handleSave = async () => {
@@ -152,7 +146,7 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
             roleId,
             objectMetadataId: objectMetadataItem.id,
             logicalOperator,
-            conditions: conditionInputs.filter(isDefined),
+            conditions: conditionInputs ?? [],
           },
         },
       });
@@ -188,44 +182,36 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
       <Card.Root rounded>
         <StyledConditions>
           {drafts.length === 0 ? (
-            <StyledEmptyState>
-              {t`No record-level rule: this role sees every record it can read.`}
-            </StyledEmptyState>
+            <>
+              <StyledEmptyState>
+                {t`No record-level rule: this role sees every record it can read.`}
+              </StyledEmptyState>
+              <StyledFooterGroup>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  startIcon={<IconPlus />}
+                  onClick={handleAddFirstCondition}
+                  disabled={columns.length === 0}
+                >{t`Add condition`}</Button>
+              </StyledFooterGroup>
+            </>
           ) : (
-            drafts.map((draft) => (
-              <SettingsRolePermissionsObjectLevelRecordScopingConditionRow
-                key={draft.key}
-                draft={draft}
-                columns={columns}
-                instanceId={`record-scoping-${objectMetadataItem.id}-${draft.key}`}
-                onChange={handleConditionChange}
-                onRemove={() => handleConditionRemove(draft.key)}
-              />
-            ))
+            <SettingsRolePermissionsObjectLevelRecordScopingConditionList
+              drafts={drafts}
+              logicalOperator={logicalOperator}
+              columns={columns}
+              getColumns={getColumns}
+              getObjectLabel={getObjectLabel}
+              depth={0}
+              instanceId={`record-scoping-${objectMetadataItem.id}`}
+              onDraftsChange={setDrafts}
+              onLogicalOperatorChange={setLogicalOperator}
+            />
           )}
         </StyledConditions>
       </Card.Root>
       <StyledFooter>
-        <StyledFooterGroup>
-          <Button
-            size="sm"
-            variant="outline"
-            startIcon={<IconPlus />}
-            onClick={handleAddCondition}
-            disabled={columns.length === 0}
-          >{t`Add condition`}</Button>
-          {drafts.length > 1 && (
-            <Select
-              dropdownId={`record-scoping-${objectMetadataItem.id}-logical-operator`}
-              options={[
-                { value: 'AND', label: t`Match all conditions` },
-                { value: 'OR', label: t`Match any condition` },
-              ]}
-              value={logicalOperator}
-              onChange={(value: LogicalOperator) => setLogicalOperator(value)}
-            />
-          )}
-        </StyledFooterGroup>
         <StyledFooterGroup>
           {isDefined(rule) && (
             <Button
@@ -236,14 +222,14 @@ export const SettingsRolePermissionsObjectLevelRecordScopingRuleForm = ({
               disabled={isDeleting}
             >{t`Remove rule`}</Button>
           )}
-          <Button
-            size="sm"
-            variant="solid"
-            color="accent"
-            onClick={handleSave}
-            disabled={!isValid || !isDirty || isSaving}
-          >{t`Save rule`}</Button>
         </StyledFooterGroup>
+        <Button
+          size="sm"
+          variant="solid"
+          color="accent"
+          onClick={handleSave}
+          disabled={!isValid || !isDirty || isSaving}
+        >{t`Save rule`}</Button>
       </StyledFooter>
     </>
   );

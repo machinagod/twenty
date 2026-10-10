@@ -87,3 +87,23 @@ export const buildFlatEntityMaps = <
       }),
     createEmptyFlatEntityMaps() as FlatEntityMaps<never>,
   );
+
+export const COMPANY_FIELDS: FlatFieldMetadata[] = [
+  getFlatFieldMetadataMock({
+    universalIdentifier: 'company-accountOwner',
+    id: 'field-company-accountOwner',
+    objectMetadataId: COMPANY_ID,
+    type: FieldMetadataType.RELATION,
+    name: 'accountOwner',
+    isSystem: false,
+    settings: { relationType: RelationType.MANY_TO_ONE },
+    relationTargetObjectMetadataId: WORKSPACE_MEMBER_ID,
+  } as never),
+];
+
+export const COMPANY_OBJECT: FlatObjectMetadata = getFlatObjectMetadataMock({
+  universalIdentifier: 'company',
+  id: COMPANY_ID,
+  nameSingular: 'company',
+  fieldIds: COMPANY_FIELDS.map(({ id }) => id),
+});
