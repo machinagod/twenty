@@ -137,8 +137,12 @@ const renderConditionGroup = ({
       return undefined;
     }
 
+    const selectedColumn = escapeIdentifier(
+      condition.related.matchColumn ?? 'id',
+    );
+
     renderedConditions.push({
-      sql: `${column} IN (SELECT ${escapeIdentifier(relatedAlias)}."id" FROM ${relatedTableName} ${escapeIdentifier(relatedAlias)} WHERE ${relatedCondition.sql})`,
+      sql: `${column} IN (SELECT ${escapeIdentifier(relatedAlias)}.${selectedColumn} FROM ${relatedTableName} ${escapeIdentifier(relatedAlias)} WHERE ${relatedCondition.sql})`,
       parameters: relatedCondition.parameters,
     });
   }

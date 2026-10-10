@@ -185,4 +185,51 @@ describe('resolveRecordScoping', () => {
       }),
     ).toEqual({ kind: 'match-nothing' });
   });
+
+  it('should carry the match column of related records', () => {
+    const relatedCondition = {
+      column: 'ownerId',
+      operator: 'eq' as const,
+      currentWorkspaceMemberField: 'id',
+    };
+
+    expect(
+      resolveRecordScoping({
+        rules: [
+          {
+            ...ownerRule,
+            conditions: [
+              {
+                column: 'id',
+                operator: 'in',
+                relatedRecords: {
+                  objectMetadataId: 'line-id',
+                  matchColumn: 'routeId',
+                  logicalOperator: 'AND',
+                  conditions: [relatedCondition],
+                },
+              },
+            ],
+          },
+        ],
+        currentWorkspaceMember,
+      }),
+    ).toEqual({
+      kind: 'conditions',
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          column: 'id',
+          related: {
+            objectMetadataId: 'line-id',
+            matchColumn: 'routeId',
+            logicalOperator: 'AND',
+            conditions: [
+              { column: 'ownerId', operator: 'eq', value: 'wm-current' },
+            ],
+          },
+        },
+      ],
+    });
+  });
 });

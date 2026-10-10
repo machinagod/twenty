@@ -74,7 +74,7 @@ const resolveCondition = ({
   currentWorkspaceMember?: CurrentWorkspaceMemberLike;
 }): ResolvedRecordScopingCondition | undefined => {
   if (isDefined(condition.relatedRecords)) {
-    const { objectMetadataId, logicalOperator, conditions } =
+    const { objectMetadataId, matchColumn, logicalOperator, conditions } =
       condition.relatedRecords;
     const resolvedConditions = conditions.map((relatedCondition) =>
       resolveCondition({ condition: relatedCondition, currentWorkspaceMember }),
@@ -91,6 +91,7 @@ const resolveCondition = ({
       column: condition.column,
       related: {
         objectMetadataId,
+        ...(isDefined(matchColumn) ? { matchColumn } : {}),
         logicalOperator,
         conditions: resolvedConditions,
       },

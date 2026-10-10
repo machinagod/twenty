@@ -22,6 +22,10 @@ export const MAX_RECORD_SCOPING_RELATED_DEPTH = 3;
 
 const OPERATORS: RecordScopingOperator[] = ['eq', 'neq', 'in'];
 
+// The scoped object's primary key: only conditions matching related records that
+// point back at it (relatedRecords with a matchColumn) may use it.
+const ID_COLUMN = 'id';
+
 // The member fields a condition may read, and the columns each can match.
 const VALUE_KINDS_BY_MEMBER_FIELD: Record<
   string,
@@ -38,6 +42,7 @@ export type RecordScopingConditionInput = {
   currentWorkspaceMemberField?: string | null;
   relatedRecords?: {
     objectMetadataId: string;
+    matchColumn?: string | null;
     logicalOperator: string;
     conditions: RecordScopingConditionInput[];
   } | null;
@@ -107,15 +112,18 @@ const validateStaticValue = (
 // them normalized for storage. Anything the query-time applier could not render
 // to a valid WHERE is rejected here, so a stored rule never fails open. Related
 // records are checked against their own object's columns, from
-// `getColumnsForObject`.
+// `getColumnsForObject`; `objectMetadataId` is the object the conditions filter,
+// which a related matchColumn must point at.
 export const validateRecordScopingConditions = ({
   conditions,
+  objectMetadataId,
   columns,
   getColumnsForObject,
   depth = 0,
   path = 'conditions',
 }: {
   conditions: RecordScopingConditionInput[];
+  objectMetadataId: string;
   columns: Map<string, RecordScopingColumn>;
   getColumnsForObject: (
     objectMetadataId: string,
@@ -135,6 +143,20 @@ export const validateRecordScopingConditions = ({
 
   return conditions.map((condition, index) => {
     const location = `${path}[${index}]`;
+
+    if (
+      condition.column === ID_COLUMN ||
+      isDefined(condition.relatedRecords?.matchColumn)
+    ) {
+      return validateReverseRelatedRecordsCondition({
+        condition,
+        objectMetadataId,
+        location,
+        getColumnsForObject,
+        depth,
+      });
+    }
+
     const column = columns.get(condition.column);
 
     if (!isDefined(column)) {
@@ -281,6 +303,107 @@ const validateRelatedRecordsCondition = ({
         relatedRecords.logicalOperator as RecordScopingLogicalOperator,
       conditions: validateRecordScopingConditions({
         conditions: relatedRecords.conditions,
+        objectMetadataId: relatedRecords.objectMetadataId,
+        columns: relatedColumns,
+        getColumnsForObject,
+        depth: depth + 1,
+        path: `${location}.relatedRecords.conditions`,
+      }),
+    },
+  };
+};
+
+// "Any related record pointing back at this one matches": the condition sits on
+// the scoped object's id and the related object's matchColumn must be a
+// many-to-one join column targeting the scoped object.
+const validateReverseRelatedRecordsCondition = ({
+  condition,
+  objectMetadataId,
+  location,
+  getColumnsForObject,
+  depth,
+}: {
+  condition: RecordScopingConditionInput;
+  objectMetadataId: string;
+  location: string;
+  getColumnsForObject: (
+    objectMetadataId: string,
+  ) => Map<string, RecordScopingColumn> | undefined;
+  depth: number;
+}): RecordScopingCondition => {
+  const relatedRecords = condition.relatedRecords;
+
+  if (condition.column !== ID_COLUMN) {
+    return invalid(
+      `${location}: matchColumn needs the condition on "${ID_COLUMN}", not "${condition.column}"`,
+    );
+  }
+
+  if (!isDefined(relatedRecords) || !isDefined(relatedRecords.matchColumn)) {
+    return invalid(
+      `${location}: "${ID_COLUMN}" can only match related records that point back at it through a matchColumn`,
+    );
+  }
+
+  if (
+    isDefined(condition.staticValue) ||
+    isDefined(condition.currentWorkspaceMemberField)
+  ) {
+    return invalid(
+      `${location}: set exactly one of staticValue, currentWorkspaceMemberField or relatedRecords`,
+    );
+  }
+
+  if (condition.operator !== 'in') {
+    return invalid(`${location}: related records need the "in" operator`);
+  }
+
+  if (depth + 1 > MAX_RECORD_SCOPING_RELATED_DEPTH) {
+    return invalid(
+      `${location}: related records can be nested at most ${MAX_RECORD_SCOPING_RELATED_DEPTH} levels deep`,
+    );
+  }
+
+  if (
+    relatedRecords.logicalOperator !== 'AND' &&
+    relatedRecords.logicalOperator !== 'OR'
+  ) {
+    return invalid(`${location}: logicalOperator must be AND or OR`);
+  }
+
+  const relatedColumns = getColumnsForObject(relatedRecords.objectMetadataId);
+
+  if (!isDefined(relatedColumns)) {
+    return invalid(
+      `${location}: object ${relatedRecords.objectMetadataId} not found`,
+    );
+  }
+
+  const matchColumn = relatedColumns.get(relatedRecords.matchColumn);
+
+  if (!isDefined(matchColumn?.targetObjectMetadataId)) {
+    return invalid(
+      `${location}: "${relatedRecords.matchColumn}" is not a relation on object ${relatedRecords.objectMetadataId}`,
+    );
+  }
+
+  if (matchColumn.targetObjectMetadataId !== objectMetadataId) {
+    return invalid(
+      `${location}: "${relatedRecords.matchColumn}" does not point at object ${objectMetadataId}`,
+    );
+  }
+
+  return {
+    column: ID_COLUMN,
+    operator: 'in',
+    relatedRecords: {
+      objectMetadataId: relatedRecords.objectMetadataId,
+      matchColumn: matchColumn.column,
+      logicalOperator:
+        relatedRecords.logicalOperator as RecordScopingLogicalOperator,
+      conditions: validateRecordScopingConditions({
+        conditions: relatedRecords.conditions,
+        objectMetadataId: relatedRecords.objectMetadataId,
         columns: relatedColumns,
         getColumnsForObject,
         depth: depth + 1,

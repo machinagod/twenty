@@ -19,6 +19,9 @@ export class RecordScopingRelatedRecordsDTO {
   @Field(() => UUIDScalarType)
   objectMetadataId: string;
 
+  @Field(() => String, { nullable: true })
+  matchColumn?: string;
+
   @Field()
   logicalOperator: string;
 
@@ -49,6 +52,12 @@ export class RecordScopingRelatedRecordsInput {
   @IsUUID()
   @Field(() => UUIDScalarType)
   objectMetadataId: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @Field(() => String, { nullable: true })
+  matchColumn?: string | null;
 
   @IsIn(['AND', 'OR'])
   @Field()
