@@ -1,4 +1,4 @@
-export type RecordScopingColumnValueKind =
+type RecordScopingColumnValueKind =
   | 'WORKSPACE_MEMBER'
   | 'UUID'
   | 'TEXT'
