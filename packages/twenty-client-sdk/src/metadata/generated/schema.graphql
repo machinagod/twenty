@@ -3830,6 +3830,7 @@ type MinimalMetadata {
 
 type RecordScopingRelatedRecords {
   objectMetadataId: UUID!
+  matchColumn: String
   logicalOperator: String!
   conditions: [RecordScopingCondition!]!
 }
@@ -5602,6 +5603,7 @@ input RecordScopingConditionInput {
 
 input RecordScopingRelatedRecordsInput {
   objectMetadataId: UUID!
+  matchColumn: String
   logicalOperator: String!
   conditions: [RecordScopingConditionInput!]!
 }
