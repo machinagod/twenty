@@ -152,6 +152,36 @@ via `applyRecordScopingForAlias()`:
   scoped here and continue to rely on object/field permissions; the existing
   `shouldBypassPermissionChecks` bypass is honored.
 
+### Mailbox visibility for messages (built-in rule)
+
+Besides the configurable rules, the same chokepoint applies one built-in rule to
+the standard messaging objects (`message`, `messageThread`,
+`messageParticipant`, `messageChannelMessageAssociation`,
+`messageChannelMessageAssociationMessageFolder`): a non-admin user only sees rows
+synced through a mailbox they connected (`core.connectedAccount.userWorkspaceId`)
+or through a channel shared with everyone (`SHARE_EVERYTHING`, for shared
+addresses and groups). Upstream's channel visibility (`SUBJECT`, `METADATA`)
+only masked content after the query, so every user could list every thread,
+subject and participant.
+
+- Code: `twenty-orm/record-scoping/utils/build-message-visibility-condition.util.ts`,
+  added in `WorkspaceRepository.applyRecordScopingForAlias` next to the rules.
+  Allowed channels are read in the same statement from `core.messageChannel` and
+  `core.connectedAccount`, so there is no cache to invalidate. Threads are
+  reached through `message.messageThreadId` (the association's own
+  `messageThreadId` is not populated by the sync).
+- Admins (roles with `canUpdateAllSettings`, i.e. `roleIdsWithAllRecordsAccess`)
+  are not restricted and skip the upstream content masking too
+  (`MessageMailboxAdminService`, used by the message post-query hooks).
+- The person/company timeline lists threads with permission checks bypassed, so
+  `TimelineMessagingService` applies the same SQL explicitly, drops replies that
+  only reached someone else's mailbox, and gives admins full visibility.
+- `messageThread` findMany/findOne post-query hooks mask the thread subject like
+  `message.subject` (relevant for API keys, which the row rule does not cover).
+- API keys, applications and system contexts are not restricted by the row rule.
+- Messaging objects are system objects and not searchable, so global search and
+  the AI search tools never return them; the integration spec guards that.
+
 ### Known limitations / next steps
 
 - Relations are followed through related-record subqueries, many-to-one and

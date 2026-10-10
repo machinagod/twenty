@@ -10,6 +10,7 @@ import { In, Repository } from 'typeorm';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
+import { MessageMailboxAdminService } from 'src/modules/messaging/common/services/message-mailbox-admin.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { type MessageChannelMessageAssociationWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-channel-message-association.workspace-entity';
@@ -26,6 +27,7 @@ export class ApplyMessagesVisibilityRestrictionsService {
     private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
     @InjectRepository(MessageChannelEntity)
     private readonly messageChannelRepository: Repository<MessageChannelEntity>,
+    private readonly messageMailboxAdminService: MessageMailboxAdminService,
   ) {}
 
   public async applyMessagesVisibilityRestrictions(
@@ -33,7 +35,18 @@ export class ApplyMessagesVisibilityRestrictionsService {
     workspaceId: string,
     userId?: string,
     applicationId?: string,
+    userWorkspaceId?: string,
   ) {
+    if (
+      isDefined(userWorkspaceId) &&
+      (await this.messageMailboxAdminService.isAdmin(
+        workspaceId,
+        userWorkspaceId,
+      ))
+    ) {
+      return messages;
+    }
+
     const authContext = buildSystemAuthContext(workspaceId);
 
     return this.workspaceOrmManager.executeInWorkspaceContext(

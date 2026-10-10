@@ -15,11 +15,28 @@ import { type TargetFilter } from 'src/engine/core-modules/target/utils/get-targ
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
 import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
+import {
+  type MessageVisibilityObjectName,
+  renderMessageVisibilitySql,
+} from 'src/engine/twenty-orm/record-scoping/utils/build-message-visibility-condition.util';
+import { computeObjectTargetTable } from 'src/engine/utils/compute-object-target-table.util';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
+import { TWENTY_STANDARD_APPLICATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-standard-applications';
+import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
+import { type MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
+import { MessageMailboxAdminService } from 'src/modules/messaging/common/services/message-mailbox-admin.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { type MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
 import { type MessageThreadWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread.workspace-entity';
 import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
+
+// Who is reading the timeline: admins see every mailbox, everyone else only
+// threads from mailboxes they connected or that are shared with everyone.
+export type TimelineMessageViewer = {
+  userWorkspaceId: string | null;
+  isAdmin: boolean;
+};
 
 @Injectable()
 export class TimelineMessagingService {
@@ -32,13 +49,90 @@ export class TimelineMessagingService {
     @InjectRepository(UserWorkspaceEntity)
     private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
     private readonly fileUrlService: FileUrlService,
+    private readonly messageMailboxAdminService: MessageMailboxAdminService,
   ) {}
+
+  public async resolveViewer(
+    workspaceMemberId: string,
+    workspaceId: string,
+  ): Promise<TimelineMessageViewer> {
+    const authContext = buildSystemAuthContext(workspaceId);
+
+    const userWorkspaceId =
+      await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
+        const workspaceMemberRepository =
+          this.workspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const currentMember = await workspaceMemberRepository.findOne({
+          where: { id: workspaceMemberId },
+          select: { userId: true },
+        });
+
+        if (!currentMember) {
+          return null;
+        }
+
+        const currentUserWorkspace = await this.userWorkspaceRepository.findOne(
+          {
+            where: { userId: currentMember.userId, workspaceId },
+            select: { id: true },
+          },
+        );
+
+        return currentUserWorkspace?.id ?? null;
+      }, authContext);
+
+    return {
+      userWorkspaceId,
+      isAdmin:
+        isDefined(userWorkspaceId) &&
+        (await this.messageMailboxAdminService.isAdmin(
+          workspaceId,
+          userWorkspaceId,
+        )),
+    };
+  }
+
+  private visibilitySql({
+    alias,
+    objectNameSingular,
+    workspaceId,
+    userWorkspaceId,
+  }: {
+    alias: string;
+    objectNameSingular: MessageVisibilityObjectName;
+    workspaceId: string;
+    userWorkspaceId: string;
+  }) {
+    const standardTable = (nameSingular: string) =>
+      `${escapeIdentifier(getWorkspaceSchemaName(workspaceId))}.${escapeIdentifier(
+        computeObjectTargetTable({
+          nameSingular,
+          applicationUniversalIdentifier:
+            TWENTY_STANDARD_APPLICATION.universalIdentifier,
+        }),
+      )}`;
+
+    return renderMessageVisibilitySql({
+      alias,
+      objectNameSingular,
+      associationTable: standardTable('messageChannelMessageAssociation'),
+      messageTable: standardTable('message'),
+      parameterPrefix: `timelineVisibility_${alias}`,
+      workspaceId,
+      userWorkspaceId,
+    });
+  }
 
   public async getAndCountMessageThreads(
     personIds: string[],
     workspaceId: string,
     offset: number,
     pageSize: number,
+    viewer: TimelineMessageViewer,
     targetFilter?: TargetFilter,
   ): Promise<{
     messageThreads: Omit<
@@ -52,6 +146,14 @@ export class TimelineMessagingService {
     totalNumberOfThreads: number;
   }> {
     const authContext = buildSystemAuthContext(workspaceId);
+
+    if (!viewer.isAdmin && !isDefined(viewer.userWorkspaceId)) {
+      return { messageThreads: [], totalNumberOfThreads: 0 };
+    }
+
+    const restrictedUserWorkspaceId = viewer.isAdmin
+      ? null
+      : viewer.userWorkspaceId;
 
     return this.workspaceOrmManager.executeInWorkspaceContext(async () => {
       const messageThreadRepository =
@@ -101,6 +203,24 @@ export class TimelineMessagingService {
       applyRecordFilter(totalQueryBuilder);
       applyRecordFilter(threadIdsQueryBuilder);
 
+      if (isDefined(restrictedUserWorkspaceId)) {
+        const threadVisibility = this.visibilitySql({
+          alias: 'messageThread',
+          objectNameSingular: 'messageThread',
+          workspaceId,
+          userWorkspaceId: restrictedUserWorkspaceId,
+        });
+
+        totalQueryBuilder.andWhere(
+          threadVisibility.sql,
+          threadVisibility.parameters,
+        );
+        threadIdsQueryBuilder.andWhere(
+          threadVisibility.sql,
+          threadVisibility.parameters,
+        );
+      }
+
       const totalNumberOfThreads = await totalQueryBuilder.getCount();
       const threadIdsQuery = await threadIdsQueryBuilder.getRawMany();
 
@@ -118,8 +238,45 @@ export class TimelineMessagingService {
         relations: ['messages'],
       });
 
+      // A visible thread can still hold replies that only reached someone
+      // else's mailbox; those stay out of the preview.
+      if (isDefined(restrictedUserWorkspaceId) && messageThreadIds.length > 0) {
+        const messageVisibility = this.visibilitySql({
+          alias: 'message',
+          objectNameSingular: 'message',
+          workspaceId,
+          userWorkspaceId: restrictedUserWorkspaceId,
+        });
+
+        const visibleMessageIds = new Set(
+          (
+            await this.workspaceOrmManager
+              .getRepository<MessageWorkspaceEntity>('message', {
+                shouldBypassPermissionChecks: true,
+              })
+              .createQueryBuilder('message')
+              .select('message.id', 'id')
+              .where('message.messageThreadId IN (:...messageThreadIds)', {
+                messageThreadIds,
+              })
+              .andWhere(messageVisibility.sql, messageVisibility.parameters)
+              .getRawMany<{ id: string }>()
+          ).map((row) => row.id),
+        );
+
+        for (const messageThread of messageThreads) {
+          messageThread.messages = messageThread.messages.filter((message) =>
+            visibleMessageIds.has(message.id),
+          );
+        }
+      }
+
+      const threadsWithMessages = messageThreads.filter(
+        (messageThread) => messageThread.messages.length > 0,
+      );
+
       return {
-        messageThreads: messageThreads.map((messageThread) => {
+        messageThreads: threadsWithMessages.map((messageThread) => {
           const lastMessage = messageThread.messages[0];
           const firstMessage =
             messageThread.messages[messageThread.messages.length - 1];
@@ -252,9 +409,19 @@ export class TimelineMessagingService {
     messageThreadIds: string[],
     workspaceMemberId: string,
     workspaceId: string,
+    viewer?: TimelineMessageViewer,
   ): Promise<{
     [key: string]: MessageChannelVisibility;
   }> {
+    if (viewer?.isAdmin) {
+      return Object.fromEntries(
+        messageThreadIds.map((threadId) => [
+          threadId,
+          MessageChannelVisibility.SHARE_EVERYTHING,
+        ]),
+      );
+    }
+
     const authContext = buildSystemAuthContext(workspaceId);
 
     return this.workspaceOrmManager.executeInWorkspaceContext(async () => {

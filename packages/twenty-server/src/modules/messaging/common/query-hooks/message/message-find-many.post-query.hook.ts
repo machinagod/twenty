@@ -55,6 +55,7 @@ export class MessageFindManyPostQueryHook implements WorkspacePostQueryHookInsta
       workspace.id,
       userId,
       applicationId,
+      isUserAuthContext(authContext) ? authContext.userWorkspaceId : undefined,
     );
   }
 }

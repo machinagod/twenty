@@ -28,12 +28,18 @@ export class GetMessagesService {
   ): Promise<TimelineThreadsWithTotalDTO> {
     const offset = (page - 1) * pageSize;
 
+    const viewer = await this.timelineMessagingService.resolveViewer(
+      workspaceMemberId,
+      workspaceId,
+    );
+
     const { messageThreads, totalNumberOfThreads } =
       await this.timelineMessagingService.getAndCountMessageThreads(
         personIds,
         workspaceId,
         offset,
         pageSize,
+        viewer,
         targetFilter,
       );
 
@@ -60,6 +66,7 @@ export class GetMessagesService {
         messageThreadIds,
         workspaceMemberId,
         workspaceId,
+        viewer,
       );
 
     return {
