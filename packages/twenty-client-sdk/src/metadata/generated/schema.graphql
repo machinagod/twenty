@@ -3828,11 +3828,18 @@ type MinimalMetadata {
   collectionHashes: [CollectionHash!]!
 }
 
+type RecordScopingRelatedRecords {
+  objectMetadataId: UUID!
+  logicalOperator: String!
+  conditions: [RecordScopingCondition!]!
+}
+
 type RecordScopingCondition {
   column: String!
   operator: String!
   staticValue: JSON
   currentWorkspaceMemberField: String
+  relatedRecords: RecordScopingRelatedRecords
 }
 
 type RecordScopingRule {
@@ -5590,6 +5597,13 @@ input RecordScopingConditionInput {
   operator: String!
   staticValue: JSON
   currentWorkspaceMemberField: String
+  relatedRecords: RecordScopingRelatedRecordsInput
+}
+
+input RecordScopingRelatedRecordsInput {
+  objectMetadataId: UUID!
+  logicalOperator: String!
+  conditions: [RecordScopingConditionInput!]!
 }
 
 input DeleteRecordScopingRuleInput {

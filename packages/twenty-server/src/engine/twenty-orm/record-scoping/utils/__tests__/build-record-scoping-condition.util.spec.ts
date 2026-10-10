@@ -38,6 +38,10 @@ const buildForOpportunity = (
     recordScopingRulesByRoleId: rulesByRole,
     userWorkspaceRoleMap,
     authContext: userAuthContext,
+    getRelatedTableName: (objectMetadataId) =>
+      ({ 'company-id': '"ws"."company"', 'document-id': '"ws"."_documento"' })[
+        objectMetadataId
+      ],
     ...overrides,
   });
 
@@ -201,5 +205,127 @@ describe('buildRecordScopingCondition', () => {
         },
       }),
     ).toEqual({ sql: '1 = 0', parameters: {} });
+  });
+  describe('related records', () => {
+    const relatedRule = (
+      conditions: RecordScopingRule['conditions'],
+    ): RecordScopingRulesByRoleId => ({
+      'role-1': [
+        {
+          objectMetadataId: 'opportunity-id',
+          logicalOperator: 'AND',
+          conditions,
+        },
+      ],
+    });
+    const companyOwnedByMe = {
+      column: 'companyId',
+      operator: 'in' as const,
+      relatedRecords: {
+        objectMetadataId: 'company-id',
+        logicalOperator: 'AND' as const,
+        conditions: [
+          {
+            column: 'accountOwnerId',
+            operator: 'eq' as const,
+            currentWorkspaceMemberField: 'id',
+          },
+        ],
+      },
+    };
+
+    it('should keep records whose relation points at a matching record', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: relatedRule([companyOwnedByMe]),
+        }),
+      ).toEqual({
+        sql: '("opportunity"."companyId" IN (SELECT "recordScoping_opportunity_0"."id" FROM "ws"."company" "recordScoping_opportunity_0" WHERE ("recordScoping_opportunity_0"."accountOwnerId" = :recordScoping_opportunity_0_0)))',
+        parameters: { recordScoping_opportunity_0_0: 'wm-current' },
+      });
+    });
+
+    it('should nest related records and mix them with plain conditions', () => {
+      const condition = buildForOpportunity({
+        recordScopingRulesByRoleId: relatedRule([
+          {
+            column: 'documentoId',
+            operator: 'in',
+            relatedRecords: {
+              objectMetadataId: 'document-id',
+              logicalOperator: 'OR',
+              conditions: [
+                companyOwnedByMe,
+                { column: 'status', operator: 'eq', staticValue: 1 },
+              ],
+            },
+          },
+          { column: 'stage', operator: 'neq', staticValue: 'LOST' },
+        ]),
+      });
+
+      expect(condition?.sql).toBe(
+        '("opportunity"."documentoId" IN (SELECT "recordScoping_opportunity_0"."id" FROM "ws"."_documento" "recordScoping_opportunity_0" WHERE ("recordScoping_opportunity_0"."companyId" IN (SELECT "recordScoping_opportunity_0_0"."id" FROM "ws"."company" "recordScoping_opportunity_0_0" WHERE ("recordScoping_opportunity_0_0"."accountOwnerId" = :recordScoping_opportunity_0_0_0)) OR "recordScoping_opportunity_0"."status" = :recordScoping_opportunity_0_1)) AND "opportunity"."stage" != :recordScoping_opportunity_1)',
+      );
+      expect(condition?.parameters).toEqual({
+        recordScoping_opportunity_0_0_0: 'wm-current',
+        recordScoping_opportunity_0_1: 1,
+        recordScoping_opportunity_1: 'LOST',
+      });
+    });
+
+    it('should fail closed when the related object has no table', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: relatedRule([
+            {
+              ...companyOwnedByMe,
+              relatedRecords: {
+                ...companyOwnedByMe.relatedRecords,
+                objectMetadataId: 'deleted-id',
+              },
+            },
+          ]),
+        }),
+      ).toEqual({ sql: '1 = 0', parameters: {} });
+    });
+
+    it('should fail closed when a nested member value is missing', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: relatedRule([companyOwnedByMe]),
+          authContext: {
+            ...userAuthContext,
+            workspaceMember: undefined,
+          } as unknown as WorkspaceAuthContext,
+        }),
+      ).toEqual({ sql: '1 = 0', parameters: {} });
+    });
+
+    it('should fail closed on related records without conditions', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: relatedRule([
+            {
+              ...companyOwnedByMe,
+              relatedRecords: {
+                ...companyOwnedByMe.relatedRecords,
+                conditions: [],
+              },
+            },
+          ]),
+        }),
+      ).toEqual({ sql: '1 = 0', parameters: {} });
+    });
+
+    it('should compile to positional parameters', () => {
+      const condition = buildForOpportunity({
+        recordScopingRulesByRoleId: relatedRule([companyOwnedByMe]),
+      });
+
+      expect(
+        compileNamedParameters(condition!.sql, condition!.parameters).values,
+      ).toEqual(['wm-current']);
+    });
   });
 });

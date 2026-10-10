@@ -63,6 +63,12 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   let originalMemberRoleId: string;
   let companyObjectMetadataId: string;
 
+  // People are scoped through their company (related records), not a column
+  // of their own.
+  const inScopePersonId = randomUUID();
+  const outOfScopePersonId = randomUUID();
+  const testPersonIds = [inScopePersonId, outOfScopePersonId];
+
   const findTestCompaniesAs = (token: string) =>
     makeGraphqlApiRequest(
       findManyOperationFactory({
@@ -148,6 +154,22 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
         conditions: [{ column: 'employees', operator: 'eq', staticValue: 42 }],
       },
       {
+        objectMetadataId: objectId('person'),
+        conditions: [
+          {
+            column: 'companyId',
+            operator: 'in',
+            relatedRecords: {
+              objectMetadataId: companyObjectMetadataId,
+              logicalOperator: 'AND',
+              conditions: [
+                { column: 'employees', operator: 'eq', staticValue: 42 },
+              ],
+            },
+          },
+        ],
+      },
+      {
         objectMetadataId: objectId('opportunity'),
         conditions: [
           {
@@ -201,6 +223,19 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       }),
     );
 
+    for (const [id, companyId, firstName] of [
+      [inScopePersonId, inScopeCompanyId, 'RecordScopingInScope'],
+      [outOfScopePersonId, outOfScopeCompanyId, 'RecordScopingOutOfScope'],
+    ]) {
+      await makeGraphqlApiRequest(
+        createOneOperationFactory({
+          objectMetadataSingularName: 'person',
+          gqlFields: 'id',
+          data: { id, companyId, name: { firstName, lastName: 'Person' } },
+        }),
+      );
+    }
+
     await makeGraphqlApiRequest(
       createOneOperationFactory({
         objectMetadataSingularName: 'opportunity',
@@ -239,6 +274,16 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       await makeGraphqlApiRequest(
         destroyOneOperationFactory({
           objectMetadataSingularName: 'company',
+          gqlFields: 'id',
+          recordId: id,
+        }),
+      );
+    }
+
+    for (const id of testPersonIds) {
+      await makeGraphqlApiRequest(
+        destroyOneOperationFactory({
+          objectMetadataSingularName: 'person',
           gqlFields: 'id',
           recordId: id,
         }),
@@ -342,11 +387,43 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       'RecordScoping Owned By Scoped Member',
     ]);
   });
+  it('scopes people through their company (related records)', async () => {
+    const findPeopleAs = (token: string) =>
+      makeGraphqlApiRequest(
+        findManyOperationFactory({
+          objectMetadataSingularName: 'person',
+          objectMetadataPluralName: 'people',
+          gqlFields: 'id name { firstName }',
+          filter: { id: { in: testPersonIds } },
+          first: 10,
+        }),
+        token,
+      );
+    const firstNames = (response: {
+      body: {
+        data: {
+          people: { edges: { node: { name: { firstName: string } } }[] };
+        };
+      };
+    }) =>
+      response.body.data.people.edges
+        .map((edge) => edge.node.name.firstName)
+        .sort((a, b) => a.localeCompare(b));
+
+    const scoped = await findPeopleAs(APPLE_JONY_MEMBER_ACCESS_TOKEN);
+
+    expect(scoped.body.errors).toBeUndefined();
+    expect(firstNames(scoped)).toEqual(['RecordScopingInScope']);
+    expect(
+      firstNames(await findPeopleAs(APPLE_JANE_ADMIN_ACCESS_TOKEN)),
+    ).toEqual(['RecordScopingInScope', 'RecordScopingOutOfScope']);
+  });
+
   it('lists the role rules through the metadata API', async () => {
     const response = await findRecordScopingRules(customRoleId);
 
     expect(response.body.errors).toBeUndefined();
-    expect(response.body.data.recordScopingRules).toHaveLength(2);
+    expect(response.body.data.recordScopingRules).toHaveLength(3);
     expect(response.body.data.recordScopingRules[0]).toMatchObject({
       roleId: customRoleId,
       objectMetadataId: companyObjectMetadataId,

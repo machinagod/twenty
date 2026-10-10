@@ -21,6 +21,8 @@ export type RecordScopingColumn = {
   column: string;
   valueKind: RecordScopingColumnValueKind;
   selectOptionValues?: string[];
+  // Set on many-to-one join columns: the object the column points at.
+  targetObjectMetadataId?: string;
 };
 
 const SCALAR_VALUE_KIND_BY_FIELD_TYPE: Partial<
@@ -68,6 +70,9 @@ export const getRecordScopingColumns = ({
             workspaceMemberObjectMetadataId
             ? 'WORKSPACE_MEMBER'
             : 'UUID',
+        ...(isDefined(field.relationTargetObjectMetadataId)
+          ? { targetObjectMetadataId: field.relationTargetObjectMetadataId }
+          : {}),
       });
       continue;
     }

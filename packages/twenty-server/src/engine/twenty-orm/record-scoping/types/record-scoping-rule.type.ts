@@ -12,9 +12,19 @@ export type RecordScopingOperator = 'eq' | 'neq' | 'in';
 
 export type RecordScopingScalar = string | number | boolean;
 
-// A single condition compares a column on the scoped object's table to either a
-// static value or a value read from the current workspace member (e.g.
-// "owner = me"). Exactly one value source must be provided.
+// Records of another object, selected by their own conditions. A condition with
+// relatedRecords keeps the scoped record when its join column points at one of
+// them, e.g. people whose company's account owner is the current member.
+export type RecordScopingRelatedRecords = {
+  objectMetadataId: string;
+  logicalOperator: RecordScopingLogicalOperator;
+  conditions: RecordScopingCondition[];
+};
+
+// A single condition compares a column on the scoped object's table to a static
+// value, a value read from the current workspace member (e.g. "owner = me"), or
+// the ids of related records matching their own conditions. Exactly one value
+// source must be provided.
 export type RecordScopingCondition = {
   // Physical column on the object's workspace table, e.g. 'assigneeId' or the
   // flattened composite column 'createdByWorkspaceMemberId'.
@@ -24,6 +34,8 @@ export type RecordScopingCondition = {
   // Read the comparison value from a field on the current workspace member,
   // e.g. 'id' to scope to records the member owns.
   currentWorkspaceMemberField?: string;
+  // Only with operator 'in', on a many-to-one join column.
+  relatedRecords?: RecordScopingRelatedRecords;
 };
 
 export type RecordScopingLogicalOperator = 'AND' | 'OR';
@@ -58,8 +70,21 @@ export type ResolvedRecordScoping =
       conditions: ResolvedRecordScopingCondition[];
     };
 
-export type ResolvedRecordScopingCondition = {
+export type ResolvedRecordScopingValueCondition = {
   column: string;
   operator: RecordScopingOperator;
   value: RecordScopingScalar | RecordScopingScalar[];
 };
+
+export type ResolvedRecordScopingRelatedCondition = {
+  column: string;
+  related: {
+    objectMetadataId: string;
+    logicalOperator: RecordScopingLogicalOperator;
+    conditions: ResolvedRecordScopingCondition[];
+  };
+};
+
+export type ResolvedRecordScopingCondition =
+  | ResolvedRecordScopingValueCondition
+  | ResolvedRecordScopingRelatedCondition;

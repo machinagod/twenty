@@ -10,11 +10,15 @@ import {
 } from 'src/engine/metadata-modules/record-scoping-rule/utils/get-record-scoping-columns.util';
 import {
   type RecordScopingCondition,
+  type RecordScopingLogicalOperator,
   type RecordScopingOperator,
   type RecordScopingScalar,
 } from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
 
 export const MAX_RECORD_SCOPING_CONDITIONS = 20;
+
+// How many related objects a rule may hop through (person -> company is one).
+export const MAX_RECORD_SCOPING_RELATED_DEPTH = 3;
 
 const OPERATORS: RecordScopingOperator[] = ['eq', 'neq', 'in'];
 
@@ -32,6 +36,11 @@ export type RecordScopingConditionInput = {
   operator: string;
   staticValue?: unknown;
   currentWorkspaceMemberField?: string | null;
+  relatedRecords?: {
+    objectMetadataId: string;
+    logicalOperator: string;
+    conditions: RecordScopingConditionInput[];
+  } | null;
 };
 
 const invalid = (message: string): never => {
@@ -96,26 +105,36 @@ const validateStaticValue = (
 
 // Checks a rule's conditions against the object's scopable columns and returns
 // them normalized for storage. Anything the query-time applier could not render
-// to a valid WHERE is rejected here, so a stored rule never fails open.
+// to a valid WHERE is rejected here, so a stored rule never fails open. Related
+// records are checked against their own object's columns, from
+// `getColumnsForObject`.
 export const validateRecordScopingConditions = ({
   conditions,
   columns,
+  getColumnsForObject,
+  depth = 0,
+  path = 'conditions',
 }: {
   conditions: RecordScopingConditionInput[];
   columns: Map<string, RecordScopingColumn>;
+  getColumnsForObject: (
+    objectMetadataId: string,
+  ) => Map<string, RecordScopingColumn> | undefined;
+  depth?: number;
+  path?: string;
 }): RecordScopingCondition[] => {
   if (conditions.length === 0) {
-    return invalid('A rule needs at least one condition');
+    return invalid(`${path}: a rule needs at least one condition`);
   }
 
   if (conditions.length > MAX_RECORD_SCOPING_CONDITIONS) {
     return invalid(
-      `A rule can have at most ${MAX_RECORD_SCOPING_CONDITIONS} conditions`,
+      `${path}: a rule can have at most ${MAX_RECORD_SCOPING_CONDITIONS} conditions`,
     );
   }
 
   return conditions.map((condition, index) => {
-    const location = `conditions[${index}]`;
+    const location = `${path}[${index}]`;
     const column = columns.get(condition.column);
 
     if (!isDefined(column)) {
@@ -132,16 +151,31 @@ export const validateRecordScopingConditions = ({
 
     const operator = condition.operator as RecordScopingOperator;
     const memberField = condition.currentWorkspaceMemberField;
-    const hasMemberField = isDefined(memberField);
-    const hasStaticValue = isDefined(condition.staticValue);
+    const valueSourceCount = [
+      condition.staticValue,
+      memberField,
+      condition.relatedRecords,
+    ].filter(isDefined).length;
 
-    if (hasMemberField === hasStaticValue) {
+    if (valueSourceCount !== 1) {
       return invalid(
-        `${location}: set exactly one of staticValue or currentWorkspaceMemberField`,
+        `${location}: set exactly one of staticValue, currentWorkspaceMemberField or relatedRecords`,
       );
     }
 
-    if (!hasMemberField) {
+    if (isDefined(condition.relatedRecords)) {
+      return validateRelatedRecordsCondition({
+        condition,
+        relatedRecords: condition.relatedRecords,
+        column,
+        operator,
+        location,
+        getColumnsForObject,
+        depth,
+      });
+    }
+
+    if (!isDefined(memberField)) {
       return {
         column: column.column,
         operator,
@@ -180,4 +214,78 @@ export const validateRecordScopingConditions = ({
       currentWorkspaceMemberField: memberField,
     };
   });
+};
+
+const validateRelatedRecordsCondition = ({
+  condition,
+  relatedRecords,
+  column,
+  operator,
+  location,
+  getColumnsForObject,
+  depth,
+}: {
+  condition: RecordScopingConditionInput;
+  relatedRecords: NonNullable<RecordScopingConditionInput['relatedRecords']>;
+  column: RecordScopingColumn;
+  operator: RecordScopingOperator;
+  location: string;
+  getColumnsForObject: (
+    objectMetadataId: string,
+  ) => Map<string, RecordScopingColumn> | undefined;
+  depth: number;
+}): RecordScopingCondition => {
+  if (!isDefined(column.targetObjectMetadataId)) {
+    return invalid(
+      `${location}: "${condition.column}" is not a relation, so it cannot match related records`,
+    );
+  }
+
+  if (relatedRecords.objectMetadataId !== column.targetObjectMetadataId) {
+    return invalid(
+      `${location}: "${condition.column}" does not point at object ${relatedRecords.objectMetadataId}`,
+    );
+  }
+
+  if (operator !== 'in') {
+    return invalid(`${location}: related records need the "in" operator`);
+  }
+
+  if (depth + 1 > MAX_RECORD_SCOPING_RELATED_DEPTH) {
+    return invalid(
+      `${location}: related records can be nested at most ${MAX_RECORD_SCOPING_RELATED_DEPTH} levels deep`,
+    );
+  }
+
+  if (
+    relatedRecords.logicalOperator !== 'AND' &&
+    relatedRecords.logicalOperator !== 'OR'
+  ) {
+    return invalid(`${location}: logicalOperator must be AND or OR`);
+  }
+
+  const relatedColumns = getColumnsForObject(relatedRecords.objectMetadataId);
+
+  if (!isDefined(relatedColumns)) {
+    return invalid(
+      `${location}: object ${relatedRecords.objectMetadataId} not found`,
+    );
+  }
+
+  return {
+    column: column.column,
+    operator,
+    relatedRecords: {
+      objectMetadataId: relatedRecords.objectMetadataId,
+      logicalOperator:
+        relatedRecords.logicalOperator as RecordScopingLogicalOperator,
+      conditions: validateRecordScopingConditions({
+        conditions: relatedRecords.conditions,
+        columns: relatedColumns,
+        getColumnsForObject,
+        depth: depth + 1,
+        path: `${location}.relatedRecords.conditions`,
+      }),
+    },
+  };
 };

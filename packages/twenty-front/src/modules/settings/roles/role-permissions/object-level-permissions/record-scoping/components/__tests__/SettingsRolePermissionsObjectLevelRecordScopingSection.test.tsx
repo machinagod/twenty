@@ -17,6 +17,35 @@ import {
 
 const enqueueToast = jest.fn();
 
+const companyMetadataItem = {
+  id: 'company-id',
+  labelPlural: 'Companies',
+  fields: [
+    {
+      id: 'accountOwner',
+      name: 'accountOwner',
+      label: 'Account owner',
+      type: FieldMetadataType.RELATION,
+      isActive: true,
+      isSystem: false,
+      relation: {
+        type: RelationType.MANY_TO_ONE,
+        targetObjectMetadata: {
+          id: 'wm',
+          nameSingular: 'workspaceMember',
+          namePlural: 'workspaceMembers',
+        },
+      },
+    },
+  ],
+};
+
+jest.mock('@/object-metadata/hooks/useObjectMetadataItems', () => ({
+  useObjectMetadataItems: () => ({
+    objectMetadataItems: [companyMetadataItem],
+  }),
+}));
+
 jest.mock('twenty-ui/components', () => ({
   ...jest.requireActual('twenty-ui/components'),
   useToast: () => ({ enqueueToast }),
@@ -52,6 +81,22 @@ const objectMetadataItem = {
       isActive: true,
       isSystem: false,
     },
+    {
+      id: 'company',
+      name: 'company',
+      label: 'Company',
+      type: FieldMetadataType.RELATION,
+      isActive: true,
+      isSystem: false,
+      relation: {
+        type: RelationType.MANY_TO_ONE,
+        targetObjectMetadata: {
+          id: 'company-id',
+          nameSingular: 'company',
+          namePlural: 'companies',
+        },
+      },
+    },
   ],
 } as never;
 
@@ -61,6 +106,7 @@ const ownerIsMe = {
   operator: 'eq',
   staticValue: null,
   currentWorkspaceMemberField: 'id',
+  relatedRecords: null,
 };
 
 const savedRule = {
@@ -344,4 +390,66 @@ it('reports a failed removal', async () => {
       expect.objectContaining({ variant: 'error' }),
     ),
   );
+});
+
+it('shows a saved rule on related records', async () => {
+  renderSection({
+    mocks: [
+      rulesQuery([
+        {
+          ...savedRule,
+          conditions: [
+            {
+              __typename: 'RecordScopingCondition',
+              column: 'companyId',
+              operator: 'in',
+              staticValue: null,
+              currentWorkspaceMemberField: null,
+              relatedRecords: {
+                __typename: 'RecordScopingRelatedRecords',
+                objectMetadataId: 'company-id',
+                logicalOperator: 'AND',
+                conditions: [ownerIsMe],
+              },
+            },
+          ] as never,
+        },
+      ]),
+    ],
+  });
+
+  expect(await screen.findByText('Companies matching')).toBeInTheDocument();
+  expect(screen.getByText('Account owner')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Save rule' })).toBeDisabled();
+});
+
+it('keeps a rule on a related object that no longer exists unsaveable', async () => {
+  renderSection({
+    mocks: [
+      rulesQuery([
+        {
+          ...savedRule,
+          logicalOperator: 'OR',
+          conditions: [
+            {
+              __typename: 'RecordScopingCondition',
+              column: 'companyId',
+              operator: 'in',
+              staticValue: null,
+              currentWorkspaceMemberField: null,
+              relatedRecords: {
+                __typename: 'RecordScopingRelatedRecords',
+                objectMetadataId: 'deleted-object-id',
+                logicalOperator: 'AND',
+                conditions: [ownerIsMe],
+              },
+            },
+          ] as never,
+        },
+      ]),
+    ],
+  });
+
+  expect(await screen.findByText('matching')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Save rule' })).toBeDisabled();
 });

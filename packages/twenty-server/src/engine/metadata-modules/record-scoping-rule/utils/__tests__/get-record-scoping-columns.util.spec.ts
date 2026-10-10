@@ -2,6 +2,7 @@ import { getRecordScopingColumns } from 'src/engine/metadata-modules/record-scop
 
 import {
   buildFlatEntityMaps,
+  COMPANY_ID,
   OPPORTUNITY_FIELDS,
   OPPORTUNITY_OBJECT,
   WORKSPACE_MEMBER_ID,
@@ -18,10 +19,12 @@ describe('getRecordScopingColumns', () => {
     expect(columns.get('ownerId')).toEqual({
       column: 'ownerId',
       valueKind: 'WORKSPACE_MEMBER',
+      targetObjectMetadataId: WORKSPACE_MEMBER_ID,
     });
     expect(columns.get('companyId')).toEqual({
       column: 'companyId',
       valueKind: 'UUID',
+      targetObjectMetadataId: COMPANY_ID,
     });
   });
 

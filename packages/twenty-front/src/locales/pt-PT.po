@@ -25590,3 +25590,14 @@ msgstr "Guardar regra"
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingSection.tsx
 msgid "Save the role before adding record-level rules."
 msgstr "Guarde a função antes de adicionar regras de nível de registo."
+
+#. js-lingui-id: O7kLe6
+#. placeholder {0}: getObjectLabel(related.objectMetadataId)
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
+msgid "{0} matching"
+msgstr "{0} que cumprem"
+
+#. js-lingui-id: bmVasd
+#: src/modules/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionRow.tsx
+msgid "Matching records"
+msgstr "Registos correspondentes"

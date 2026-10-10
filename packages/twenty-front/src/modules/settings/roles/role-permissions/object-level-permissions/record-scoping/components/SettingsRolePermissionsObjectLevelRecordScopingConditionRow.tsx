@@ -4,10 +4,15 @@ import {
   type RecordScopingOperator,
   type RecordScopingValueSource,
 } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingConditionDraft';
+import { SettingsRolePermissionsObjectLevelRecordScopingConditionList } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/components/SettingsRolePermissionsObjectLevelRecordScopingConditionList';
 import {
+  canMatchRelatedRecords,
   createRecordScopingConditionDraft,
+  type GetRecordScopingColumns,
   getCurrentMemberFieldForColumn,
   getRecordScopingOperators,
+  MAX_RECORD_SCOPING_RELATED_DEPTH,
+  toRelatedRecordScopingConditionDraft,
 } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/utils/recordScopingConditionDraft';
 import { Select } from '@/ui/input/components/Select';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
@@ -25,6 +30,26 @@ const StyledRow = styled.div`
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 3fr) auto;
 `;
 
+const StyledCondition = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[2]};
+`;
+
+const StyledRelated = styled.div`
+  border-left: 1px solid ${themeCssVariables.border.color.medium};
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[2]};
+  margin-left: ${themeCssVariables.spacing[2]};
+  padding-left: ${themeCssVariables.spacing[3]};
+`;
+
+const StyledRelatedTitle = styled.div`
+  color: ${themeCssVariables.font.color.tertiary};
+  font-size: ${themeCssVariables.font.size.sm};
+`;
+
 const StyledValueGroup = styled.div`
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
@@ -34,6 +59,9 @@ const StyledValueGroup = styled.div`
 type SettingsRolePermissionsObjectLevelRecordScopingConditionRowProps = {
   draft: RecordScopingConditionDraft;
   columns: RecordScopingColumnOption[];
+  getColumns: GetRecordScopingColumns;
+  getObjectLabel: (objectMetadataId: string) => string;
+  depth: number;
   instanceId: string;
   onChange: (draft: RecordScopingConditionDraft) => void;
   onRemove: () => void;
@@ -42,6 +70,9 @@ type SettingsRolePermissionsObjectLevelRecordScopingConditionRowProps = {
 export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
   draft,
   columns,
+  getColumns,
+  getObjectLabel,
+  depth,
   instanceId,
   onChange,
   onRemove,
@@ -73,9 +104,62 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
     });
   };
 
+  const canUseRelatedRecords =
+    isDefined(column) &&
+    canMatchRelatedRecords(column) &&
+    depth < MAX_RECORD_SCOPING_RELATED_DEPTH;
+
+  const handleValueSourceChange = (valueSource: RecordScopingValueSource) => {
+    if (!isDefined(column)) {
+      return;
+    }
+
+    if (valueSource === 'RELATED') {
+      onChange(toRelatedRecordScopingConditionDraft(draft, column, getColumns));
+      return;
+    }
+
+    onChange({
+      ...draft,
+      valueSource,
+      operator: draft.valueSource === 'RELATED' ? 'eq' : draft.operator,
+      related: undefined,
+    });
+  };
+
   const renderValueInput = () => {
     if (!isDefined(column)) {
       return null;
+    }
+
+    if (canUseRelatedRecords) {
+      return (
+        <StyledValueGroup>
+          <Select
+            dropdownId={`${instanceId}-value-source`}
+            fullWidth
+            options={[
+              { value: 'STATIC', label: t`Value` },
+              { value: 'RELATED', label: t`Matching records` },
+            ]}
+            value={draft.valueSource}
+            onChange={handleValueSourceChange}
+          />
+          {draft.valueSource === 'STATIC' && (
+            <SettingsTextInput
+              instanceId={`${instanceId}-value`}
+              fullWidth
+              value={draft.staticValue}
+              placeholder={
+                draft.operator === 'in'
+                  ? t`Comma-separated values`
+                  : t`Enter value`
+              }
+              onChange={(staticValue) => onChange({ ...draft, staticValue })}
+            />
+          )}
+        </StyledValueGroup>
+      );
     }
 
     if (column.valueKind === 'WORKSPACE_MEMBER') {
@@ -140,49 +224,75 @@ export const SettingsRolePermissionsObjectLevelRecordScopingConditionRow = ({
             { value: 'CURRENT_MEMBER', label: t`My email` },
           ]}
           value={draft.valueSource}
-          onChange={(valueSource: RecordScopingValueSource) =>
-            onChange({ ...draft, valueSource })
-          }
+          onChange={handleValueSourceChange}
         />
         {draft.valueSource === 'STATIC' && textInput}
       </StyledValueGroup>
     );
   };
 
+  const isRelated = draft.valueSource === 'RELATED' && isDefined(draft.related);
+  const related = draft.related;
+
   return (
-    <StyledRow>
-      <Select
-        dropdownId={`${instanceId}-column`}
-        fullWidth
-        withSearchInput
-        options={columns.map((option) => ({
-          value: option.column,
-          label: option.label,
-        }))}
-        value={draft.column}
-        onChange={handleColumnChange}
-      />
-      <Select
-        dropdownId={`${instanceId}-operator`}
-        fullWidth
-        options={(isDefined(column)
-          ? getRecordScopingOperators(column)
-          : []
-        ).map((operator) => ({
-          value: operator,
-          label: operatorLabels[operator],
-        }))}
-        value={draft.operator}
-        onChange={handleOperatorChange}
-      />
-      {renderValueInput()}
-      <LightIconButton
-        aria-label={t`Remove condition`}
-        emphasis="subtle"
-        onClick={onRemove}
-      >
-        <IconTrash />
-      </LightIconButton>
-    </StyledRow>
+    <StyledCondition>
+      <StyledRow>
+        <Select
+          dropdownId={`${instanceId}-column`}
+          fullWidth
+          withSearchInput
+          options={columns.map((option) => ({
+            value: option.column,
+            label: option.label,
+          }))}
+          value={draft.column}
+          onChange={handleColumnChange}
+        />
+        <Select
+          dropdownId={`${instanceId}-operator`}
+          fullWidth
+          disabled={isRelated}
+          options={(isDefined(column)
+            ? getRecordScopingOperators(column)
+            : []
+          ).map((operator) => ({
+            value: operator,
+            label: operatorLabels[operator],
+          }))}
+          value={draft.operator}
+          onChange={handleOperatorChange}
+        />
+        {renderValueInput()}
+        <LightIconButton
+          aria-label={t`Remove condition`}
+          emphasis="subtle"
+          onClick={onRemove}
+        >
+          <IconTrash />
+        </LightIconButton>
+      </StyledRow>
+      {isRelated && isDefined(related) && (
+        <StyledRelated>
+          <StyledRelatedTitle>
+            {t`${getObjectLabel(related.objectMetadataId)} matching`}
+          </StyledRelatedTitle>
+          <SettingsRolePermissionsObjectLevelRecordScopingConditionList
+            drafts={related.conditions}
+            logicalOperator={related.logicalOperator}
+            columns={getColumns(related.objectMetadataId) ?? []}
+            getColumns={getColumns}
+            getObjectLabel={getObjectLabel}
+            depth={depth + 1}
+            instanceId={`${instanceId}-related`}
+            onDraftsChange={(conditions) =>
+              onChange({ ...draft, related: { ...related, conditions } })
+            }
+            onLogicalOperatorChange={(logicalOperator) =>
+              onChange({ ...draft, related: { ...related, logicalOperator } })
+            }
+          />
+        </StyledRelated>
+      )}
+    </StyledCondition>
   );
 };

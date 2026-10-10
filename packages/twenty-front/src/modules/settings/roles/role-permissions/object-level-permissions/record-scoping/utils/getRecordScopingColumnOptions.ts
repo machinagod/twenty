@@ -37,6 +37,7 @@ export const getRecordScopingColumnOptions = (
           field.relation.targetObjectMetadata.nameSingular === 'workspaceMember'
             ? 'WORKSPACE_MEMBER'
             : 'UUID',
+        targetObjectMetadataId: field.relation.targetObjectMetadata.id,
       });
       continue;
     }

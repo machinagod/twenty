@@ -8,7 +8,21 @@ import { SettingsRolePermissionsObjectLevelRecordScopingConditionRow } from '@/s
 import { type RecordScopingColumnOption } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingColumnOption';
 import { type RecordScopingConditionDraft } from '@/settings/roles/role-permissions/object-level-permissions/record-scoping/types/RecordScopingConditionDraft';
 
+const COMPANY_COLUMNS: RecordScopingColumnOption[] = [
+  {
+    column: 'accountOwnerId',
+    label: 'Account owner',
+    valueKind: 'WORKSPACE_MEMBER',
+  },
+];
+
 const COLUMNS: RecordScopingColumnOption[] = [
+  {
+    column: 'companyId',
+    label: 'Company',
+    valueKind: 'UUID',
+    targetObjectMetadataId: 'company-id',
+  },
   { column: 'ownerId', label: 'Owner', valueKind: 'WORKSPACE_MEMBER' },
   { column: 'city', label: 'City', valueKind: 'TEXT' },
   { column: 'employees', label: 'Employees', valueKind: 'NUMBER' },
@@ -35,7 +49,7 @@ const draft = (
   ...overrides,
 });
 
-const renderRow = (conditionDraft: RecordScopingConditionDraft) => {
+const renderRow = (conditionDraft: RecordScopingConditionDraft, depth = 0) => {
   const onChange = jest.fn();
   const onRemove = jest.fn();
 
@@ -45,6 +59,11 @@ const renderRow = (conditionDraft: RecordScopingConditionDraft) => {
         <SettingsRolePermissionsObjectLevelRecordScopingConditionRow
           draft={conditionDraft}
           columns={COLUMNS}
+          getColumns={(objectMetadataId) =>
+            objectMetadataId === 'company-id' ? COMPANY_COLUMNS : undefined
+          }
+          getObjectLabel={() => 'Companies'}
+          depth={depth}
           instanceId="row"
           onChange={onChange}
           onRemove={onRemove}
@@ -171,5 +190,117 @@ describe('SettingsRolePermissionsObjectLevelRecordScopingConditionRow', () => {
     );
 
     expect(onRemove).toHaveBeenCalled();
+  });
+  it('switches a relation to matching related records', async () => {
+    const { onChange } = renderRow(draft({ column: 'companyId' }));
+
+    await userEvent.click(screen.getByText('Value'));
+    await userEvent.click(await screen.findByText('Matching records'));
+
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        valueSource: 'RELATED',
+        operator: 'in',
+        related: expect.objectContaining({
+          objectMetadataId: 'company-id',
+          conditions: [expect.objectContaining({ column: 'accountOwnerId' })],
+        }),
+      }),
+    );
+  });
+
+  const relatedDraft = draft({
+    column: 'companyId',
+    operator: 'in',
+    valueSource: 'RELATED',
+    related: {
+      objectMetadataId: 'company-id',
+      logicalOperator: 'AND',
+      conditions: [
+        draft({
+          key: 'nested',
+          column: 'accountOwnerId',
+          valueSource: 'CURRENT_MEMBER',
+        }),
+      ],
+    },
+  });
+
+  it('shows the related records conditions under the row', () => {
+    renderRow(relatedDraft);
+
+    expect(screen.getByText('Companies matching')).toBeInTheDocument();
+    expect(screen.getByText('Account owner')).toBeInTheDocument();
+    expect(screen.getByText('Me')).toBeInTheDocument();
+  });
+
+  it('edits and leaves related records', async () => {
+    const { onChange } = renderRow(relatedDraft);
+
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Remove condition' })[1],
+    );
+    expect(onChange).toHaveBeenLastCalledWith({
+      ...relatedDraft,
+      related: { ...relatedDraft.related, conditions: [] },
+    });
+
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Add condition' })[0],
+    );
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        related: expect.objectContaining({
+          conditions: [
+            expect.objectContaining({ key: 'nested' }),
+            expect.objectContaining({ column: 'accountOwnerId' }),
+          ],
+        }),
+      }),
+    );
+
+    await userEvent.click(screen.getByText('Matching records'));
+    await userEvent.click(await screen.findByText('Value'));
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        valueSource: 'STATIC',
+        operator: 'eq',
+        related: undefined,
+      }),
+    );
+  });
+
+  it('switches the related records to match any condition', async () => {
+    const twoConditions = {
+      ...relatedDraft,
+      related: {
+        ...relatedDraft.related!,
+        conditions: [
+          ...relatedDraft.related!.conditions,
+          draft({
+            key: 'second',
+            column: 'accountOwnerId',
+            valueSource: 'CURRENT_MEMBER',
+          }),
+        ],
+      },
+    };
+    const { onChange } = renderRow(twoConditions);
+
+    await userEvent.click(screen.getByText('Match all conditions'));
+    await userEvent.click(await screen.findByText('Match any condition'));
+
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        related: expect.objectContaining({ logicalOperator: 'OR' }),
+      }),
+    );
+  });
+
+  it('stops offering related records at the maximum depth', () => {
+    renderRow(draft({ column: 'companyId' }), 3);
+
+    expect(screen.queryByText('Value')).toBeNull();
+    expect(screen.getByPlaceholderText('Enter value')).toBeInTheDocument();
   });
 });

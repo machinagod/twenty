@@ -38,20 +38,16 @@ export const resolveRecordScoping = ({
 
   for (const rule of rulesWithConditions) {
     for (const condition of rule.conditions) {
-      const value = resolveConditionValue({
+      const resolvedCondition = resolveCondition({
         condition,
         currentWorkspaceMember,
       });
 
-      if (!isDefined(value)) {
+      if (!isDefined(resolvedCondition)) {
         return { kind: 'match-nothing' };
       }
 
-      resolvedConditions.push({
-        column: condition.column,
-        operator: condition.operator,
-        value,
-      });
+      resolvedConditions.push(resolvedCondition);
     }
   }
 
@@ -66,6 +62,46 @@ export const resolveRecordScoping = ({
     logicalOperator,
     conditions: resolvedConditions,
   };
+};
+
+// Undefined when any value, at any depth, cannot be resolved: the caller then
+// fails closed for the whole rule.
+const resolveCondition = ({
+  condition,
+  currentWorkspaceMember,
+}: {
+  condition: RecordScopingCondition;
+  currentWorkspaceMember?: CurrentWorkspaceMemberLike;
+}): ResolvedRecordScopingCondition | undefined => {
+  if (isDefined(condition.relatedRecords)) {
+    const { objectMetadataId, logicalOperator, conditions } =
+      condition.relatedRecords;
+    const resolvedConditions = conditions.map((relatedCondition) =>
+      resolveCondition({ condition: relatedCondition, currentWorkspaceMember }),
+    );
+
+    if (
+      resolvedConditions.length === 0 ||
+      !resolvedConditions.every(isDefined)
+    ) {
+      return undefined;
+    }
+
+    return {
+      column: condition.column,
+      related: {
+        objectMetadataId,
+        logicalOperator,
+        conditions: resolvedConditions,
+      },
+    };
+  }
+
+  const value = resolveConditionValue({ condition, currentWorkspaceMember });
+
+  return isDefined(value)
+    ? { column: condition.column, operator: condition.operator, value }
+    : undefined;
 };
 
 const resolveConditionValue = ({

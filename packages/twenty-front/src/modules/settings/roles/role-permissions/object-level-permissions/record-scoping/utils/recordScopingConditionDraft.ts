@@ -13,7 +13,20 @@ export type RecordScopingConditionValue = {
   operator: string;
   staticValue?: unknown;
   currentWorkspaceMemberField?: string | null;
+  relatedRecords?: {
+    objectMetadataId: string;
+    logicalOperator: string;
+    conditions: RecordScopingConditionValue[];
+  } | null;
 };
+
+// The scopable columns of an object, or undefined for an unknown object.
+export type GetRecordScopingColumns = (
+  objectMetadataId: string,
+) => RecordScopingColumnOption[] | undefined;
+
+// Matches the server limit: a rule may hop through at most three related objects.
+export const MAX_RECORD_SCOPING_RELATED_DEPTH = 3;
 
 const LIST_VALUE_KINDS: RecordScopingColumnOption['valueKind'][] = [
   'TEXT',
@@ -42,6 +55,22 @@ export const getCurrentMemberFieldForColumn = (
   }
 };
 
+export const canMatchRelatedRecords = (column: RecordScopingColumnOption) =>
+  column.valueKind === 'UUID' && isDefined(column.targetObjectMetadataId);
+
+// An owner-style relation is the most common rule; actor columns (created by /
+// updated by) come next.
+export const getDefaultRecordScopingColumn = (
+  columns: RecordScopingColumnOption[],
+): RecordScopingColumnOption | undefined =>
+  columns.find(
+    (column) =>
+      column.valueKind === 'WORKSPACE_MEMBER' &&
+      !column.column.endsWith('WorkspaceMemberId'),
+  ) ??
+  columns.find((column) => column.valueKind === 'WORKSPACE_MEMBER') ??
+  columns[0];
+
 export const createRecordScopingConditionDraft = (
   column: RecordScopingColumnOption,
 ): RecordScopingConditionDraft => ({
@@ -55,6 +84,33 @@ export const createRecordScopingConditionDraft = (
       ? 'true'
       : (column.selectOptions?.[0]?.value ?? ''),
 });
+
+// Switches a relation condition to "matching records", seeded with the
+// related object's default condition.
+export const toRelatedRecordScopingConditionDraft = (
+  draft: RecordScopingConditionDraft,
+  column: RecordScopingColumnOption,
+  getColumns: GetRecordScopingColumns,
+): RecordScopingConditionDraft => {
+  const targetObjectMetadataId = column.targetObjectMetadataId ?? '';
+  const defaultColumn = getDefaultRecordScopingColumn(
+    getColumns(targetObjectMetadataId) ?? [],
+  );
+
+  return {
+    ...draft,
+    operator: 'in',
+    valueSource: 'RELATED',
+    staticValue: '',
+    related: {
+      objectMetadataId: targetObjectMetadataId,
+      logicalOperator: 'AND',
+      conditions: isDefined(defaultColumn)
+        ? [createRecordScopingConditionDraft(defaultColumn)]
+        : [],
+    },
+  };
+};
 
 const parseScalar = (
   text: string,
@@ -86,13 +142,63 @@ const parseScalar = (
   }
 };
 
+// The API inputs for a list of drafts, or undefined while any is incomplete.
+export const toRecordScopingConditionInputs = (
+  drafts: RecordScopingConditionDraft[],
+  columns: RecordScopingColumnOption[],
+  getColumns: GetRecordScopingColumns,
+): RecordScopingConditionValue[] | undefined => {
+  const inputs = drafts.map((draft) =>
+    toRecordScopingConditionInput(
+      draft,
+      columns.find((column) => column.column === draft.column),
+      getColumns,
+    ),
+  );
+
+  return inputs.length > 0 && inputs.every(isDefined) ? inputs : undefined;
+};
+
 // The API input for a draft, or undefined while the draft is incomplete.
 export const toRecordScopingConditionInput = (
   draft: RecordScopingConditionDraft,
   column: RecordScopingColumnOption | undefined,
+  getColumns: GetRecordScopingColumns,
 ): RecordScopingConditionValue | undefined => {
   if (!isDefined(column)) {
     return undefined;
+  }
+
+  if (draft.valueSource === 'RELATED') {
+    const relatedColumns = isDefined(draft.related)
+      ? getColumns(draft.related.objectMetadataId)
+      : undefined;
+
+    if (
+      !isDefined(draft.related) ||
+      !isDefined(relatedColumns) ||
+      !canMatchRelatedRecords(column)
+    ) {
+      return undefined;
+    }
+
+    const relatedInputs = toRecordScopingConditionInputs(
+      draft.related.conditions,
+      relatedColumns,
+      getColumns,
+    );
+
+    return isDefined(relatedInputs)
+      ? {
+          column: draft.column,
+          operator: 'in',
+          relatedRecords: {
+            objectMetadataId: draft.related.objectMetadataId,
+            logicalOperator: draft.related.logicalOperator,
+            conditions: relatedInputs,
+          },
+        }
+      : undefined;
   }
 
   if (draft.valueSource === 'CURRENT_MEMBER') {
@@ -127,16 +233,36 @@ export const toRecordScopingConditionInput = (
 
 export const fromRecordScopingCondition = (
   condition: RecordScopingConditionValue,
-): RecordScopingConditionDraft => ({
-  key: v4(),
-  column: condition.column,
-  operator: condition.operator as RecordScopingOperator,
-  valueSource: isDefined(condition.currentWorkspaceMemberField)
-    ? 'CURRENT_MEMBER'
-    : 'STATIC',
-  staticValue: Array.isArray(condition.staticValue)
-    ? condition.staticValue.join(', ')
-    : isDefined(condition.staticValue)
-      ? String(condition.staticValue)
-      : '',
-});
+): RecordScopingConditionDraft => {
+  if (isDefined(condition.relatedRecords)) {
+    return {
+      key: v4(),
+      column: condition.column,
+      operator: 'in',
+      valueSource: 'RELATED',
+      staticValue: '',
+      related: {
+        objectMetadataId: condition.relatedRecords.objectMetadataId,
+        logicalOperator:
+          condition.relatedRecords.logicalOperator === 'OR' ? 'OR' : 'AND',
+        conditions: condition.relatedRecords.conditions.map(
+          fromRecordScopingCondition,
+        ),
+      },
+    };
+  }
+
+  return {
+    key: v4(),
+    column: condition.column,
+    operator: condition.operator as RecordScopingOperator,
+    valueSource: isDefined(condition.currentWorkspaceMemberField)
+      ? 'CURRENT_MEMBER'
+      : 'STATIC',
+    staticValue: Array.isArray(condition.staticValue)
+      ? condition.staticValue.join(', ')
+      : isDefined(condition.staticValue)
+        ? String(condition.staticValue)
+        : '',
+  };
+};
