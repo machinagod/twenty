@@ -119,6 +119,8 @@ import { compileNamedParameters } from 'src/engine/twenty-orm/sql/utils/compile-
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { computeObjectTargetTable } from 'src/engine/utils/compute-object-target-table.util';
+import { buildMessageVisibilityCondition } from 'src/engine/twenty-orm/record-scoping/utils/build-message-visibility-condition.util';
+import { TWENTY_STANDARD_APPLICATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-standard-applications';
 import { buildRecordScopingCondition } from 'src/engine/twenty-orm/record-scoping/utils/build-record-scoping-condition.util';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
 import { serializeJsonbWriteValue } from 'src/engine/twenty-orm/sql/utils/serialize-jsonb-write-value.util';
@@ -2436,6 +2438,41 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
         queryBuilder,
         alias,
         ...recordScopingCondition,
+      });
+    }
+
+    const { internalContext } = this.options;
+    const messageVisibilityCondition = buildMessageVisibilityCondition({
+      alias,
+      objectNameSingular: flatObjectMetadata.nameSingular,
+      isStandardObject:
+        flatObjectMetadata.applicationUniversalIdentifier ===
+        TWENTY_STANDARD_APPLICATION.universalIdentifier,
+      workspaceId: internalContext.workspaceId,
+      authContext: this.options.authContext,
+      userWorkspaceRoleMap: internalContext.userWorkspaceRoleMap,
+      adminRoleIds: internalContext.roleIdsWithAllRecordsAccess,
+      getStandardTableName: (nameSingular) => {
+        const objectMetadataId =
+          internalContext.objectIdByNameSingular[nameSingular];
+        const objectMetadata = isDefined(objectMetadataId)
+          ? findFlatEntityByIdInFlatEntityMaps({
+              flatEntityMaps: internalContext.flatObjectMetadataMaps,
+              flatEntityId: objectMetadataId,
+            })
+          : undefined;
+
+        return isDefined(objectMetadata)
+          ? `${escapeIdentifier(getWorkspaceSchemaName(internalContext.workspaceId))}.${escapeIdentifier(computeObjectTargetTable(objectMetadata))}`
+          : undefined;
+      },
+    });
+
+    if (isDefined(messageVisibilityCondition)) {
+      this.addConditionForAlias({
+        queryBuilder,
+        alias,
+        ...messageVisibilityCondition,
       });
     }
   }

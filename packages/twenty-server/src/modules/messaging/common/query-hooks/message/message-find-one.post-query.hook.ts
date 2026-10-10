@@ -55,6 +55,7 @@ export class MessageFindOnePostQueryHook implements WorkspacePostQueryHookInstan
       workspace.id,
       userId,
       applicationId,
+      isUserAuthContext(authContext) ? authContext.userWorkspaceId : undefined,
     );
   }
 }

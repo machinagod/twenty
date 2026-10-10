@@ -15,6 +15,8 @@ import { WorkspaceDataSourceModule } from 'src/engine/workspace-datasource/works
 import { ConnectedAccountModule } from 'src/modules/connected-account/connected-account.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { TargetModule } from 'src/engine/core-modules/target/target.module';
+import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
+import { MessageMailboxAdminService } from 'src/modules/messaging/common/services/message-mailbox-admin.service';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { TargetModule } from 'src/engine/core-modules/target/target.module';
     PermissionsModule,
     RelatedPersonIdsModule,
     TargetModule,
+    WorkspaceCacheModule,
     TypeOrmModule.forFeature([
       MessageChannelEntity,
       ConnectedAccountEntity,
@@ -37,6 +40,7 @@ import { TargetModule } from 'src/engine/core-modules/target/target.module';
     TimelineMessagingResolver,
     TimelineMessagingService,
     GetMessagesService,
+    MessageMailboxAdminService,
   ],
 })
 export class TimelineMessagingModule {}
