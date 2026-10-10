@@ -3362,6 +3362,23 @@ export interface MinimalMetadata {
     __typename: 'MinimalMetadata'
 }
 
+export interface RecordScopingCondition {
+    column: Scalars['String']
+    operator: Scalars['String']
+    staticValue?: Scalars['JSON']
+    currentWorkspaceMemberField?: Scalars['String']
+    __typename: 'RecordScopingCondition'
+}
+
+export interface RecordScopingRule {
+    id: Scalars['UUID']
+    roleId: Scalars['UUID']
+    objectMetadataId: Scalars['UUID']
+    logicalOperator: Scalars['String']
+    conditions: RecordScopingCondition[]
+    __typename: 'RecordScopingRule'
+}
+
 export interface Query {
     recordSharing: RecordSharingDTO
     navigationMenuItems: NavigationMenuItem[]
@@ -3459,6 +3476,7 @@ export interface Query {
     myMessageFolders: MessageFolder[]
     myCalendarChannels: CalendarChannel[]
     getPermissionFlags: PermissionFlag[]
+    recordScopingRules: RecordScopingRule[]
     minimalMetadata: MinimalMetadata
     appKeyValue?: AppKeyValue
     getJobs: JobStatus[]
@@ -3694,6 +3712,8 @@ export interface Mutation {
     updateMessageFolder: MessageFolder
     updateMessageFolders: MessageFolder[]
     updateCalendarChannel: CalendarChannel
+    upsertRecordScopingRule: RecordScopingRule
+    deleteRecordScopingRule: RecordScopingRule
     setAppKeyValue: AppKeyValue
     deleteAppKeyValue: Scalars['Boolean']
     /** @deprecated Use enqueueJobs instead. */
@@ -7298,6 +7318,25 @@ export interface MinimalMetadataGenqlSelection{
     __scalar?: boolean | number
 }
 
+export interface RecordScopingConditionGenqlSelection{
+    column?: boolean | number
+    operator?: boolean | number
+    staticValue?: boolean | number
+    currentWorkspaceMemberField?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface RecordScopingRuleGenqlSelection{
+    id?: boolean | number
+    roleId?: boolean | number
+    objectMetadataId?: boolean | number
+    logicalOperator?: boolean | number
+    conditions?: RecordScopingConditionGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface QueryGenqlSelection{
     recordSharing?: (RecordSharingDTOGenqlSelection & { __args: {target: RecordSharingTargetInput} })
     navigationMenuItems?: NavigationMenuItemGenqlSelection
@@ -7407,6 +7446,7 @@ export interface QueryGenqlSelection{
     myMessageFolders?: (MessageFolderGenqlSelection & { __args?: {messageChannelId?: (Scalars['UUID'] | null)} })
     myCalendarChannels?: (CalendarChannelGenqlSelection & { __args?: {connectedAccountId?: (Scalars['UUID'] | null)} })
     getPermissionFlags?: PermissionFlagGenqlSelection
+    recordScopingRules?: (RecordScopingRuleGenqlSelection & { __args: {roleId: Scalars['UUID']} })
     minimalMetadata?: MinimalMetadataGenqlSelection
     appKeyValue?: (AppKeyValueGenqlSelection & { __args: {key: Scalars['String'], scope?: (AppKeyValueScope | null)} })
     getJobs?: (JobStatusGenqlSelection & { __args: {jobIds: Scalars['String'][]} })
@@ -7683,6 +7723,8 @@ export interface MutationGenqlSelection{
     updateMessageFolder?: (MessageFolderGenqlSelection & { __args: {input: UpdateMessageFolderInput} })
     updateMessageFolders?: (MessageFolderGenqlSelection & { __args: {input: UpdateMessageFoldersInput} })
     updateCalendarChannel?: (CalendarChannelGenqlSelection & { __args: {input: UpdateCalendarChannelInput} })
+    upsertRecordScopingRule?: (RecordScopingRuleGenqlSelection & { __args: {input: UpsertRecordScopingRuleInput} })
+    deleteRecordScopingRule?: (RecordScopingRuleGenqlSelection & { __args: {input: DeleteRecordScopingRuleInput} })
     setAppKeyValue?: (AppKeyValueGenqlSelection & { __args: {input: SetAppKeyValueInput} })
     deleteAppKeyValue?: { __args: {key: Scalars['String'], scope?: (AppKeyValueScope | null)} }
     /** @deprecated Use enqueueJobs instead. */
@@ -8158,6 +8200,12 @@ export interface UpdateMessageFoldersInput {ids: Scalars['UUID'][],update: Updat
 export interface UpdateCalendarChannelInput {id: Scalars['UUID'],update: UpdateCalendarChannelInputUpdates}
 
 export interface UpdateCalendarChannelInputUpdates {visibility?: (CalendarChannelVisibility | null),isContactAutoCreationEnabled?: (Scalars['Boolean'] | null),contactAutoCreationPolicy?: (CalendarChannelContactAutoCreationPolicy | null),isSyncEnabled?: (Scalars['Boolean'] | null)}
+
+export interface UpsertRecordScopingRuleInput {roleId: Scalars['UUID'],objectMetadataId: Scalars['UUID'],logicalOperator: Scalars['String'],conditions: RecordScopingConditionInput[]}
+
+export interface RecordScopingConditionInput {column: Scalars['String'],operator: Scalars['String'],staticValue?: (Scalars['JSON'] | null),currentWorkspaceMemberField?: (Scalars['String'] | null)}
+
+export interface DeleteRecordScopingRuleInput {roleId: Scalars['UUID'],objectMetadataId: Scalars['UUID']}
 
 export interface SetAppKeyValueInput {key: Scalars['String'],value?: (Scalars['JSON'] | null),scope?: (AppKeyValueScope | null)}
 
@@ -10728,6 +10776,22 @@ export interface CreateRecordExportInput {objectMetadataId: Scalars['UUID'],fiel
     export const isMinimalMetadata = (obj?: { __typename?: any } | null): obj is MinimalMetadata => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isMinimalMetadata"')
       return MinimalMetadata_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RecordScopingCondition_possibleTypes: string[] = ['RecordScopingCondition']
+    export const isRecordScopingCondition = (obj?: { __typename?: any } | null): obj is RecordScopingCondition => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRecordScopingCondition"')
+      return RecordScopingCondition_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RecordScopingRule_possibleTypes: string[] = ['RecordScopingRule']
+    export const isRecordScopingRule = (obj?: { __typename?: any } | null): obj is RecordScopingRule => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRecordScopingRule"')
+      return RecordScopingRule_possibleTypes.includes(obj.__typename)
     }
     
 
