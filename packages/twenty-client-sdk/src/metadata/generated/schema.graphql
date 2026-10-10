@@ -3828,6 +3828,21 @@ type MinimalMetadata {
   collectionHashes: [CollectionHash!]!
 }
 
+type RecordScopingCondition {
+  column: String!
+  operator: String!
+  staticValue: JSON
+  currentWorkspaceMemberField: String
+}
+
+type RecordScopingRule {
+  id: UUID!
+  roleId: UUID!
+  objectMetadataId: UUID!
+  logicalOperator: String!
+  conditions: [RecordScopingCondition!]!
+}
+
 type Query {
   recordSharing(target: RecordSharingTargetInput!): RecordSharingDTO!
   navigationMenuItems: [NavigationMenuItem!]!
@@ -3943,6 +3958,7 @@ type Query {
   myMessageFolders(messageChannelId: UUID): [MessageFolder!]!
   myCalendarChannels(connectedAccountId: UUID): [CalendarChannel!]!
   getPermissionFlags: [PermissionFlag!]!
+  recordScopingRules(roleId: UUID!): [RecordScopingRule!]!
   minimalMetadata: MinimalMetadata!
   appKeyValue(key: String!, scope: AppKeyValueScope = WORKSPACE): AppKeyValue
   getJobs(jobIds: [String!]!): [JobStatus!]!
@@ -4306,6 +4322,8 @@ type Mutation {
   updateMessageFolder(input: UpdateMessageFolderInput!): MessageFolder!
   updateMessageFolders(input: UpdateMessageFoldersInput!): [MessageFolder!]!
   updateCalendarChannel(input: UpdateCalendarChannelInput!): CalendarChannel!
+  upsertRecordScopingRule(input: UpsertRecordScopingRuleInput!): RecordScopingRule!
+  deleteRecordScopingRule(input: DeleteRecordScopingRuleInput!): RecordScopingRule!
   setAppKeyValue(input: SetAppKeyValueInput!): AppKeyValue!
   deleteAppKeyValue(key: String!, scope: AppKeyValueScope = WORKSPACE): Boolean!
   enqueueJob(input: EnqueueJobInput!): EnqueueJobResult! @deprecated(reason: "Use enqueueJobs instead.")
@@ -5558,6 +5576,25 @@ input UpdateCalendarChannelInputUpdates {
   isContactAutoCreationEnabled: Boolean
   contactAutoCreationPolicy: CalendarChannelContactAutoCreationPolicy
   isSyncEnabled: Boolean
+}
+
+input UpsertRecordScopingRuleInput {
+  roleId: UUID!
+  objectMetadataId: UUID!
+  logicalOperator: String!
+  conditions: [RecordScopingConditionInput!]!
+}
+
+input RecordScopingConditionInput {
+  column: String!
+  operator: String!
+  staticValue: JSON
+  currentWorkspaceMemberField: String
+}
+
+input DeleteRecordScopingRuleInput {
+  roleId: UUID!
+  objectMetadataId: UUID!
 }
 
 input SetAppKeyValueInput {
