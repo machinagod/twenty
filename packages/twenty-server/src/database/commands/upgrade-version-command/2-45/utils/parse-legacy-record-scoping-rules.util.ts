@@ -1,20 +1,32 @@
 import { isDefined } from 'twenty-shared/utils';
 
-import { RecordScopingConfigException } from 'src/engine/twenty-orm/record-scoping/exceptions/record-scoping-config.exception';
-import {
-  type RecordScopingCondition,
-  type RecordScopingOperator,
-  type RecordScopingRule,
-} from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
+// The RECORD_SCOPING_RULES env format the fork used before rules moved to
+// core.recordScopingRule. Frozen here for the one-time import command.
+export type LegacyRecordScopingOperator = 'eq' | 'neq' | 'in';
 
-const VALID_OPERATORS: RecordScopingOperator[] = ['eq', 'neq', 'in'];
+export type LegacyRecordScopingScalar = string | number | boolean;
 
-// Parses and validates the RECORD_SCOPING_RULES config (a JSON array of rules).
-// Throws RecordScopingConfigException on any structural problem so misconfiguration
-// surfaces loudly instead of silently disabling the lock.
-export const parseRecordScopingRules = (
+export type LegacyRecordScopingCondition = {
+  column: string;
+  operator: LegacyRecordScopingOperator;
+  staticValue?: LegacyRecordScopingScalar | LegacyRecordScopingScalar[];
+  currentWorkspaceMemberField?: string;
+};
+
+export type LegacyRecordScopingRule = {
+  roleLabel: string;
+  objectNameSingular: string;
+  logicalOperator: 'AND' | 'OR';
+  conditions: LegacyRecordScopingCondition[];
+};
+
+export class LegacyRecordScopingRulesException extends Error {}
+
+const VALID_OPERATORS: LegacyRecordScopingOperator[] = ['eq', 'neq', 'in'];
+
+export const parseLegacyRecordScopingRules = (
   rawConfig: string | undefined | null,
-): RecordScopingRule[] => {
+): LegacyRecordScopingRule[] => {
   if (!isDefined(rawConfig) || rawConfig.trim() === '') {
     return [];
   }
@@ -24,7 +36,7 @@ export const parseRecordScopingRules = (
   try {
     parsed = JSON.parse(rawConfig);
   } catch (error) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `RECORD_SCOPING_RULES is not valid JSON: ${
         error instanceof Error ? error.message : 'unknown error'
       }`,
@@ -32,7 +44,7 @@ export const parseRecordScopingRules = (
   }
 
   if (!Array.isArray(parsed)) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       'RECORD_SCOPING_RULES must be a JSON array of rules',
     );
   }
@@ -40,9 +52,9 @@ export const parseRecordScopingRules = (
   return parsed.map((rule, index) => parseRule(rule, index));
 };
 
-const parseRule = (rule: unknown, index: number): RecordScopingRule => {
+const parseRule = (rule: unknown, index: number): LegacyRecordScopingRule => {
   if (!isRecord(rule)) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `RECORD_SCOPING_RULES[${index}] must be an object`,
     );
   }
@@ -52,7 +64,7 @@ const parseRule = (rule: unknown, index: number): RecordScopingRule => {
   const logicalOperator = rule.logicalOperator ?? 'AND';
 
   if (typeof roleLabel !== 'string' || roleLabel.trim() === '') {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `RECORD_SCOPING_RULES[${index}].roleLabel must be a non-empty string`,
     );
   }
@@ -61,19 +73,19 @@ const parseRule = (rule: unknown, index: number): RecordScopingRule => {
     typeof objectNameSingular !== 'string' ||
     objectNameSingular.trim() === ''
   ) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `RECORD_SCOPING_RULES[${index}].objectNameSingular must be a non-empty string`,
     );
   }
 
   if (logicalOperator !== 'AND' && logicalOperator !== 'OR') {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `RECORD_SCOPING_RULES[${index}].logicalOperator must be 'AND' or 'OR'`,
     );
   }
 
   if (!Array.isArray(rule.conditions) || rule.conditions.length === 0) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `RECORD_SCOPING_RULES[${index}].conditions must be a non-empty array`,
     );
   }
@@ -92,21 +104,21 @@ const parseCondition = (
   condition: unknown,
   ruleIndex: number,
   conditionIndex: number,
-): RecordScopingCondition => {
+): LegacyRecordScopingCondition => {
   const location = `RECORD_SCOPING_RULES[${ruleIndex}].conditions[${conditionIndex}]`;
 
   if (!isRecord(condition)) {
-    throw new RecordScopingConfigException(`${location} must be an object`);
+    throw new LegacyRecordScopingRulesException(`${location} must be an object`);
   }
 
   if (typeof condition.column !== 'string' || condition.column.trim() === '') {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `${location}.column must be a non-empty string`,
     );
   }
 
-  if (!VALID_OPERATORS.includes(condition.operator as RecordScopingOperator)) {
-    throw new RecordScopingConfigException(
+  if (!VALID_OPERATORS.includes(condition.operator as LegacyRecordScopingOperator)) {
+    throw new LegacyRecordScopingRulesException(
       `${location}.operator must be one of ${VALID_OPERATORS.join(', ')}`,
     );
   }
@@ -115,7 +127,7 @@ const parseCondition = (
   const hasMemberField = isDefined(condition.currentWorkspaceMemberField);
 
   if (hasStaticValue === hasMemberField) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `${location} must set exactly one of staticValue or currentWorkspaceMemberField`,
     );
   }
@@ -125,18 +137,18 @@ const parseCondition = (
     (typeof condition.currentWorkspaceMemberField !== 'string' ||
       condition.currentWorkspaceMemberField.trim() === '')
   ) {
-    throw new RecordScopingConfigException(
+    throw new LegacyRecordScopingRulesException(
       `${location}.currentWorkspaceMemberField must be a non-empty string`,
     );
   }
 
   return {
     column: condition.column,
-    operator: condition.operator as RecordScopingOperator,
+    operator: condition.operator as LegacyRecordScopingOperator,
     ...(hasStaticValue
       ? {
           staticValue:
-            condition.staticValue as RecordScopingCondition['staticValue'],
+            condition.staticValue as LegacyRecordScopingCondition['staticValue'],
         }
       : {
           currentWorkspaceMemberField:

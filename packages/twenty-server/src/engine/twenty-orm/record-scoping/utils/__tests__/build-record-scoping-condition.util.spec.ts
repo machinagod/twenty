@@ -20,8 +20,7 @@ const apiKeyAuthContext = {
 const userWorkspaceRoleMap = { 'uw-1': 'role-1' };
 
 const ownerRule: RecordScopingRule = {
-  roleLabel: 'Member',
-  objectNameSingular: 'opportunity',
+  objectMetadataId: 'opportunity-id',
   logicalOperator: 'AND',
   conditions: [
     { column: 'ownerId', operator: 'eq', currentWorkspaceMemberField: 'id' },
@@ -35,7 +34,7 @@ const buildForOpportunity = (
 ) =>
   buildRecordScopingCondition({
     alias: 'opportunity',
-    objectNameSingular: 'opportunity',
+    objectMetadataId: 'opportunity-id',
     recordScopingRulesByRoleId: rulesByRole,
     userWorkspaceRoleMap,
     authContext: userAuthContext,
@@ -51,7 +50,7 @@ describe('buildRecordScopingCondition', () => {
 
   it('should return undefined when no rule targets the queried object', () => {
     expect(
-      buildForOpportunity({ alias: 'person', objectNameSingular: 'person' }),
+      buildForOpportunity({ alias: 'person', objectMetadataId: 'person-id' }),
     ).toBeUndefined();
   });
 

@@ -14,9 +14,8 @@ const authContext = {
 } as unknown as WorkspaceAuthContext;
 
 const recordScopingRulesByRoleId: RecordScopingRulesByRoleId = {
-  'role-1': ['person', 'company'].map((objectNameSingular) => ({
-    roleLabel: 'Member',
-    objectNameSingular,
+  'role-1': ['person-id', 'company-id'].map((objectMetadataId) => ({
+    objectMetadataId,
     logicalOperator: 'AND',
     conditions: [
       {
@@ -32,20 +31,20 @@ const recordScopingRulesByRoleId: RecordScopingRulesByRoleId = {
 // row access condition, on joined aliases as an extra ON condition.
 const applyRecordScoping = (queryBuilder: WorkspaceSelectQueryBuilder) => {
   const aliases = [
-    { alias: queryBuilder.alias, objectNameSingular: 'person' },
+    { alias: queryBuilder.alias, objectMetadataId: 'person-id' },
     ...queryBuilder
       .getJoinAliases()
-      .map(({ name }) => ({ alias: name, objectNameSingular: 'company' })),
+      .map(({ name }) => ({ alias: name, objectMetadataId: 'company-id' })),
   ];
 
-  for (const { alias, objectNameSingular } of aliases) {
+  for (const { alias, objectMetadataId } of aliases) {
     if (!queryBuilder.markRowLevelPermissionApplied(alias)) {
       continue;
     }
 
     const condition = buildRecordScopingCondition({
       alias,
-      objectNameSingular,
+      objectMetadataId,
       recordScopingRulesByRoleId,
       userWorkspaceRoleMap: { 'uw-1': 'role-1' },
       authContext,

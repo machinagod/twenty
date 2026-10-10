@@ -15191,3 +15191,13 @@ msgstr "Seu espaço de trabalho foi atualizado com um novo modelo de dados. Por 
 #: src/engine/workspace-manager/workspace-cleaner/services/cleaner.workspace-service.ts
 msgid "Your workspace is paused — reactivate to keep your data"
 msgstr "O seu workspace está em pausa — reative-o para manter os seus dados"
+
+#. js-lingui-id: 7t5kU8
+#: src/engine/metadata-modules/record-scoping-rule/record-scoping-rule.exception.ts
+msgid "Invalid record-level rule."
+msgstr "Regra de nível de registo inválida."
+
+#. js-lingui-id: xNe6xd
+#: src/engine/metadata-modules/record-scoping-rule/record-scoping-rule.exception.ts
+msgid "Record-level rule not found."
+msgstr "Regra de nível de registo não encontrada."
