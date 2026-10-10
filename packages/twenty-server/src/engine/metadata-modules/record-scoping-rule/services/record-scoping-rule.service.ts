@@ -110,6 +110,7 @@ export class RecordScopingRuleService {
 
     const conditions = validateRecordScopingConditions({
       conditions: input.conditions,
+      objectMetadataId: input.objectMetadataId,
       columns: getRecordScopingColumns({
         flatObjectMetadata,
         flatFieldMetadataMaps,

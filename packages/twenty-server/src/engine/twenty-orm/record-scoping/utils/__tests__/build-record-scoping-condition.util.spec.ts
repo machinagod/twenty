@@ -245,6 +245,28 @@ describe('buildRecordScopingCondition', () => {
       });
     });
 
+    it('should keep records that matching related records point back at', () => {
+      expect(
+        buildForOpportunity({
+          recordScopingRulesByRoleId: relatedRule([
+            {
+              column: 'id',
+              operator: 'in',
+              relatedRecords: {
+                objectMetadataId: 'document-id',
+                matchColumn: 'opportunityId',
+                logicalOperator: 'AND',
+                conditions: [companyOwnedByMe],
+              },
+            },
+          ]),
+        }),
+      ).toEqual({
+        sql: '("opportunity"."id" IN (SELECT "recordScoping_opportunity_0"."opportunityId" FROM "ws"."_documento" "recordScoping_opportunity_0" WHERE ("recordScoping_opportunity_0"."companyId" IN (SELECT "recordScoping_opportunity_0_0"."id" FROM "ws"."company" "recordScoping_opportunity_0_0" WHERE ("recordScoping_opportunity_0_0"."accountOwnerId" = :recordScoping_opportunity_0_0_0)))))',
+        parameters: { recordScoping_opportunity_0_0_0: 'wm-current' },
+      });
+    });
+
     it('should nest related records and mix them with plain conditions', () => {
       const condition = buildForOpportunity({
         recordScopingRulesByRoleId: relatedRule([

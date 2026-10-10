@@ -23,6 +23,7 @@ export type RecordScopingRuleRequestInput = {
     operator: string;
     staticValue?: unknown;
     currentWorkspaceMemberField?: string;
+    relatedRecords?: unknown;
   }>;
 };
 

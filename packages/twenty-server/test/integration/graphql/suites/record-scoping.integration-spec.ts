@@ -30,7 +30,9 @@ import { WORKSPACE_MEMBER_DATA_SEED_IDS } from 'src/engine/workspace-manager/dev
 //      writes go through,
 //   4. member-relative scoping works on `opportunity`,
 //   5. editing rules needs the Roles permission, invalid rules are rejected,
-//      and removing a rule lifts the scope without a restart.
+//      and removing a rule lifts the scope without a restart,
+//   6. a rule can keep records that related records point back at (companies
+//      with an opportunity owned by the member).
 // This is the regression net that survives upstream syncs: if a future upstream
 // refactor of the query builders drops the record scoping call, this fails.
 const ROLE_LABEL = 'Record Scoping Test Role';
@@ -62,6 +64,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
   let customRoleId: string;
   let originalMemberRoleId: string;
   let companyObjectMetadataId: string;
+  let opportunityObjectMetadataId: string;
 
   // People are scoped through their company (related records), not a column
   // of their own.
@@ -147,6 +150,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
     };
 
     companyObjectMetadataId = objectId('company');
+    opportunityObjectMetadataId = objectId('opportunity');
 
     for (const rule of [
       {
@@ -170,7 +174,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
         ],
       },
       {
-        objectMetadataId: objectId('opportunity'),
+        objectMetadataId: opportunityObjectMetadataId,
         conditions: [
           {
             column: 'ownerId',
@@ -244,6 +248,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
           id: ownedByScopedMemberOpportunityId,
           name: 'RecordScoping Owned By Scoped Member',
           ownerId: WORKSPACE_MEMBER_DATA_SEED_IDS.JONY,
+          companyId: inScopeCompanyId,
         },
       }),
     );
@@ -256,6 +261,7 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
           id: ownedByOtherMemberOpportunityId,
           name: 'RecordScoping Owned By Other Member',
           ownerId: WORKSPACE_MEMBER_DATA_SEED_IDS.PHIL,
+          companyId: outOfScopeCompanyId,
         },
       }),
     );
@@ -478,5 +484,76 @@ describe('record scoping is enforced at the workspace ORM chokepoint', () => {
       'RecordScoping In Scope Co (edited)',
       'RecordScoping Out Of Scope Co',
     ]);
+  });
+
+  it('keeps records that matching related records point back at', async () => {
+    const upsertResponse = await upsertRecordScopingRule({
+      roleId: customRoleId,
+      objectMetadataId: companyObjectMetadataId,
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          column: 'id',
+          operator: 'in',
+          relatedRecords: {
+            objectMetadataId: opportunityObjectMetadataId,
+            matchColumn: 'companyId',
+            logicalOperator: 'AND',
+            conditions: [
+              {
+                column: 'ownerId',
+                operator: 'eq',
+                currentWorkspaceMemberField: 'id',
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(upsertResponse.body.errors).toBeUndefined();
+
+    const scoped = await findTestCompaniesAs(APPLE_JONY_MEMBER_ACCESS_TOKEN);
+
+    expect(scoped.body.errors).toBeUndefined();
+    expect(namesFromCompaniesResponse(scoped)).toEqual([
+      'RecordScoping In Scope Co (edited)',
+    ]);
+    expect(
+      namesFromCompaniesResponse(
+        await findTestCompaniesAs(APPLE_JANE_ADMIN_ACCESS_TOKEN),
+      ),
+    ).toEqual([
+      'RecordScoping In Scope Co (edited)',
+      'RecordScoping Out Of Scope Co',
+    ]);
+  });
+
+  it('rejects related records pointing back through a column that does not point here', async () => {
+    const response = await upsertRecordScopingRule({
+      roleId: customRoleId,
+      objectMetadataId: companyObjectMetadataId,
+      logicalOperator: 'AND',
+      conditions: [
+        {
+          column: 'id',
+          operator: 'in',
+          relatedRecords: {
+            objectMetadataId: opportunityObjectMetadataId,
+            matchColumn: 'ownerId',
+            logicalOperator: 'AND',
+            conditions: [
+              {
+                column: 'ownerId',
+                operator: 'eq',
+                currentWorkspaceMemberField: 'id',
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(response.body.errors?.[0]?.extensions?.code).toBe('BAD_USER_INPUT');
   });
 });

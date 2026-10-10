@@ -13,6 +13,7 @@ import {
   COMPANY_ID,
   COMPANY_OBJECT,
   OPPORTUNITY_FIELDS,
+  OPPORTUNITY_ID,
   OPPORTUNITY_OBJECT,
   WORKSPACE_MEMBER_ID,
 } from 'src/engine/metadata-modules/record-scoping-rule/utils/__tests__/record-scoping-rule-fixtures';
@@ -30,10 +31,17 @@ const companyColumns = getRecordScopingColumns({
 });
 
 const getColumnsForObject = (objectMetadataId: string) =>
-  objectMetadataId === COMPANY_ID ? companyColumns : undefined;
+  ({ [COMPANY_ID]: companyColumns, [OPPORTUNITY_ID]: columns })[
+    objectMetadataId
+  ];
 
 const validate = (conditions: RecordScopingConditionInput[]) =>
-  validateRecordScopingConditions({ conditions, columns, getColumnsForObject });
+  validateRecordScopingConditions({
+    conditions,
+    objectMetadataId: OPPORTUNITY_ID,
+    columns,
+    getColumnsForObject,
+  });
 
 const companyOwnedByMe = (
   overrides: Partial<
@@ -239,6 +247,7 @@ describe('validateRecordScopingConditions', () => {
     expect(() =>
       validateRecordScopingConditions({
         conditions: [companyOwnedByMe()],
+        objectMetadataId: OPPORTUNITY_ID,
         columns,
         getColumnsForObject: () => undefined,
       }),
@@ -249,10 +258,135 @@ describe('validateRecordScopingConditions', () => {
     expect(() =>
       validateRecordScopingConditions({
         conditions: [companyOwnedByMe()],
+        objectMetadataId: OPPORTUNITY_ID,
         columns,
         getColumnsForObject,
         depth: MAX_RECORD_SCOPING_RELATED_DEPTH,
       }),
     ).toThrow('nested at most');
+  });
+
+  describe('related records pointing back', () => {
+    const ownedOpportunities = (
+      overrides: Partial<RecordScopingConditionInput> = {},
+      relatedOverrides: Partial<
+        NonNullable<RecordScopingConditionInput['relatedRecords']>
+      > = {},
+    ): RecordScopingConditionInput => ({
+      column: 'id',
+      operator: 'in',
+      relatedRecords: {
+        objectMetadataId: OPPORTUNITY_ID,
+        matchColumn: 'companyId',
+        logicalOperator: 'AND',
+        conditions: [
+          {
+            column: 'ownerId',
+            operator: 'eq',
+            currentWorkspaceMemberField: 'id',
+          },
+        ],
+        ...relatedOverrides,
+      },
+      ...overrides,
+    });
+
+    const validateForCompany = (conditions: RecordScopingConditionInput[]) =>
+      validateRecordScopingConditions({
+        conditions,
+        objectMetadataId: COMPANY_ID,
+        columns: companyColumns,
+        getColumnsForObject,
+      });
+
+    it('accepts any related record whose join column points at the scoped one', () => {
+      expect(validateForCompany([ownedOpportunities()])).toEqual([
+        {
+          column: 'id',
+          operator: 'in',
+          relatedRecords: {
+            objectMetadataId: OPPORTUNITY_ID,
+            matchColumn: 'companyId',
+            logicalOperator: 'AND',
+            conditions: [
+              {
+                column: 'ownerId',
+                operator: 'eq',
+                currentWorkspaceMemberField: 'id',
+              },
+            ],
+          },
+        },
+      ]);
+    });
+
+    it.each([
+      [
+        'a matchColumn on another column',
+        ownedOpportunities({ column: 'accountOwnerId' }),
+        'matchColumn needs the condition on "id"',
+      ],
+      [
+        'the id without a matchColumn',
+        ownedOpportunities({}, { matchColumn: undefined }),
+        'can only match related records that point back',
+      ],
+      [
+        'the id without related records',
+        { column: 'id', operator: 'eq', staticValue: MEMBER_UUID },
+        'can only match related records that point back',
+      ],
+      [
+        'a second value source',
+        ownedOpportunities({ staticValue: MEMBER_UUID }),
+        'set exactly one of',
+      ],
+      [
+        'an operator other than in',
+        ownedOpportunities({ operator: 'eq' }),
+        'need the "in" operator',
+      ],
+      [
+        'a bad logical operator',
+        ownedOpportunities({}, { logicalOperator: 'XOR' }),
+        'logicalOperator must be AND or OR',
+      ],
+      [
+        'an unknown related object',
+        ownedOpportunities({}, { objectMetadataId: MEMBER_UUID }),
+        'not found',
+      ],
+      [
+        'a matchColumn that is not a join column',
+        ownedOpportunities({}, { matchColumn: 'name' }),
+        'is not a relation on object',
+      ],
+      [
+        'a matchColumn pointing at another object',
+        ownedOpportunities({}, { matchColumn: 'ownerId' }),
+        `does not point at object ${COMPANY_ID}`,
+      ],
+      [
+        'invalid conditions on the related object',
+        ownedOpportunities({}, { conditions: [] }),
+        'at least one condition',
+      ],
+    ])('rejects %s', (_label, condition, message) => {
+      expect(() =>
+        validateForCompany([condition as RecordScopingConditionInput]),
+      ).toThrow(message);
+    });
+
+    it('limits how deep they nest', () => {
+      expect(() =>
+        validateRecordScopingConditions({
+          conditions: [ownedOpportunities()],
+          objectMetadataId: COMPANY_ID,
+          columns: companyColumns,
+          getColumnsForObject,
+          depth: MAX_RECORD_SCOPING_RELATED_DEPTH,
+        }),
+      ).toThrow('nested at most');
+    });
   });
 });

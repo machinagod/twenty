@@ -14,9 +14,14 @@ export type RecordScopingScalar = string | number | boolean;
 
 // Records of another object, selected by their own conditions. A condition with
 // relatedRecords keeps the scoped record when its join column points at one of
-// them, e.g. people whose company's account owner is the current member.
+// them, e.g. people whose company's account owner is the current member. With
+// matchColumn the direction flips: the condition is on the scoped record's id and
+// keeps it when one of the related records points back at it through matchColumn
+// (a many-to-one join column on the related object), e.g. a route kept when any of
+// its lines comes from an owned customer.
 export type RecordScopingRelatedRecords = {
   objectMetadataId: string;
+  matchColumn?: string;
   logicalOperator: RecordScopingLogicalOperator;
   conditions: RecordScopingCondition[];
 };
@@ -34,7 +39,8 @@ export type RecordScopingCondition = {
   // Read the comparison value from a field on the current workspace member,
   // e.g. 'id' to scope to records the member owns.
   currentWorkspaceMemberField?: string;
-  // Only with operator 'in', on a many-to-one join column.
+  // Only with operator 'in', on a many-to-one join column, or on 'id' when the
+  // related records carry a matchColumn.
   relatedRecords?: RecordScopingRelatedRecords;
 };
 
@@ -80,6 +86,7 @@ export type ResolvedRecordScopingRelatedCondition = {
   column: string;
   related: {
     objectMetadataId: string;
+    matchColumn?: string;
     logicalOperator: RecordScopingLogicalOperator;
     conditions: ResolvedRecordScopingCondition[];
   };
