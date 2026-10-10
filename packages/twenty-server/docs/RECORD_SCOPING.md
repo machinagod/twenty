@@ -77,6 +77,29 @@ server validates every condition against the object's metadata
 (`record-scoping-rule/utils/validate-record-scoping-conditions.util.ts`), so a
 stored rule can always be rendered to a valid WHERE.
 
+A one-to-many relation works the other way round: the condition sits on the
+scoped record's `id`, and `matchColumn` names the related object's many-to-one
+join column that points back at it. The record is kept when **any** related
+record matches. This scopes objects with no owner of their own, e.g. a route
+(`rota`) kept when one of its lines comes from a document of an owned company:
+
+```json
+{ "column": "id", "operator": "in",
+  "relatedRecords": { "objectMetadataId": "<linhaCarga>", "matchColumn": "cargaId", "logicalOperator": "AND",
+    "conditions": [{ "column": "sourceDocumentId", "operator": "in",
+      "relatedRecords": { "objectMetadataId": "<documento>", "logicalOperator": "AND",
+        "conditions": [{ "column": "companyId", "operator": "in",
+          "relatedRecords": { "objectMetadataId": "<company>", "logicalOperator": "AND",
+            "conditions": [{ "column": "accountOwnerId", "operator": "eq", "currentWorkspaceMemberField": "id" }] } }] } }] } }
+```
+
+It renders to `"rota"."id" IN (SELECT "cargaId" FROM <linhaCarga table> WHERE
+...)`. `id` is accepted only in this form, `matchColumn` must be a many-to-one
+join column of the related object that targets the scoped object, and the
+operator must be `in`. It counts toward the same three-level nesting limit.
+Settings > Roles offers it as "Any of <relation>" for one-to-many relations whose
+inverse is a plain many-to-one.
+
 Until 2026-10 the rules lived in the `RECORD_SCOPING_RULES` env var (authored by
 role label and object name). The `upgrade:2-45:import-record-scoping-rules-from-env`
 command copied them into the table on the first boot of that release; the env var
@@ -131,9 +154,9 @@ via `applyRecordScopingForAlias()`:
 
 ### Known limitations / next steps
 
-- Relations are followed through related-record subqueries (many-to-one only,
-  three levels deep); one-to-many conditions ("companies with an open
-  opportunity") are not supported.
+- Relations are followed through related-record subqueries, many-to-one and
+  one-to-many ("any related record matching"), three levels deep. Morph
+  relations are not supported.
 - One rule per (role, object). Mixing AND and OR needs two rules on different
   objects, not nested groups.
 - Lite workspace contexts (`executeInWorkspaceContext(..., { lite: true })`, used by
