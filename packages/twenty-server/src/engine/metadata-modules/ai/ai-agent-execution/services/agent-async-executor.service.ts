@@ -52,7 +52,9 @@ import { type AgentToolLoadingStrategy } from 'src/engine/metadata-modules/ai/ai
 import { assertAgentResponseFormatHasOutputFieldsOrThrow } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/assert-agent-response-format-has-output-fields-or-throw.util';
 import { buildAgentRolePermissionConfig } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-agent-role-permission-config.util';
 import { buildStrictAgentResponseSchema } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-strict-agent-response-schema.util';
+import { buildStructuredOutputPrompt } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-structured-output-prompt.util';
 import { endsOnPausingToolCall } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/ends-on-pausing-tool-call.util';
+import { validateAgentStructuredOutput } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/validate-agent-structured-output.util';
 import { AGENT_CONFIG } from 'src/engine/metadata-modules/ai/ai-agent/constants/agent-config.const';
 import { STRUCTURED_OUTPUT_SYSTEM_PROMPT } from 'src/engine/metadata-modules/ai/ai-agent/constants/structured-output-system-prompt.const';
 import { type AgentEntity } from 'src/engine/metadata-modules/ai/ai-agent/entities/agent.entity';
@@ -512,16 +514,19 @@ export class AgentAsyncExecutorService {
       });
 
       if (isDefined(agentSchema) && !endsOnPausingTool) {
+        const strictAgentSchema = buildStrictAgentResponseSchema(agentSchema);
         const structuredResult = await generateText({
           instructions: STRUCTURED_OUTPUT_SYSTEM_PROMPT,
           model: registeredModel.model,
-          prompt: `Based on the following execution results, generate the structured output according to the schema:
-
-                 Execution Results: ${textResponse.text}
-
-                 Please generate the structured output based on the execution results and context above.`,
+          prompt: buildStructuredOutputPrompt({
+            executionResultsText: textResponse.text,
+            schema: strictAgentSchema,
+          }),
           output: Output.object({
-            schema: jsonSchema(buildStrictAgentResponseSchema(agentSchema)),
+            schema: jsonSchema(strictAgentSchema, {
+              validate: (value) =>
+                validateAgentStructuredOutput(strictAgentSchema, value),
+            }),
           }),
           providerOptions: getCallLevelProviderOptions({
             sdkPackage: registeredModel.sdkPackage,
