@@ -4,7 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { type AllMetadataName } from 'twenty-shared/metadata';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { DataSource } from 'typeorm';
+import { DataSource, type QueryRunner } from 'typeorm';
 
 import { LoggerService } from 'src/engine/core-modules/logger/logger.service';
 import { WORKSPACE_MIGRATION_DURATION_MS_BUCKET_BOUNDARIES } from 'src/engine/core-modules/metrics/constants/workspace-migration-duration-ms-bucket-boundaries.constant';
@@ -36,6 +36,13 @@ import { getDerivedCacheTriggers } from 'src/engine/workspace-manager/workspace-
 import { getFlatEntityMapsKeysToInvalidateForWorkspaceMigration } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/get-flat-entity-maps-keys-to-invalidate-for-workspace-migration.util';
 import { getMetadataNamesToLoadForWorkspaceMigration } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/get-metadata-names-to-load-for-workspace-migration.util';
 import { buildPreallocatedIdByUniversalIdentifierFromActions } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/build-preallocated-id-by-universal-identifier-from-actions.util';
+import { computeMigrationStatementTimeoutMs } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/compute-migration-statement-timeout-ms.util';
+import { terminatePostgresBackend } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/utils/terminate-postgres-backend.util';
+
+// How long to wait for the pool to drop a terminated connection before
+// releasing it anyway (a dead connection is evicted on its next use).
+const FAILED_TRANSACTION_RELEASE_POLLS = 50;
+const FAILED_TRANSACTION_RELEASE_POLL_MS = 100;
 
 @Injectable()
 export class WorkspaceMigrationRunnerService {
@@ -137,6 +144,66 @@ export class WorkspaceMigrationRunnerService {
       attributes: { phase, status },
       bucketBoundaries: WORKSPACE_MIGRATION_DURATION_MS_BUCKET_BOUNDARIES,
     });
+  }
+
+  private async getBackendPid(
+    queryRunner: QueryRunner,
+  ): Promise<number | undefined> {
+    const [row] = await queryRunner.query('SELECT pg_backend_pid() AS pid');
+    const pid = Number(row?.pid);
+
+    return Number.isInteger(pid) ? pid : undefined;
+  }
+
+  // A failed ROLLBACK can leave the session inside its transaction, still
+  // holding its locks, and release() would hand it to the next request. Ending
+  // the backend makes Postgres roll it back; TypeORM then drops the connection
+  // from the pool on the resulting connection error.
+  private async discardFailedTransaction(
+    queryRunner: QueryRunner,
+    backendPid: number | undefined,
+  ): Promise<void> {
+    if (!isDefined(backendPid)) {
+      this.logger.error(
+        '[install-perf] cannot end the failed transaction: backend pid unknown',
+        'Runner',
+      );
+
+      return;
+    }
+
+    try {
+      const terminated = await terminatePostgresBackend({
+        dataSourceOptions: this.coreDataSource.options,
+        backendPid,
+      });
+
+      this.logger.error(
+        `[install-perf] ended backend ${backendPid} of the failed transaction (terminated=${terminated})`,
+        'Runner',
+      );
+    } catch (terminateError) {
+      this.logger.error(
+        `[install-perf] could not end backend ${backendPid}: ${
+          terminateError instanceof Error
+            ? terminateError.message
+            : String(terminateError)
+        }`,
+        'Runner',
+      );
+
+      return;
+    }
+
+    for (
+      let attempt = 0;
+      attempt < FAILED_TRANSACTION_RELEASE_POLLS && !queryRunner.isReleased;
+      attempt++
+    ) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, FAILED_TRANSACTION_RELEASE_POLL_MS),
+      );
+    }
   }
 
   private async logBlockingDbActivity(): Promise<void> {
@@ -382,8 +449,24 @@ export class WorkspaceMigrationRunnerService {
         () => allFlatEntityMaps.flatSearchFieldMetadataMaps,
       );
 
+    let backendPid: number | undefined;
+
     try {
+      backendPid = await this.getBackendPid(queryRunner);
+
       await queryRunner.query(`SET LOCAL lock_timeout = '8s'`);
+
+      const statementTimeoutMs = computeMigrationStatementTimeoutMs(
+        this.coreDataSource.options.type === 'postgres'
+          ? this.coreDataSource.options.extra?.query_timeout
+          : undefined,
+      );
+
+      if (isDefined(statementTimeoutMs)) {
+        await queryRunner.query(
+          `SET LOCAL statement_timeout = ${statementTimeoutMs}`,
+        );
+      }
 
       for (const action of actions) {
         const actionStart = performance.now();
@@ -483,14 +566,13 @@ export class WorkspaceMigrationRunnerService {
       );
 
       if (queryRunner.isTransactionActive && !queryRunner.isReleased) {
-        await queryRunner
-          .rollbackTransaction()
-          .catch((rollbackError) =>
-            this.logger.error(
-              `[install-perf] rollback failed: ${rollbackError.message}`,
-              'Runner',
-            ),
+        await queryRunner.rollbackTransaction().catch(async (rollbackError) => {
+          this.logger.error(
+            `[install-perf] rollback failed: ${rollbackError.message}`,
+            'Runner',
           );
+          await this.discardFailedTransaction(queryRunner, backendPid);
+        });
       } else {
         this.logger.error(
           `[install-perf] skipping rollback (txnActive=${queryRunner.isTransactionActive} released=${queryRunner.isReleased})`,
