@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import {
   convertToModelMessages,
   generateText,
   jsonSchema,
+  type LanguageModelUsage,
   NoObjectGeneratedError,
   NoOutputGeneratedError,
   Output,
@@ -48,9 +49,12 @@ import { type AgentToolLoadingStrategy } from 'src/engine/metadata-modules/ai/ai
 import { assertAgentResponseFormatHasOutputFieldsOrThrow } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/assert-agent-response-format-has-output-fields-or-throw.util';
 import { buildStrictAgentResponseSchema } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-strict-agent-response-schema.util';
 import { buildStructuredOutputPrompt } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-structured-output-prompt.util';
+import { parseAgentStructuredOutputFromText } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/parse-agent-structured-output-from-text.util';
+import { retryStructuredOutput } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/retry-structured-output.util';
 import { validateAgentStructuredOutput } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/validate-agent-structured-output.util';
 import { getCallLevelProviderOptions } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/provider-options.util';
 import { replaceUnsupportedFileParts } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/replace-unsupported-file-parts.util';
+import { STRUCTURED_OUTPUT_MAX_ATTEMPTS } from 'src/engine/metadata-modules/ai/ai-agent/constants/structured-output-max-attempts.const';
 import { STRUCTURED_OUTPUT_SYSTEM_PROMPT } from 'src/engine/metadata-modules/ai/ai-agent/constants/structured-output-system-prompt.const';
 import { NATIVE_WEB_SEARCH_COST_PER_CALL_DOLLARS } from 'src/engine/metadata-modules/ai/ai-billing/constants/native-web-search-cost-per-call-dollars';
 import { AiBillingService } from 'src/engine/metadata-modules/ai/ai-billing/services/ai-billing.service';
@@ -109,6 +113,8 @@ const buildSpenders = ({
 
 @Injectable()
 export class AgentRunTurnService {
+  private readonly logger = new Logger(AgentRunTurnService.name);
+
   constructor(
     private readonly agentTurnService: AgentTurnService,
     private readonly aiBillingService: AiBillingService,
@@ -305,54 +311,91 @@ export class AgentRunTurnService {
       result = await this.readSameRequestOutputOrThrow(turn);
     } else if (isStructuredOutputExpected) {
       const strictAgentSchema = buildStrictAgentResponseSchema(agentSchema);
-      const structuredResult = await generateText({
-        instructions: STRUCTURED_OUTPUT_SYSTEM_PROMPT,
-        model: registeredModel.model,
-        prompt: buildStructuredOutputPrompt({
-          executionResultsText: text,
-          schema: strictAgentSchema,
-        }),
-        output: Output.object({
-          schema: jsonSchema(strictAgentSchema, {
-            validate: (value) =>
-              validateAgentStructuredOutput(strictAgentSchema, value),
-          }),
-        }),
-        abortSignal,
-        providerOptions: getCallLevelProviderOptions({
-          sdkPackage: registeredModel.sdkPackage,
-          providerOptions: undefined,
-          promptCacheKey: persona.promptCacheKey,
-        }),
-        ...buildAiTelemetry({
-          functionId: 'agent-structured-output',
-          isContentRecordingAllowed: turn.isContentRecordingAllowed,
+      // an agent told to answer in JSON often already did, so its reply is used before asking again
+      const outputFromReply = parseAgentStructuredOutputFromText(
+        strictAgentSchema,
+        text,
+      );
+
+      const billStructuredOutputUsage = (
+        structuredOutputUsage: LanguageModelUsage,
+      ) =>
+        void this.aiBillingService.calculateAndBillUsage({
+          modelId: registeredModel.modelId,
+          billingInput: { usage: structuredOutputUsage },
           workspaceId,
-          userWorkspaceId,
-          agentId: persona.agentId ?? undefined,
-        }),
-      });
+          operationType: UsageOperationType.AI_WORKFLOW_TOKEN,
+          spenders,
+        });
 
-      void this.aiBillingService.calculateAndBillUsage({
-        modelId: registeredModel.modelId,
-        billingInput: { usage: structuredResult.usage },
-        workspaceId,
-        operationType: UsageOperationType.AI_WORKFLOW_TOKEN,
-        spenders,
-      });
+      const structuredOutput = isDefined(outputFromReply)
+        ? outputFromReply
+        : await retryStructuredOutput({
+            maxAttempts: STRUCTURED_OUTPUT_MAX_ATTEMPTS,
+            generate: async () => {
+              const structuredResult = await generateText({
+                instructions: STRUCTURED_OUTPUT_SYSTEM_PROMPT,
+                model: registeredModel.model,
+                prompt: buildStructuredOutputPrompt({
+                  executionResultsText: text,
+                  schema: strictAgentSchema,
+                }),
+                output: Output.object({
+                  schema: jsonSchema(strictAgentSchema, {
+                    validate: (value) =>
+                      validateAgentStructuredOutput(strictAgentSchema, value),
+                  }),
+                }),
+                abortSignal,
+                providerOptions: getCallLevelProviderOptions({
+                  sdkPackage: registeredModel.sdkPackage,
+                  providerOptions: undefined,
+                  promptCacheKey: persona.promptCacheKey,
+                }),
+                ...buildAiTelemetry({
+                  functionId: 'agent-structured-output',
+                  isContentRecordingAllowed: turn.isContentRecordingAllowed,
+                  workspaceId,
+                  userWorkspaceId,
+                  agentId: persona.agentId ?? undefined,
+                }),
+              }).catch((error: unknown) => {
+                // a rejected attempt still spent tokens
+                if (
+                  NoObjectGeneratedError.isInstance(error) &&
+                  isDefined(error.usage)
+                ) {
+                  billStructuredOutputUsage(error.usage);
+                  usage = mergeLanguageModelUsage(usage, error.usage);
+                }
 
-      usage = mergeLanguageModelUsage(usage, structuredResult.usage);
-      steps = [...steps, ...structuredResult.steps];
-      structuredOutputSteps = structuredResult.steps;
+                throw error;
+              });
 
-      if (structuredResult.output == null) {
+              billStructuredOutputUsage(structuredResult.usage);
+              usage = mergeLanguageModelUsage(usage, structuredResult.usage);
+              steps = [...steps, ...structuredResult.steps];
+              structuredOutputSteps = [
+                ...structuredOutputSteps,
+                ...structuredResult.steps,
+              ];
+
+              return (structuredResult.output as object | null) ?? null;
+            },
+            onFailedAttempt: (attempt, error) =>
+              this.logger.warn(
+                `Agent ${persona.agentId} structured output attempt ${attempt} failed: ${error.message}`,
+              ),
+          });
+
+      if (!isDefined(structuredOutput)) {
         throw new AiException(
           'Failed to generate structured output from execution results',
           AiExceptionCode.AGENT_EXECUTION_FAILED,
         );
       }
 
-      result = structuredResult.output as object;
+      result = structuredOutput;
     }
 
     const nativeWebSearchCallCount = countNativeWebSearchCallsFromSteps(steps);
