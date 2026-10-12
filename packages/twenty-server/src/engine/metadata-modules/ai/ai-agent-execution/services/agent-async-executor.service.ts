@@ -54,8 +54,11 @@ import { buildAgentRolePermissionConfig } from 'src/engine/metadata-modules/ai/a
 import { buildStrictAgentResponseSchema } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-strict-agent-response-schema.util';
 import { buildStructuredOutputPrompt } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/build-structured-output-prompt.util';
 import { endsOnPausingToolCall } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/ends-on-pausing-tool-call.util';
+import { parseAgentStructuredOutputFromText } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/parse-agent-structured-output-from-text.util';
+import { retryStructuredOutput } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/retry-structured-output.util';
 import { validateAgentStructuredOutput } from 'src/engine/metadata-modules/ai/ai-agent-execution/utils/validate-agent-structured-output.util';
 import { AGENT_CONFIG } from 'src/engine/metadata-modules/ai/ai-agent/constants/agent-config.const';
+import { STRUCTURED_OUTPUT_MAX_ATTEMPTS } from 'src/engine/metadata-modules/ai/ai-agent/constants/structured-output-max-attempts.const';
 import { STRUCTURED_OUTPUT_SYSTEM_PROMPT } from 'src/engine/metadata-modules/ai/ai-agent/constants/structured-output-system-prompt.const';
 import { type AgentEntity } from 'src/engine/metadata-modules/ai/ai-agent/entities/agent.entity';
 import { repairToolCall } from 'src/engine/metadata-modules/ai/ai-agent/utils/repair-tool-call.util';
@@ -515,65 +518,89 @@ export class AgentAsyncExecutorService {
 
       if (isDefined(agentSchema) && !endsOnPausingTool) {
         const strictAgentSchema = buildStrictAgentResponseSchema(agentSchema);
-        const structuredResult = await generateText({
-          instructions: STRUCTURED_OUTPUT_SYSTEM_PROMPT,
-          model: registeredModel.model,
-          prompt: buildStructuredOutputPrompt({
-            executionResultsText: textResponse.text,
-            schema: strictAgentSchema,
-          }),
-          output: Output.object({
-            schema: jsonSchema(strictAgentSchema, {
-              validate: (value) =>
-                validateAgentStructuredOutput(strictAgentSchema, value),
-            }),
-          }),
-          providerOptions: getCallLevelProviderOptions({
-            sdkPackage: registeredModel.sdkPackage,
-            providerOptions: undefined,
-            promptCacheKey: agent?.id,
-          }),
-          ...buildAiTelemetry({
-            functionId: 'agent-structured-output',
-            workspaceId,
-            userWorkspaceId,
-            agentId: agent?.id,
-          }),
-          onStepEnd: async (step) => {
-            const { hasNoMoreAvailableCredits: stepHasNoMoreAvailableCredits } =
-              await this.aiBillingService.decrementAndCheckAvailableCredits({
-                modelId: registeredModel.modelId,
-                billingInput: {
-                  usage: step.usage,
-                  cacheCreationTokens: extractCacheCreationTokens(
-                    step.providerMetadata,
-                  ),
+        const outputFromReply = parseAgentStructuredOutputFromText(
+          strictAgentSchema,
+          textResponse.text,
+        );
+
+        if (isDefined(outputFromReply)) {
+          result = outputFromReply;
+        } else {
+          const structuredOutput = await retryStructuredOutput({
+            maxAttempts: STRUCTURED_OUTPUT_MAX_ATTEMPTS,
+            generate: async () => {
+              const structuredResult = await generateText({
+                instructions: STRUCTURED_OUTPUT_SYSTEM_PROMPT,
+                model: registeredModel.model,
+                prompt: buildStructuredOutputPrompt({
+                  executionResultsText: textResponse.text,
+                  schema: strictAgentSchema,
+                }),
+                output: Output.object({
+                  schema: jsonSchema(strictAgentSchema, {
+                    validate: (value) =>
+                      validateAgentStructuredOutput(strictAgentSchema, value),
+                  }),
+                }),
+                providerOptions: getCallLevelProviderOptions({
+                  sdkPackage: registeredModel.sdkPackage,
+                  providerOptions: undefined,
+                  promptCacheKey: agent?.id,
+                }),
+                ...buildAiTelemetry({
+                  functionId: 'agent-structured-output',
+                  workspaceId,
+                  userWorkspaceId,
+                  agentId: agent?.id,
+                }),
+                onStepEnd: async (step) => {
+                  const {
+                    hasNoMoreAvailableCredits: stepHasNoMoreAvailableCredits,
+                  } =
+                    await this.aiBillingService.decrementAndCheckAvailableCredits(
+                      {
+                        modelId: registeredModel.modelId,
+                        billingInput: {
+                          usage: step.usage,
+                          cacheCreationTokens: extractCacheCreationTokens(
+                            step.providerMetadata,
+                          ),
+                        },
+                        workspaceId,
+                        operationType,
+                        spenders: { userWorkspaceId, agentId: agent?.id },
+                      },
+                    );
+
+                  if (stepHasNoMoreAvailableCredits) {
+                    hasNoMoreAvailableCredits = true;
+                  }
                 },
-                workspaceId,
-                operationType,
-                spenders: { userWorkspaceId, agentId: agent?.id },
               });
 
-            if (stepHasNoMoreAvailableCredits) {
-              hasNoMoreAvailableCredits = true;
-            }
-          },
-        });
+              accumulatedUsage = mergeLanguageModelUsage(
+                accumulatedUsage,
+                structuredResult.usage,
+              );
+              executionSteps = [...executionSteps, ...structuredResult.steps];
 
-        accumulatedUsage = mergeLanguageModelUsage(
-          textResponse.usage,
-          structuredResult.usage,
-        );
-        executionSteps = [...textResponse.steps, ...structuredResult.steps];
+              return (structuredResult.output as object | null) ?? null;
+            },
+            onFailedAttempt: (attempt, error) =>
+              this.logger.warn(
+                `Agent ${agent?.id} structured output attempt ${attempt} failed: ${error.message}`,
+              ),
+          });
 
-        if (structuredResult.output == null) {
-          throw new AiException(
-            'Failed to generate structured output from execution results',
-            AiExceptionCode.AGENT_EXECUTION_FAILED,
-          );
+          if (structuredOutput === null) {
+            throw new AiException(
+              'Failed to generate structured output from execution results',
+              AiExceptionCode.AGENT_EXECUTION_FAILED,
+            );
+          }
+
+          result = structuredOutput;
         }
-
-        result = structuredResult.output as object;
       }
 
       const tokenCostInDollars = this.aiBillingService.calculateStepsCost(
