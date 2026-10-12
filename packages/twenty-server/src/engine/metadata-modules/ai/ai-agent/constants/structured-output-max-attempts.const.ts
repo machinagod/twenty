@@ -1,0 +1,1 @@
+export const STRUCTURED_OUTPUT_MAX_ATTEMPTS = 3;
