@@ -187,6 +187,10 @@ Railway image** (the fork's deploy), **Claude Code** (the `@claude` assistant,
 member-gated), and the CI validation suite (**CI Server/Front/Shared/UI/SDK/…**). **CI Utils / danger-js** stays enabled (useful PR-hygiene) but
 *times out* (5-min cap) on a huge sync PR — that red is a one-off, non-blocking
 (`main` is unprotected), and clears on normal PRs.
+Its **congratulate** job (on merge) is gated to `github.repository == 'twentyhq/twenty'`:
+it fetches twenty.com contributor stats, which return HTML for fork authors, so it
+posted a red Danger "node failed" on every merged fork PR. Keep that gate when a
+sync conflicts on `ci-utils.yaml`.
 
 ### PR previews — none for now (deliberate)
 
