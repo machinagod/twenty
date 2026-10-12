@@ -43,6 +43,15 @@ import { type ByteRange } from 'src/engine/core-modules/file-storage/types/byte-
 import { buildAwsRequestHandlerOptions } from 'src/utils/aws-request-handler.util';
 import { propagateDestroyToSource } from 'src/utils/propagate-destroy-to-source.util';
 
+const CONDITIONAL_COPY_CONFLICT_RETRY_DELAYS_MS = [250, 1000];
+
+const isConditionalRequestConflict = (error: {
+  name?: string;
+  Code?: string;
+}): boolean =>
+  error.name === 'ConditionalRequestConflict' ||
+  error.Code === 'ConditionalRequestConflict';
+
 export interface S3DriverOptions extends S3ClientConfig {
   bucketName: string;
   endpoint?: string;
@@ -382,6 +391,66 @@ export class S3Driver implements StorageDriver {
     }
   }
 
+  // Some backends (Railway buckets) answer CopySourceIfMatch with 409
+  // ConditionalRequestConflict, which S3 documents as retryable. If the conflict
+  // persists, the source is re-checked and copied unconditionally, the same
+  // guarantee backends without conditional copies get.
+  private async copyAfterConditionalConflicts({
+    copySource,
+    fromKey,
+    toKey,
+    ifMatchChecksum,
+  }: {
+    copySource: string;
+    fromKey: string;
+    toKey: string;
+    ifMatchChecksum: string;
+  }): Promise<void> {
+    for (const delayMs of CONDITIONAL_COPY_CONFLICT_RETRY_DELAYS_MS) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      try {
+        await this.s3Client.send(
+          new CopyObjectCommand({
+            CopySource: copySource,
+            CopySourceIfMatch: ifMatchChecksum,
+            Bucket: this.bucketName,
+            Key: toKey,
+          }),
+        );
+
+        return;
+      } catch (error) {
+        if (!isConditionalRequestConflict(error)) {
+          throw error;
+        }
+      }
+    }
+
+    const head = await this.s3Client.send(
+      new HeadObjectCommand({ Bucket: this.bucketName, Key: fromKey }),
+    );
+
+    if (head.ETag !== ifMatchChecksum) {
+      throw new FileStorageException(
+        `Object at ${fromKey} changed since it was inspected`,
+        FileStorageExceptionCode.PRECONDITION_FAILED,
+      );
+    }
+
+    this.logger.warn(
+      `S3 backend kept rejecting CopySourceIfMatch with ConditionalRequestConflict for ${fromKey}, copying unconditionally`,
+    );
+
+    await this.s3Client.send(
+      new CopyObjectCommand({
+        CopySource: copySource,
+        Bucket: this.bucketName,
+        Key: toKey,
+      }),
+    );
+  }
+
   // Some S3-compatible backends (e.g. OVHcloud) reject CopySourceIfMatch with 501.
   private async copyObjectIfMatch({
     fromKey,
@@ -410,6 +479,17 @@ export class S3Driver implements StorageDriver {
         const isNotImplemented =
           error.name === 'NotImplemented' ||
           error.$metadata?.httpStatusCode === 501;
+
+        if (isConditionalRequestConflict(error)) {
+          await this.copyAfterConditionalConflicts({
+            copySource,
+            fromKey,
+            toKey,
+            ifMatchChecksum,
+          });
+
+          return;
+        }
 
         if (!isNotImplemented) {
           throw error;
