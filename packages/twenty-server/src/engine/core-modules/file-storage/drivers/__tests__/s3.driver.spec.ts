@@ -14,7 +14,10 @@ import { isDefined } from 'twenty-shared/utils';
 
 import { FILE_STORAGE_S3_METADATA_MAX_ATTEMPTS } from 'src/engine/core-modules/file-storage/constants/s3-client-timeouts.constant';
 import { S3Driver } from 'src/engine/core-modules/file-storage/drivers/s3.driver';
-import { FileStorageExceptionCode } from 'src/engine/core-modules/file-storage/interfaces/file-storage-exception';
+import {
+  FileStorageException,
+  FileStorageExceptionCode,
+} from 'src/engine/core-modules/file-storage/interfaces/file-storage-exception';
 
 const mockS3Send = jest.fn();
 
@@ -402,6 +405,144 @@ describe('S3Driver.move', () => {
     expect(copyCommands[0].input.CopySourceIfMatch).toBe('"etag"');
     expect(copyCommands[1].input.CopySourceIfMatch).toBeUndefined();
     expect(copyCommands[2].input.CopySourceIfMatch).toBeUndefined();
+  });
+
+  describe('when the backend answers CopySourceIfMatch with ConditionalRequestConflict', () => {
+    const conflictError = () =>
+      Object.assign(
+        new Error('Concurrent operation occurred during conditional request'),
+        {
+          name: 'ConditionalRequestConflict',
+          Code: 'ConditionalRequestConflict',
+          $metadata: { httpStatusCode: 409 },
+        },
+      );
+
+    const createDriver = () =>
+      new S3Driver({ bucketName: 'test-bucket', region: 'us-east-1' });
+
+    const moveWithTimers = async (driver: S3Driver) => {
+      const moving = driver.move(moveParams);
+      const settled = moving.then(
+        () => undefined,
+        (error: unknown) => error,
+      );
+
+      await jest.runAllTimersAsync();
+
+      return settled;
+    };
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should retry the conditional copy', async () => {
+      let conflicts = 1;
+
+      mockS3Send.mockImplementation(async (command) => {
+        if (
+          command instanceof CopyObjectCommand &&
+          isDefined(command.input.CopySourceIfMatch) &&
+          conflicts > 0
+        ) {
+          conflicts -= 1;
+          throw conflictError();
+        }
+
+        return { ETag: '"etag"' };
+      });
+
+      expect(await moveWithTimers(createDriver())).toBeUndefined();
+
+      const copyCommands = getCopyCommands();
+
+      expect(copyCommands).toHaveLength(2);
+      expect(copyCommands[1].input.CopySourceIfMatch).toBe('"etag"');
+    });
+
+    it('should copy unconditionally once the source is re-checked, and keep conditional copies for later moves', async () => {
+      mockS3Send.mockImplementation(async (command) => {
+        if (
+          command instanceof CopyObjectCommand &&
+          isDefined(command.input.CopySourceIfMatch)
+        ) {
+          throw conflictError();
+        }
+
+        return { ETag: '"etag"' };
+      });
+
+      const driver = createDriver();
+
+      expect(await moveWithTimers(driver)).toBeUndefined();
+
+      const copyCommands = getCopyCommands();
+
+      expect(copyCommands).toHaveLength(4);
+      expect(copyCommands[3].input.CopySourceIfMatch).toBeUndefined();
+      expect(
+        mockS3Send.mock.calls[mockS3Send.mock.calls.length - 1][0],
+      ).toBeInstanceOf(DeleteObjectCommand);
+
+      await moveWithTimers(driver);
+
+      expect(getCopyCommands()[4].input.CopySourceIfMatch).toBe('"etag"');
+    });
+
+    it('should refuse to copy a source that changed meanwhile', async () => {
+      let heads = 0;
+
+      mockS3Send.mockImplementation(async (command) => {
+        if (
+          command instanceof CopyObjectCommand &&
+          isDefined(command.input.CopySourceIfMatch)
+        ) {
+          throw conflictError();
+        }
+
+        if (command instanceof HeadObjectCommand) {
+          heads += 1;
+
+          return { ETag: heads === 1 ? '"etag"' : '"other"' };
+        }
+
+        return {};
+      });
+
+      const error = await moveWithTimers(createDriver());
+
+      expect(error).toBeInstanceOf(FileStorageException);
+      expect((error as FileStorageException).code).toBe(
+        FileStorageExceptionCode.PRECONDITION_FAILED,
+      );
+      expect(
+        getCopyCommands().filter(
+          (command) => !isDefined(command.input.CopySourceIfMatch),
+        ),
+      ).toHaveLength(0);
+    });
+
+    it('should not swallow other errors raised while retrying', async () => {
+      let copies = 0;
+
+      mockS3Send.mockImplementation(async (command) => {
+        if (command instanceof CopyObjectCommand) {
+          copies += 1;
+          throw copies === 1 ? conflictError() : new Error('Access denied');
+        }
+
+        return { ETag: '"etag"' };
+      });
+
+      const error = await moveWithTimers(createDriver());
+
+      expect((error as Error).message).toBe('Access denied');
+    });
   });
 
   it('should still report a failed precondition', async () => {
