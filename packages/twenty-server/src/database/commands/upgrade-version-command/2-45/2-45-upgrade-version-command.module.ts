@@ -8,6 +8,7 @@ import { GateWorkflowCommandsOnRecordUpdatePermissionCommand } from 'src/databas
 import { ImportRecordScopingRulesFromEnvCommand } from 'src/database/commands/upgrade-version-command/2-45/2-45-workspace-command-1791590005647-import-record-scoping-rules-from-env.command';
 import { CopyRecordScopingRulesFromEnvCommand } from 'src/database/commands/upgrade-version-command/2-45/2-45-workspace-command-1791624474376-copy-record-scoping-rules-from-env.command';
 import { RemoveSeeVersionWorkflowRunCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/2-45/2-45-workspace-command-1790860694324-remove-see-version-workflow-run-command-menu-item.command';
+import { AddRetryWorkflowRunCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/2-45/2-45-workspace-command-1793565413000-add-retry-workflow-run-command-menu-item.command';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
 
@@ -25,6 +26,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     OpenShareRecordToEveryObjectCommand,
     ImportRecordScopingRulesFromEnvCommand,
     CopyRecordScopingRulesFromEnvCommand,
+    AddRetryWorkflowRunCommandMenuItemCommand,
   ],
 })
 export class V2_45_UpgradeVersionCommandModule {}
