@@ -43,9 +43,14 @@ packages/twenty-server/scripts/bump-version.ts 2.45.1`; the folder stays `2-45`)
 A whole version always runs after the previous one, and upstream's next minor
 (2.46.0) still sorts after it. Once a command name has been attempted in prod,
 keep it registered (as a no-op if superseded): the cursor is resolved by name and
-an unknown name aborts the upgrade. So at the next sync keep `2.45.1` in
-`TWENTY_PREVIOUS_VERSIONS` and its commands registered when replaying onto
+an unknown name aborts the upgrade. So at the next sync keep `2.45.1` and `2.45.2`
+in `TWENTY_PREVIOUS_VERSIONS` and their commands registered when replaying onto
 upstream's tag, since prod's cursor will point at them.
+
+**2.45.2** holds `add-retry-workflow-run-command-menu-item`. Upstream added the
+workflow run Retry command (#21458) to the standard definition with no backfill, so
+workspaces older than it never got the item. If upstream ships its own backfill, drop
+nothing: the command skips a workspace that already has the item.
 
 **Dropped commits get pruned, not carried.** The i18n message-compiler fix was a
 custom commit until upstream shipped the same fix; at the 2026-06-24 sync it
