@@ -7,6 +7,7 @@ import { UsageLimitEntity } from 'src/engine/core-modules/usage-limit/usage-limi
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { ALL_METADATA_ENTITY_BY_METADATA_NAME } from 'src/engine/metadata-modules/flat-entity/constant/all-metadata-entity-by-metadata-name.constant';
 import { IndexFieldMetadataEntity } from 'src/engine/metadata-modules/index-metadata/index-field-metadata.entity';
+import { RecordScopingRuleEntity } from 'src/engine/metadata-modules/record-scoping-rule/record-scoping-rule.entity';
 
 export const ALL_WORKSPACE_CACHE_ENTITY_BY_NAME = {
   ...ALL_METADATA_ENTITY_BY_METADATA_NAME,
@@ -18,4 +19,5 @@ export const ALL_WORKSPACE_CACHE_ENTITY_BY_NAME = {
   billingEntitlement: BillingEntitlementEntity,
   usageLimit: UsageLimitEntity,
   userWorkspace: UserWorkspaceEntity,
+  recordScopingRule: RecordScopingRuleEntity,
 } as const;

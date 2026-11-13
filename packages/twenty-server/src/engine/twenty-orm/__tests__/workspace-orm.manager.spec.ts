@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 
 import { EnterprisePlanService } from 'src/engine/core-modules/enterprise/services/enterprise-plan.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
@@ -6,6 +6,7 @@ import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-enti
 import { PrincipalPermissionsService } from 'src/engine/permissions/principal-permissions.service';
 import { RecordPermissionsService } from 'src/engine/permissions/record-permissions.service';
 import { WorkspaceDataSourceService } from 'src/engine/twenty-orm/datasource/workspace-data-source.service';
+import { type RecordScopingRulesByRoleId } from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
 import { getWorkspaceContext } from 'src/engine/twenty-orm/storage/orm-workspace-context.storage';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
@@ -64,4 +65,99 @@ describe('workspace context sharing enforcement', () => {
       await module.close();
     },
   );
+});
+
+describe('workspace context record scoping', () => {
+  const memberOwnerRules: RecordScopingRulesByRoleId = {
+    'member-role-id': [
+      {
+        objectMetadataId: 'opportunity-id',
+        logicalOperator: 'AND',
+        conditions: [
+          {
+            column: 'ownerId',
+            operator: 'eq',
+            currentWorkspaceMemberField: 'id',
+          },
+        ],
+      },
+    ],
+  };
+
+  const buildModule = () =>
+    Test.createTestingModule({
+      providers: [
+        WorkspaceOrmManager,
+        { provide: WorkspaceDataSourceService, useValue: {} },
+        {
+          provide: PrincipalPermissionsService,
+          useValue: {
+            resolvePermissionsPrincipals: jest
+              .fn()
+              .mockResolvedValue(undefined),
+          },
+        },
+        { provide: RecordPermissionsService, useValue: {} },
+        {
+          provide: EnterprisePlanService,
+          useValue: { isValid: jest.fn().mockReturnValue(false) },
+        },
+        {
+          provide: TwentyConfigService,
+          useValue: { get: jest.fn().mockReturnValue(false) },
+        },
+        {
+          provide: WorkspaceCacheService,
+          useValue: {
+            getOrRecompute: jest.fn().mockResolvedValue({
+              flatObjectMetadataMaps: createEmptyFlatEntityMaps(),
+              featureFlagsMap: {},
+              billingEntitlements: {},
+              recordScopingRulesByRoleId: memberOwnerRules,
+              userWorkspaceRoleMap: { 'user-workspace-id': 'member-role-id' },
+              roleIdsWithAllRecordsAccess: ['admin-role-id'],
+            }),
+          },
+        },
+      ],
+    }).compile();
+
+  const loadContext = (module: TestingModule, lite: boolean) =>
+    module
+      .get(WorkspaceOrmManager)
+      .executeInWorkspaceContext(
+        () => getWorkspaceContext(),
+        buildSystemAuthContext('workspace'),
+        { lite },
+      );
+
+  it('should expose the cached rules and role maps on a full context', async () => {
+    const module = await buildModule();
+    const context = await loadContext(module, false);
+
+    expect(context.recordScoping).toEqual({
+      rulesByRoleId: memberOwnerRules,
+      userWorkspaceRoleMap: { 'user-workspace-id': 'member-role-id' },
+      roleIdsWithAllRecordsAccess: ['admin-role-id'],
+    });
+    expect(
+      module.get(WorkspaceCacheService).getOrRecompute,
+    ).toHaveBeenCalledWith(
+      'workspace',
+      expect.arrayContaining([
+        'recordScopingRulesByRoleId',
+        'userWorkspaceRoleMap',
+        'roleIdsWithAllRecordsAccess',
+      ]),
+    );
+    await module.close();
+  });
+
+  it('should not load record scoping for a lite context', async () => {
+    const module = await buildModule();
+    const context = await loadContext(module, true);
+
+    expect(context.recordScoping).toBeUndefined();
+    await module.close();
+  });
 });

@@ -55,6 +55,7 @@ export class WorkspaceDataSourceService {
       billingEntitlements: workspaceContext.billingEntitlements,
       permissionsPrincipals: workspaceContext.permissionsPrincipals,
       recordReadRestrictions: workspaceContext.recordReadRestrictions,
+      recordScoping: workspaceContext.recordScoping,
       eventEmitterService: this.workspaceEventEmitter,
       recordStock: this.workspaceRecordStockService,
       recordPermissions: this.recordPermissionsService,

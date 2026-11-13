@@ -4,6 +4,7 @@ import { TypeORMModule } from 'src/database/typeorm/typeorm.module';
 import { WorkspaceBillingEntitlementsCacheModule } from 'src/engine/core-modules/billing/workspace-billing-entitlements-cache.module';
 import { EnterpriseModule } from 'src/engine/core-modules/enterprise/enterprise.module';
 import { UsageLimitModule } from 'src/engine/core-modules/usage-limit/usage-limit.module';
+import { WorkspaceRecordScopingRulesCacheModule } from 'src/engine/metadata-modules/record-scoping-rule/workspace-record-scoping-rules-cache.module';
 import { WorkspaceFeatureFlagsMapCacheModule } from 'src/engine/metadata-modules/workspace-feature-flags-map-cache/workspace-feature-flags-map-cache.module';
 import { PermissionsModule } from 'src/engine/permissions/permissions.module';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
@@ -16,6 +17,7 @@ import { WorkspaceQueryExecutorModule } from 'src/engine/workspace-query-executo
   imports: [
     TypeORMModule,
     WorkspaceFeatureFlagsMapCacheModule,
+    WorkspaceRecordScopingRulesCacheModule,
     WorkspaceBillingEntitlementsCacheModule,
     EnterpriseModule,
     UsageLimitModule,

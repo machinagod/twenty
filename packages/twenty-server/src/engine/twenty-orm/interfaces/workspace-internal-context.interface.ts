@@ -12,6 +12,7 @@ import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object
 import { type FlatValidationRuleMaps } from 'src/engine/metadata-modules/flat-validation-rule/types/flat-validation-rule-maps.type';
 import { type WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/workspace-event-emitter';
 import { type RecordReadRestrictions } from 'src/engine/permissions/types/record-read-restrictions.type';
+import { type RecordScopingWorkspaceContext } from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
 
 export interface WorkspaceInternalContext {
   workspaceId: string;
@@ -25,6 +26,8 @@ export interface WorkspaceInternalContext {
   eventEmitterService: Pick<WorkspaceEventEmitter, 'emitDatabaseBatchEvent'>;
   permissionsPrincipals: PermissionsPrincipalsWithRolesContext | undefined;
   recordReadRestrictions: RecordReadRestrictions;
+  // Absent means no record scoping is applied
+  recordScoping?: RecordScopingWorkspaceContext;
   recordPermissions: Pick<
     RecordPermissionsService,
     | 'isReadDisabled'

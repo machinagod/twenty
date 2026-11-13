@@ -10,7 +10,7 @@ Redis**.
   upstream default is `true`). With it off, no signup events go to
   `twenty-telemetry.com`. No license key, no phone-home. We keep this as env rather
   than a code default to avoid friction when syncing from upstream.
-- **Record-level locking** via `RECORD_SCOPING_RULES`
+- **Record-level locking**, edited in Settings > Roles
   (see `packages/twenty-server/docs/RECORD_SCOPING.md`).
 
 ## Image / build
@@ -67,7 +67,7 @@ trial but **not** recommended for production — override `NODE_ENV`, set a real
 Copy `twenty.env.example` into each service. The minimum required (shared between
 server and worker): `PG_DATABASE_URL`, `REDIS_URL`, `SERVER_URL`, `APP_SECRET`,
 `STORAGE_TYPE`. Set `TELEMETRY_ENABLED=false` to keep telemetry off (upstream
-defaults it to `true`). Set `RECORD_SCOPING_RULES` to turn on the lock.
+defaults it to `true`).
 
 ## First deploy
 
@@ -79,12 +79,9 @@ defaults it to `true`). Set `RECORD_SCOPING_RULES` to turn on the lock.
 
 ## Enabling / verifying record-level locking
 
-1. Create the role referenced by your rule (e.g. `Member`) and assign it to a
-   non-admin user.
-2. Set `RECORD_SCOPING_RULES` (see example) and redeploy both services (the rules
-   are read at boot).
-3. As that user, confirm they only see/can-modify records matching the rule
-   (e.g. opportunities where `assigneeId` = their workspace member id). A role
+1. Create the role to restrict (e.g. `Comercial`) and assign it to a non-admin
+   user.
+2. In Settings > Roles > that role, open an object's permissions and add a
+   record-level condition (e.g. Owner is Me). Save the rule; it applies at once.
+3. As that user, confirm they only see and can modify matching records. A role
    without a rule (e.g. admin) is unaffected.
-
-Rule changes require a redeploy/restart, since the config is read once at startup.

@@ -20,6 +20,16 @@ import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-ac
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
 import { RecordPermissionsService } from 'src/engine/permissions/record-permissions.service';
 import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
+import {
+  type MessageVisibilityObjectName,
+  renderMessageVisibilitySql,
+} from 'src/engine/twenty-orm/record-scoping/utils/build-message-visibility-condition.util';
+import { computeObjectTargetTable } from 'src/engine/utils/compute-object-target-table.util';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
+import { TWENTY_STANDARD_APPLICATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-standard-applications';
+import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
+import { type MessageWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message.workspace-entity';
+import { MessageMailboxAdminService } from 'src/modules/messaging/common/services/message-mailbox-admin.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { type MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
@@ -45,7 +55,77 @@ export class TimelineMessagingService {
     private readonly connectedAccountRepository: Repository<ConnectedAccountEntity>,
     private readonly fileUrlService: FileUrlService,
     private readonly recordPermissionsService: RecordPermissionsService,
+    private readonly messageMailboxAdminService: MessageMailboxAdminService,
   ) {}
+
+  // Admins read every mailbox; everyone else is restricted to threads from
+  // mailboxes they connected or that are shared with everyone.
+  public async resolveRestrictedUserWorkspaceId({
+    userWorkspaceId,
+    workspaceId,
+  }: {
+    userWorkspaceId: string;
+    workspaceId: string;
+  }): Promise<string | undefined> {
+    const isMailboxAdmin = await this.messageMailboxAdminService.isAdmin(
+      workspaceId,
+      userWorkspaceId,
+    );
+
+    return isMailboxAdmin ? undefined : userWorkspaceId;
+  }
+
+  private buildVisibilitySql({
+    alias,
+    objectNameSingular,
+    workspaceId,
+    userWorkspaceId,
+  }: {
+    alias: string;
+    objectNameSingular: MessageVisibilityObjectName;
+    workspaceId: string;
+    userWorkspaceId: string;
+  }) {
+    const standardTable = (nameSingular: string) =>
+      `${escapeIdentifier(getWorkspaceSchemaName(workspaceId))}.${escapeIdentifier(
+        computeObjectTargetTable({
+          nameSingular,
+          applicationUniversalIdentifier:
+            TWENTY_STANDARD_APPLICATION.universalIdentifier,
+        }),
+      )}`;
+
+    return renderMessageVisibilitySql({
+      alias,
+      objectNameSingular,
+      associationTable: standardTable('messageChannelMessageAssociation'),
+      messageTable: standardTable('message'),
+      parameterPrefix: `timelineVisibility_${alias}`,
+      workspaceId,
+      userWorkspaceId,
+    });
+  }
+
+  private applyThreadVisibility(
+    queryBuilder: WorkspaceSelectQueryBuilder,
+    {
+      workspaceId,
+      restrictedUserWorkspaceId,
+    }: { workspaceId: string; restrictedUserWorkspaceId?: string },
+  ): void {
+    if (!isDefined(restrictedUserWorkspaceId)) {
+      return;
+    }
+
+    const threadVisibility = this.buildVisibilitySql({
+      alias: 'messageThread',
+      objectNameSingular: 'messageThread',
+      workspaceId,
+      userWorkspaceId: restrictedUserWorkspaceId,
+    });
+
+    queryBuilder.andWhere(threadVisibility.sql, threadVisibility.parameters);
+  }
 
   public async getAndCountMessageThreads(
     personIds: string[],
@@ -53,6 +133,7 @@ export class TimelineMessagingService {
     offset: number,
     pageSize: number,
     targetFilter?: TargetFilter,
+    restrictedUserWorkspaceId?: string,
   ): Promise<{
     messageThreads: TimelineMessageThread[];
     totalNumberOfThreads: number;
@@ -84,6 +165,14 @@ export class TimelineMessagingService {
         targetFilter,
         personIds,
       });
+      this.applyThreadVisibility(totalQueryBuilder, {
+        workspaceId,
+        restrictedUserWorkspaceId,
+      });
+      this.applyThreadVisibility(threadIdsQueryBuilder, {
+        workspaceId,
+        restrictedUserWorkspaceId,
+      });
 
       const totalNumberOfThreads = await totalQueryBuilder.getCount();
       const threadIdsQuery = await threadIdsQueryBuilder.getRawMany<{
@@ -93,7 +182,10 @@ export class TimelineMessagingService {
       const messageThreadIds = threadIdsQuery.map((thread) => thread.id);
 
       return {
-        messageThreads: await this.findMessageThreadsByIds(messageThreadIds),
+        messageThreads: await this.findMessageThreadsByIds(messageThreadIds, {
+          workspaceId,
+          restrictedUserWorkspaceId,
+        }),
         totalNumberOfThreads,
       };
     }, authContext);
@@ -105,12 +197,14 @@ export class TimelineMessagingService {
     messageChannelIds,
     recordFilter,
     excludedMessageThreadIds = [],
+    restrictedUserWorkspaceId,
   }: {
     workspaceId: string;
     searchInput: string;
     messageChannelIds: string[];
     recordFilter?: { targetFilter?: TargetFilter; personIds: string[] };
     excludedMessageThreadIds?: string[];
+    restrictedUserWorkspaceId?: string;
   }): Promise<TimelineMessageThread[]> {
     const searchWords = searchInput
       .trim()
@@ -161,6 +255,11 @@ export class TimelineMessagingService {
         this.applyRecordFilter(queryBuilder, recordFilter);
       }
 
+      this.applyThreadVisibility(queryBuilder, {
+        workspaceId,
+        restrictedUserWorkspaceId,
+      });
+
       if (excludedMessageThreadIds.length > 0) {
         queryBuilder.andWhere(
           'messageThread.id NOT IN (:...excludedMessageThreadIds)',
@@ -176,6 +275,7 @@ export class TimelineMessagingService {
 
       return this.findMessageThreadsByIds(
         threadIdsQuery.map((thread) => thread.id),
+        { workspaceId, restrictedUserWorkspaceId },
       );
     }, buildSystemAuthContext(workspaceId));
   }
@@ -259,6 +359,10 @@ export class TimelineMessagingService {
 
   private async findMessageThreadsByIds(
     messageThreadIds: string[],
+    {
+      workspaceId,
+      restrictedUserWorkspaceId,
+    }: { workspaceId: string; restrictedUserWorkspaceId?: string },
   ): Promise<TimelineMessageThread[]> {
     if (messageThreadIds.length === 0) {
       return [];
@@ -281,6 +385,23 @@ export class TimelineMessagingService {
       relations: ['messages'],
     });
 
+    const visibleMessageIds = await this.findVisibleMessageIds({
+      messageThreadIds,
+      workspaceId,
+      restrictedUserWorkspaceId,
+    });
+
+    const messageThreadsWithVisibleMessages = isDefined(visibleMessageIds)
+      ? messageThreads
+          .map((messageThread) => ({
+            ...messageThread,
+            messages: messageThread.messages.filter((message) =>
+              visibleMessageIds.has(message.id),
+            ),
+          }))
+          .filter((messageThread) => messageThread.messages.length > 0)
+      : messageThreads;
+
     const messageThreadPositionById = new Map(
       messageThreadIds.map((messageThreadId, index) => [
         messageThreadId,
@@ -288,7 +409,7 @@ export class TimelineMessagingService {
       ]),
     );
 
-    return messageThreads
+    return messageThreadsWithVisibleMessages
       .sort(
         (a, b) =>
           (messageThreadPositionById.get(a.id) ?? 0) -
@@ -308,6 +429,41 @@ export class TimelineMessagingService {
           lastMessageIsDraft: lastMessage.isDraft ?? false,
         };
       });
+  }
+
+  // A visible thread can still hold replies that only reached someone else's
+  // mailbox; those stay out of the preview. Undefined means no restriction.
+  private async findVisibleMessageIds({
+    messageThreadIds,
+    workspaceId,
+    restrictedUserWorkspaceId,
+  }: {
+    messageThreadIds: string[];
+    workspaceId: string;
+    restrictedUserWorkspaceId?: string;
+  }): Promise<Set<string> | undefined> {
+    if (!isDefined(restrictedUserWorkspaceId)) {
+      return undefined;
+    }
+
+    const messageVisibility = this.buildVisibilitySql({
+      alias: 'message',
+      objectNameSingular: 'message',
+      workspaceId,
+      userWorkspaceId: restrictedUserWorkspaceId,
+    });
+
+    const visibleMessageRows = await this.workspaceOrmManager
+      .getRepositoryWithoutPermissionChecks<MessageWorkspaceEntity>('message')
+      .createQueryBuilder('message')
+      .select('message.id', 'id')
+      .where('message.messageThreadId IN (:...messageThreadIds)', {
+        messageThreadIds,
+      })
+      .andWhere(messageVisibility.sql, messageVisibility.parameters)
+      .getRawMany<{ id: string }>();
+
+    return new Set(visibleMessageRows.map((row) => row.id));
   }
 
   public async getThreadParticipantsByThreadId(
@@ -452,6 +608,42 @@ export class TimelineMessagingService {
   }
 
   public async getThreadVisibilityAndChannelByThreadId({
+    messageThreadIds,
+    userWorkspaceId,
+    workspaceId,
+  }: {
+    messageThreadIds: string[];
+    userWorkspaceId: string;
+    workspaceId: string;
+  }): Promise<{
+    threadVisibilityByThreadId: Record<string, MessageChannelVisibility>;
+    threadChannelByThreadId: Record<string, TimelineThreadChannelDTO>;
+  }> {
+    const [visibilityAndChannel, isMailboxAdmin] = await Promise.all([
+      this.findThreadVisibilityAndChannelByThreadId({
+        messageThreadIds,
+        userWorkspaceId,
+        workspaceId,
+      }),
+      this.messageMailboxAdminService.isAdmin(workspaceId, userWorkspaceId),
+    ]);
+
+    if (!isMailboxAdmin) {
+      return visibilityAndChannel;
+    }
+
+    return {
+      ...visibilityAndChannel,
+      threadVisibilityByThreadId: Object.fromEntries(
+        messageThreadIds.map((messageThreadId) => [
+          messageThreadId,
+          MessageChannelVisibility.SHARE_EVERYTHING,
+        ]),
+      ),
+    };
+  }
+
+  private async findThreadVisibilityAndChannelByThreadId({
     messageThreadIds,
     userWorkspaceId,
     workspaceId,
