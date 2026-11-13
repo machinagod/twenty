@@ -2137,6 +2137,11 @@ export type DeleteOneObjectInput = {
   id: Scalars['UUID']['input'];
 };
 
+export type DeleteRecordScopingRuleInput = {
+  objectMetadataId: Scalars['UUID']['input'];
+  roleId: Scalars['UUID']['input'];
+};
+
 export type DeleteSso = {
   __typename?: 'DeleteSso';
   identityProviderId: Scalars['UUID']['output'];
@@ -3737,6 +3742,7 @@ export type Mutation = {
   deleteOneRole: Scalars['String']['output'];
   deletePublicDomain: Scalars['Boolean']['output'];
   deleteQueuedChatMessage: Scalars['Boolean']['output'];
+  deleteRecordScopingRule: RecordScopingRule;
   deleteRelatedRecordPath: RelatedRecordPath;
   deleteSSOIdentityProvider: DeleteSso;
   deleteSkill: Skill;
@@ -3942,6 +3948,7 @@ export type Mutation = {
   upsertFieldsWidget: View;
   upsertObjectPermissions: Array<ObjectPermission>;
   upsertPermissionFlags: Array<RolePermissionFlag>;
+  upsertRecordScopingRule: RecordScopingRule;
   upsertRowLevelPermissionPredicates: UpsertRowLevelPermissionPredicatesResult;
   upsertViewWidget: View;
   validateApprovedAccessDomain: ApprovedAccessDomain;
@@ -4448,6 +4455,11 @@ export type MutationDeletePublicDomainArgs = {
 
 export type MutationDeleteQueuedChatMessageArgs = {
   messageId: Scalars['UUID']['input'];
+};
+
+
+export type MutationDeleteRecordScopingRuleArgs = {
+  input: DeleteRecordScopingRuleInput;
 };
 
 
@@ -5446,6 +5458,11 @@ export type MutationUpsertPermissionFlagsArgs = {
 };
 
 
+export type MutationUpsertRecordScopingRuleArgs = {
+  input: UpsertRecordScopingRuleInput;
+};
+
+
 export type MutationUpsertRowLevelPermissionPredicatesArgs = {
   input: UpsertRowLevelPermissionPredicatesInput;
 };
@@ -6191,6 +6208,7 @@ export type Query = {
   publicMarketplaceAppDetail: MarketplaceAppDetail;
   publicMarketplaceApps: Array<MarketplaceApp>;
   recordPermissions: Array<RecordPermissionsResult>;
+  recordScopingRules: Array<RecordScopingRule>;
   recordSharing: RecordSharingDto;
   relatedRecordPaths: Array<RelatedRecordPath>;
   skill?: Maybe<Skill>;
@@ -6717,6 +6735,11 @@ export type QueryRecordPermissionsArgs = {
 };
 
 
+export type QueryRecordScopingRulesArgs = {
+  roleId: Scalars['UUID']['input'];
+};
+
+
 export type QueryRecordSharingArgs = {
   target: RecordTargetInput;
 };
@@ -6791,6 +6814,47 @@ export type RecordPermissionsResult = {
   objectMetadataId: Scalars['UUID']['output'];
   permissions: RecordPermissionsDto;
   recordId: Scalars['UUID']['output'];
+};
+
+export type RecordScopingCondition = {
+  __typename?: 'RecordScopingCondition';
+  column: Scalars['String']['output'];
+  currentWorkspaceMemberField?: Maybe<Scalars['String']['output']>;
+  operator: Scalars['String']['output'];
+  relatedRecords?: Maybe<RecordScopingRelatedRecords>;
+  staticValue?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type RecordScopingConditionInput = {
+  column: Scalars['String']['input'];
+  currentWorkspaceMemberField?: InputMaybe<Scalars['String']['input']>;
+  operator: Scalars['String']['input'];
+  relatedRecords?: InputMaybe<RecordScopingRelatedRecordsInput>;
+  staticValue?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type RecordScopingRelatedRecords = {
+  __typename?: 'RecordScopingRelatedRecords';
+  conditions: Array<RecordScopingCondition>;
+  logicalOperator: Scalars['String']['output'];
+  matchColumn?: Maybe<Scalars['String']['output']>;
+  objectMetadataId: Scalars['UUID']['output'];
+};
+
+export type RecordScopingRelatedRecordsInput = {
+  conditions: Array<RecordScopingConditionInput>;
+  logicalOperator: Scalars['String']['input'];
+  matchColumn?: InputMaybe<Scalars['String']['input']>;
+  objectMetadataId: Scalars['UUID']['input'];
+};
+
+export type RecordScopingRule = {
+  __typename?: 'RecordScopingRule';
+  conditions: Array<RecordScopingCondition>;
+  id: Scalars['UUID']['output'];
+  logicalOperator: Scalars['String']['output'];
+  objectMetadataId: Scalars['UUID']['output'];
+  roleId: Scalars['UUID']['output'];
 };
 
 export enum RecordShareAccessLevel {
@@ -8176,6 +8240,13 @@ export type UpsertObjectPermissionsInput = {
 
 export type UpsertPermissionFlagsInput = {
   permissionFlagKeys: Array<Scalars['String']['input']>;
+  roleId: Scalars['UUID']['input'];
+};
+
+export type UpsertRecordScopingRuleInput = {
+  conditions: Array<RecordScopingConditionInput>;
+  logicalOperator: Scalars['String']['input'];
+  objectMetadataId: Scalars['UUID']['input'];
   roleId: Scalars['UUID']['input'];
 };
 
