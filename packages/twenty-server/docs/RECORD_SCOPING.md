@@ -133,10 +133,13 @@ is no longer read and can be removed.
    validates and upserts rules, then invalidates the workspace cache key
    `recordScopingRulesByRoleId`.
 2. **Cache** — `WorkspaceRecordScopingRulesCacheService` groups the workspace's
-   rows by role ID. `workspace-orm.manager.ts` reads that key with the other
-   permission maps when a workspace ORM context is loaded, stores it on
-   `ORMWorkspaceContext`, and `WorkspaceDataSourceService` copies it onto
-   `WorkspaceInternalContext`. Lite contexts carry no roles and are not scoped.
+   rows by role ID. `workspace-orm.manager.ts` reads that key, plus the
+   `userWorkspaceRoleMap` and `roleIdsWithAllRecordsAccess` caches, when a
+   workspace ORM context is loaded and stores them as one `recordScoping` field on
+   `ORMWorkspaceContext`; `WorkspaceDataSourceService` copies it onto
+   `WorkspaceInternalContext`. Upstream's own principals and record permissions
+   are Enterprise-licensed, so the applier never reads them. Lite contexts carry
+   no roles and are not scoped.
 3. **Resolve values** — at query time, `utils/resolve-record-scoping.util.ts` turns
    the current role's rules + the current workspace member into concrete conditions.
 4. **Build** — `utils/build-record-scoping-condition.util.ts` renders them to one
@@ -192,11 +195,13 @@ subject and participant.
   `messageThreadId` is not populated by the sync).
 - Admins (roles with `canUpdateAllSettings`, i.e. `roleIdsWithAllRecordsAccess`)
   are not restricted and skip the upstream content masking too
-  (`MessageMailboxAdminService`, used by the message post-query hooks).
-- The person/company timeline lists threads with permission checks bypassed, so
-  `TimelineMessagingService` applies the same SQL explicitly, drops replies that
-  only reached someone else's mailbox, and gives admins full visibility.
-- `messageThread` findMany/findOne post-query hooks mask the thread subject like
+  (`MessageMailboxAdminService`, used by the `message` visibility handler that
+  upstream's `CommonRecordVisibilityService` runs on every result tree).
+- The person/company timeline lists and searches threads with permission checks
+  bypassed, so `TimelineMessagingService` applies the same SQL explicitly, drops
+  replies that only reached someone else's mailbox, and gives admins full
+  visibility.
+- A `messageThread` visibility handler masks the thread subject like
   `message.subject` (relevant for API keys, which the row rule does not cover).
 - API keys, applications and system contexts are not restricted by the row rule.
 - Messaging objects are system objects and not searchable, so global search and
