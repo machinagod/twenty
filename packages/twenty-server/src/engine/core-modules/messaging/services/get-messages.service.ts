@@ -38,6 +38,12 @@ export class GetMessagesService {
   }): Promise<TimelineThreadsWithTotalDTO> {
     const offset = (page - 1) * pageSize;
 
+    const restrictedUserWorkspaceId =
+      await this.timelineMessagingService.resolveRestrictedUserWorkspaceId({
+        userWorkspaceId,
+        workspaceId,
+      });
+
     const { messageThreads, totalNumberOfThreads } =
       await this.timelineMessagingService.getAndCountMessageThreads(
         personIds,
@@ -45,6 +51,7 @@ export class GetMessagesService {
         offset,
         pageSize,
         targetFilter,
+        restrictedUserWorkspaceId,
       );
 
     if (!messageThreads) {
@@ -97,6 +104,7 @@ export class GetMessagesService {
       personIds,
       targetFilter,
       { ownedMessageChannelIds, subjectVisibleMessageChannelIds },
+      restrictedUserWorkspaceId,
     ] = await Promise.all([
       this.relatedPersonIdsService.getRelatedPersonIds({
         workspaceId,
@@ -112,6 +120,10 @@ export class GetMessagesService {
         userWorkspaceId,
         workspaceId,
       }),
+      this.timelineMessagingService.resolveRestrictedUserWorkspaceId({
+        userWorkspaceId,
+        workspaceId,
+      }),
     ]);
 
     // Only channels sharing at least the subject are searched, so a match never reveals a hidden subject
@@ -121,6 +133,7 @@ export class GetMessagesService {
         searchInput,
         messageChannelIds: subjectVisibleMessageChannelIds,
         recordFilter: { targetFilter, personIds },
+        restrictedUserWorkspaceId,
       });
 
     // The fallback searches only the viewer's own mailboxes, as nothing else narrows it down
@@ -130,6 +143,7 @@ export class GetMessagesService {
         searchInput,
         messageChannelIds: ownedMessageChannelIds,
         excludedMessageThreadIds: recordMessageThreads.map(({ id }) => id),
+        restrictedUserWorkspaceId,
       });
 
     const recordMessageThreadIds = new Set(

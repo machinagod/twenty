@@ -83,6 +83,12 @@ import {
 } from 'src/engine/twenty-orm/repository/utils/update-event-records.util';
 import { WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
 import { compileTwentyOrmStatement } from 'src/engine/twenty-orm/utils/compile-twenty-orm-statement.util';
+import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
+import { computeObjectTargetTable } from 'src/engine/utils/compute-object-target-table.util';
+import { buildMessageVisibilityCondition } from 'src/engine/twenty-orm/record-scoping/utils/build-message-visibility-condition.util';
+import { TWENTY_STANDARD_APPLICATION } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-standard-applications';
+import { buildRecordScopingCondition } from 'src/engine/twenty-orm/record-scoping/utils/build-record-scoping-condition.util';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
 import { serializeJsonbWriteValue } from 'src/engine/twenty-orm/sql/utils/serialize-jsonb-write-value.util';
 import {
@@ -1957,6 +1963,12 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       return;
     }
 
+    this.applyRecordScopingForAlias({
+      queryBuilder,
+      alias,
+      flatObjectMetadata,
+    });
+
     const condition = await this.buildPermissionsConditionForAlias({
       alias,
       isMainAlias: alias === queryBuilder.alias,
@@ -2045,6 +2057,79 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
     return `${escapeIdentifier(tableShape.schemaName)}.${escapeIdentifier(
       tableShape.tableName,
     )}`;
+  }
+
+  private applyRecordScopingForAlias({
+    queryBuilder,
+    alias,
+    flatObjectMetadata,
+  }: {
+    queryBuilder: WorkspaceSelectQueryBuilder;
+    alias: string;
+    flatObjectMetadata: FlatObjectMetadata;
+  }): void {
+    const { internalContext } = this.options;
+    const { recordScoping } = internalContext;
+
+    if (!isDefined(recordScoping)) {
+      return;
+    }
+
+    const getTableName = (objectMetadataId: string) => {
+      const objectMetadata = findFlatEntityByIdInFlatEntityMaps({
+        flatEntityMaps: internalContext.flatObjectMetadataMaps,
+        flatEntityId: objectMetadataId,
+      });
+
+      return isDefined(objectMetadata)
+        ? `${escapeIdentifier(getWorkspaceSchemaName(internalContext.workspaceId))}.${escapeIdentifier(computeObjectTargetTable(objectMetadata))}`
+        : undefined;
+    };
+
+    const recordScopingCondition = buildRecordScopingCondition({
+      alias,
+      objectMetadataId: flatObjectMetadata.id,
+      recordScopingRulesByRoleId: recordScoping.rulesByRoleId,
+      userWorkspaceRoleMap: recordScoping.userWorkspaceRoleMap,
+      authContext: this.options.authContext,
+      getRelatedTableName: getTableName,
+    });
+
+    if (isDefined(recordScopingCondition)) {
+      this.addConditionForAlias({
+        queryBuilder,
+        alias,
+        ...recordScopingCondition,
+      });
+    }
+
+    const messageVisibilityCondition = buildMessageVisibilityCondition({
+      alias,
+      objectNameSingular: flatObjectMetadata.nameSingular,
+      isStandardObject:
+        flatObjectMetadata.applicationUniversalIdentifier ===
+        TWENTY_STANDARD_APPLICATION.universalIdentifier,
+      workspaceId: internalContext.workspaceId,
+      authContext: this.options.authContext,
+      userWorkspaceRoleMap: recordScoping.userWorkspaceRoleMap,
+      adminRoleIds: recordScoping.roleIdsWithAllRecordsAccess,
+      getStandardTableName: (nameSingular) => {
+        const objectMetadataId =
+          internalContext.objectIdByNameSingular[nameSingular];
+
+        return isDefined(objectMetadataId)
+          ? getTableName(objectMetadataId)
+          : undefined;
+      },
+    });
+
+    if (isDefined(messageVisibilityCondition)) {
+      this.addConditionForAlias({
+        queryBuilder,
+        alias,
+        ...messageVisibilityCondition,
+      });
+    }
   }
 
   private denyAccessForAlias({

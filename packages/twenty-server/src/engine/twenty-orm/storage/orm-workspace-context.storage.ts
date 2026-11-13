@@ -11,6 +11,7 @@ import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-fiel
 import { type FlatIndexMetadata } from 'src/engine/metadata-modules/flat-index-metadata/types/flat-index-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { type FlatValidationRuleMaps } from 'src/engine/metadata-modules/flat-validation-rule/types/flat-validation-rule-maps.type';
+import { type RecordScopingWorkspaceContext } from 'src/engine/twenty-orm/record-scoping/types/record-scoping-rule.type';
 
 export type ORMWorkspaceContext = {
   authContext: WorkspaceAuthContext;
@@ -23,6 +24,7 @@ export type ORMWorkspaceContext = {
   permissionsPrincipals: PermissionsPrincipalsWithRolesContext | undefined;
   recordReadRestrictions: RecordReadRestrictions;
   flatValidationRuleMaps?: FlatValidationRuleMaps;
+  recordScoping?: RecordScopingWorkspaceContext;
 };
 
 export const workspaceContextStorage =

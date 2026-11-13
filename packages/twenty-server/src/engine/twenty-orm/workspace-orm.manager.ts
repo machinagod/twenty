@@ -126,12 +126,18 @@ export class WorkspaceOrmManager {
       flatIndexMaps,
       featureFlagsMap,
       billingEntitlements,
+      recordScopingRulesByRoleId,
+      userWorkspaceRoleMap,
+      roleIdsWithAllRecordsAccess,
     } = await this.workspaceCacheService.getOrRecompute(workspaceId, [
       'flatObjectMetadataMaps',
       'flatFieldMetadataMapsOrm',
       'flatIndexMaps',
       'featureFlagsMap',
       'billingEntitlements',
+      'recordScopingRulesByRoleId',
+      'userWorkspaceRoleMap',
+      'roleIdsWithAllRecordsAccess',
     ]);
 
     const { idByNameSingular: objectIdByNameSingular } =
@@ -170,6 +176,11 @@ export class WorkspaceOrmManager {
       billingEntitlements,
       permissionsPrincipals,
       recordReadRestrictions,
+      recordScoping: {
+        rulesByRoleId: recordScopingRulesByRoleId,
+        userWorkspaceRoleMap,
+        roleIdsWithAllRecordsAccess,
+      },
     };
   }
 

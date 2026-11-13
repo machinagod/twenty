@@ -17,6 +17,7 @@ import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/wo
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { MessageMailboxAdminService } from 'src/modules/messaging/common/services/message-mailbox-admin.service';
 import { type MessageChannelMessageAssociationWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-channel-message-association.workspace-entity';
 
 const RESTRICTED_MESSAGE_FIELD_NAMES = ['subject', 'text', 'attachments'];
@@ -30,6 +31,7 @@ export class ApplyMessagesVisibilityRestrictionsService
     private readonly commonRecordVisibilityService: CommonRecordVisibilityService,
     @InjectRepository(MessageChannelEntity)
     private readonly messageChannelRepository: Repository<MessageChannelEntity>,
+    private readonly messageMailboxAdminService: MessageMailboxAdminService,
   ) {}
 
   onModuleInit() {
@@ -51,6 +53,16 @@ export class ApplyMessagesVisibilityRestrictionsService
     );
 
     if (restrictableMessages.length === 0) {
+      return;
+    }
+
+    if (
+      isUserAuthContext(authContext) &&
+      (await this.messageMailboxAdminService.isAdmin(
+        authContext.workspace.id,
+        authContext.userWorkspaceId,
+      ))
+    ) {
       return;
     }
 
