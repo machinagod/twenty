@@ -2500,6 +2500,7 @@ export interface Mutation {
     deleteOneRole: Scalars['String']
     deletePublicDomain: Scalars['Boolean']
     deleteQueuedChatMessage: Scalars['Boolean']
+    deleteRecordScopingRule: RecordScopingRule
     deleteRelatedRecordPath: RelatedRecordPath
     deleteSSOIdentityProvider: DeleteSso
     deleteSkill: Skill
@@ -2705,6 +2706,7 @@ export interface Mutation {
     upsertFieldsWidget: View
     upsertObjectPermissions: ObjectPermission[]
     upsertPermissionFlags: RolePermissionFlag[]
+    upsertRecordScopingRule: RecordScopingRule
     upsertRowLevelPermissionPredicates: UpsertRowLevelPermissionPredicatesResult
     upsertViewWidget: View
     validateApprovedAccessDomain: ApprovedAccessDomain
@@ -3298,6 +3300,7 @@ export interface Query {
     publicMarketplaceAppDetail: MarketplaceAppDetail
     publicMarketplaceApps: MarketplaceApp[]
     recordPermissions: RecordPermissionsResult[]
+    recordScopingRules: RecordScopingRule[]
     recordSharing: RecordSharingDTO
     relatedRecordPaths: RelatedRecordPath[]
     skill?: Skill
@@ -3352,6 +3355,32 @@ export interface RecordPermissionsResult {
     permissions: RecordPermissionsDTO
     recordId: Scalars['UUID']
     __typename: 'RecordPermissionsResult'
+}
+
+export interface RecordScopingCondition {
+    column: Scalars['String']
+    currentWorkspaceMemberField?: Scalars['String']
+    operator: Scalars['String']
+    relatedRecords?: RecordScopingRelatedRecords
+    staticValue?: Scalars['JSON']
+    __typename: 'RecordScopingCondition'
+}
+
+export interface RecordScopingRelatedRecords {
+    conditions: RecordScopingCondition[]
+    logicalOperator: Scalars['String']
+    matchColumn?: Scalars['String']
+    objectMetadataId: Scalars['UUID']
+    __typename: 'RecordScopingRelatedRecords'
+}
+
+export interface RecordScopingRule {
+    conditions: RecordScopingCondition[]
+    id: Scalars['UUID']
+    logicalOperator: Scalars['String']
+    objectMetadataId: Scalars['UUID']
+    roleId: Scalars['UUID']
+    __typename: 'RecordScopingRule'
 }
 
 export type RecordShareAccessLevel = 'FULL' | 'NONE' | 'READ' | 'READ_WRITE'
@@ -6074,6 +6103,8 @@ export interface DeleteOneObjectInput {
 /** The id of the record to delete. */
 id: Scalars['UUID']}
 
+export interface DeleteRecordScopingRuleInput {objectMetadataId: Scalars['UUID'],roleId: Scalars['UUID']}
+
 export interface DeleteSsoGenqlSelection{
     identityProviderId?: boolean | number
     __typename?: boolean | number
@@ -7273,6 +7304,7 @@ export interface MutationGenqlSelection{
     deleteOneRole?: { __args: {roleId: Scalars['UUID']} }
     deletePublicDomain?: { __args: {domain: Scalars['String']} }
     deleteQueuedChatMessage?: { __args: {messageId: Scalars['UUID']} }
+    deleteRecordScopingRule?: (RecordScopingRuleGenqlSelection & { __args: {input: DeleteRecordScopingRuleInput} })
     deleteRelatedRecordPath?: (RelatedRecordPathGenqlSelection & { __args: {id: Scalars['UUID']} })
     deleteSSOIdentityProvider?: (DeleteSsoGenqlSelection & { __args: {input: DeleteSsoInput} })
     deleteSkill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
@@ -7478,6 +7510,7 @@ export interface MutationGenqlSelection{
     upsertFieldsWidget?: (ViewGenqlSelection & { __args: {input: UpsertFieldsWidgetInput} })
     upsertObjectPermissions?: (ObjectPermissionGenqlSelection & { __args: {upsertObjectPermissionsInput: UpsertObjectPermissionsInput} })
     upsertPermissionFlags?: (RolePermissionFlagGenqlSelection & { __args: {upsertPermissionFlagsInput: UpsertPermissionFlagsInput} })
+    upsertRecordScopingRule?: (RecordScopingRuleGenqlSelection & { __args: {input: UpsertRecordScopingRuleInput} })
     upsertRowLevelPermissionPredicates?: (UpsertRowLevelPermissionPredicatesResultGenqlSelection & { __args: {input: UpsertRowLevelPermissionPredicatesInput} })
     upsertViewWidget?: (ViewGenqlSelection & { __args: {input: UpsertViewWidgetInput} })
     validateApprovedAccessDomain?: (ApprovedAccessDomainGenqlSelection & { __args: {input: ValidateApprovedAccessDomainInput} })
@@ -8124,6 +8157,7 @@ export interface QueryGenqlSelection{
     publicMarketplaceAppDetail?: (MarketplaceAppDetailGenqlSelection & { __args: {universalIdentifier: Scalars['String']} })
     publicMarketplaceApps?: MarketplaceAppGenqlSelection
     recordPermissions?: (RecordPermissionsResultGenqlSelection & { __args: {targets: RecordTargetInput[]} })
+    recordScopingRules?: (RecordScopingRuleGenqlSelection & { __args: {roleId: Scalars['UUID']} })
     recordSharing?: (RecordSharingDTOGenqlSelection & { __args: {target: RecordTargetInput} })
     relatedRecordPaths?: RelatedRecordPathGenqlSelection
     skill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
@@ -8182,6 +8216,39 @@ export interface RecordPermissionsResultGenqlSelection{
     objectMetadataId?: boolean | number
     permissions?: RecordPermissionsDTOGenqlSelection
     recordId?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface RecordScopingConditionGenqlSelection{
+    column?: boolean | number
+    currentWorkspaceMemberField?: boolean | number
+    operator?: boolean | number
+    relatedRecords?: RecordScopingRelatedRecordsGenqlSelection
+    staticValue?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface RecordScopingConditionInput {column: Scalars['String'],currentWorkspaceMemberField?: (Scalars['String'] | null),operator: Scalars['String'],relatedRecords?: (RecordScopingRelatedRecordsInput | null),staticValue?: (Scalars['JSON'] | null)}
+
+export interface RecordScopingRelatedRecordsGenqlSelection{
+    conditions?: RecordScopingConditionGenqlSelection
+    logicalOperator?: boolean | number
+    matchColumn?: boolean | number
+    objectMetadataId?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface RecordScopingRelatedRecordsInput {conditions: RecordScopingConditionInput[],logicalOperator: Scalars['String'],matchColumn?: (Scalars['String'] | null),objectMetadataId: Scalars['UUID']}
+
+export interface RecordScopingRuleGenqlSelection{
+    conditions?: RecordScopingConditionGenqlSelection
+    id?: boolean | number
+    logicalOperator?: boolean | number
+    objectMetadataId?: boolean | number
+    roleId?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -8964,6 +9031,8 @@ widgetId: Scalars['UUID']}
 export interface UpsertObjectPermissionsInput {objectPermissions: ObjectPermissionInput[],roleId: Scalars['UUID']}
 
 export interface UpsertPermissionFlagsInput {permissionFlagKeys: Scalars['String'][],roleId: Scalars['UUID']}
+
+export interface UpsertRecordScopingRuleInput {conditions: RecordScopingConditionInput[],logicalOperator: Scalars['String'],objectMetadataId: Scalars['UUID'],roleId: Scalars['UUID']}
 
 export interface UpsertRowLevelPermissionPredicatesInput {objectMetadataId: Scalars['UUID'],predicateGroups: RowLevelPermissionPredicateGroupInput[],predicates: RowLevelPermissionPredicateInput[],roleId: Scalars['UUID']}
 
@@ -11770,6 +11839,30 @@ export interface WorkspaceUrlsAndIdGenqlSelection{
     export const isRecordPermissionsResult = (obj?: { __typename?: any } | null): obj is RecordPermissionsResult => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isRecordPermissionsResult"')
       return RecordPermissionsResult_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RecordScopingCondition_possibleTypes: string[] = ['RecordScopingCondition']
+    export const isRecordScopingCondition = (obj?: { __typename?: any } | null): obj is RecordScopingCondition => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRecordScopingCondition"')
+      return RecordScopingCondition_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RecordScopingRelatedRecords_possibleTypes: string[] = ['RecordScopingRelatedRecords']
+    export const isRecordScopingRelatedRecords = (obj?: { __typename?: any } | null): obj is RecordScopingRelatedRecords => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRecordScopingRelatedRecords"')
+      return RecordScopingRelatedRecords_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const RecordScopingRule_possibleTypes: string[] = ['RecordScopingRule']
+    export const isRecordScopingRule = (obj?: { __typename?: any } | null): obj is RecordScopingRule => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRecordScopingRule"')
+      return RecordScopingRule_possibleTypes.includes(obj.__typename)
     }
     
 

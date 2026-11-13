@@ -2019,6 +2019,11 @@ input DeleteOneObjectInput {
   id: UUID!
 }
 
+input DeleteRecordScopingRuleInput {
+  objectMetadataId: UUID!
+  roleId: UUID!
+}
+
 type DeleteSso {
   identityProviderId: UUID!
 }
@@ -3543,6 +3548,7 @@ type Mutation {
   deleteOneRole(roleId: UUID!): String!
   deletePublicDomain(domain: String!): Boolean!
   deleteQueuedChatMessage(messageId: UUID!): Boolean!
+  deleteRecordScopingRule(input: DeleteRecordScopingRuleInput!): RecordScopingRule!
   deleteRelatedRecordPath(id: UUID!): RelatedRecordPath!
   deleteSSOIdentityProvider(input: DeleteSsoInput!): DeleteSso!
   deleteSkill(id: UUID!): Skill!
@@ -3738,6 +3744,7 @@ type Mutation {
   upsertFieldsWidget(input: UpsertFieldsWidgetInput!): View!
   upsertObjectPermissions(upsertObjectPermissionsInput: UpsertObjectPermissionsInput!): [ObjectPermission!]!
   upsertPermissionFlags(upsertPermissionFlagsInput: UpsertPermissionFlagsInput!): [RolePermissionFlag!]!
+  upsertRecordScopingRule(input: UpsertRecordScopingRuleInput!): RecordScopingRule!
   upsertRowLevelPermissionPredicates(input: UpsertRowLevelPermissionPredicatesInput!): UpsertRowLevelPermissionPredicatesResult!
   upsertViewWidget(input: UpsertViewWidgetInput!): View!
   validateApprovedAccessDomain(input: ValidateApprovedAccessDomainInput!): ApprovedAccessDomain!
@@ -4432,6 +4439,7 @@ type Query {
   publicMarketplaceAppDetail(universalIdentifier: String!): MarketplaceAppDetail!
   publicMarketplaceApps: [MarketplaceApp!]!
   recordPermissions(targets: [RecordTargetInput!]!): [RecordPermissionsResult!]!
+  recordScopingRules(roleId: UUID!): [RecordScopingRule!]!
   recordSharing(target: RecordTargetInput!): RecordSharingDTO!
   relatedRecordPaths: [RelatedRecordPath!]!
   skill(id: UUID!): Skill
@@ -4480,6 +4488,44 @@ type RecordPermissionsResult {
   objectMetadataId: UUID!
   permissions: RecordPermissionsDTO!
   recordId: UUID!
+}
+
+type RecordScopingCondition {
+  column: String!
+  currentWorkspaceMemberField: String
+  operator: String!
+  relatedRecords: RecordScopingRelatedRecords
+  staticValue: JSON
+}
+
+input RecordScopingConditionInput {
+  column: String!
+  currentWorkspaceMemberField: String
+  operator: String!
+  relatedRecords: RecordScopingRelatedRecordsInput
+  staticValue: JSON
+}
+
+type RecordScopingRelatedRecords {
+  conditions: [RecordScopingCondition!]!
+  logicalOperator: String!
+  matchColumn: String
+  objectMetadataId: UUID!
+}
+
+input RecordScopingRelatedRecordsInput {
+  conditions: [RecordScopingConditionInput!]!
+  logicalOperator: String!
+  matchColumn: String
+  objectMetadataId: UUID!
+}
+
+type RecordScopingRule {
+  conditions: [RecordScopingCondition!]!
+  id: UUID!
+  logicalOperator: String!
+  objectMetadataId: UUID!
+  roleId: UUID!
 }
 
 enum RecordShareAccessLevel {
@@ -5809,6 +5855,13 @@ input UpsertObjectPermissionsInput {
 
 input UpsertPermissionFlagsInput {
   permissionFlagKeys: [String!]!
+  roleId: UUID!
+}
+
+input UpsertRecordScopingRuleInput {
+  conditions: [RecordScopingConditionInput!]!
+  logicalOperator: String!
+  objectMetadataId: UUID!
   roleId: UUID!
 }
 
