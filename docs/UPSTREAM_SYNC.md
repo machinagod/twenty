@@ -18,11 +18,11 @@ Find the latest stable (non-prerelease) tag:
 
 ## The custom surface (what makes this fork the fork)
 
-As of the 2026-10-09 sync (release tag **`twenty/v2.45.0`** @ `7e1431c84a`):
+As of the 2026-11-13 sync (release tag **`twenty/v2.57.1`** @ `f7fed3afdc`):
 
 | Theme | Commits | Notes |
 |-------|---------|-------|
-| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + settings UI + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`), plus the `recordScopingRulesByRoleId` cache key read in `workspace-orm.manager.ts` → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`. Rules live in `core.recordScopingRule` (`metadata-modules/record-scoping-rule/`, registered in `metadata-engine.module.ts`, its cache module in `twenty-orm.module.ts`, the entity in `all-workspace-cache-entity-by-name.constant.ts` and the key in `workspace-cache-key.type.ts`). Front: our `record-scoping/` section replaces the Enterprise one in `SettingsRolePermissionsObjectLevelObjectForm.tsx`; on a sync, re-apply that swap if upstream edits the form. That leaves upstream's Enterprise `record-level-permissions/` UI unreferenced; it stays untouched (clean-room) and `knip.json` ignores that folder so the unused-files rule doesn't fail. The fork sits on its own patch version **2.45.1** (`TWENTY_CURRENT_VERSION`), which holds the `add-record-scoping-rule` instance command and the `copy-record-scoping-rules-from-env` workspace command; the 2.45.0 `import-record-scoping-rules-from-env` command is a kept no-op (see "Fork upgrade commands" below). The same hook applies a built-in mailbox-visibility rule to the messaging objects (`build-message-visibility-condition.util.ts`); outside the chokepoint it is wired into `TimelineMessagingService` / `GetMessagesService` (timeline threads), the message post-query hooks (admin bypass through `MessageMailboxAdminService`) and our `messageThread` findMany/findOne post-query hooks (`query-hooks/message-thread/`). On a sync, re-check those three upstream files and any new message read path that bypasses permission checks. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
+| **record-scoping** | spike (filter builder) + feat (ORM-chokepoint enforcement) + settings UI + integration tests | The conflict risk. Since v2.4x upstream runs its own SQL builders instead of TypeORM's, and every read/write passes through `WorkspaceRepository.applyRowLevelPermissionPredicateForAlias()` (`twenty-orm/repository/workspace-repository.ts`, AGPL). Our hook is one call there (`applyRecordScopingForAlias`, right after the `markRowLevelPermissionApplied` guard). Since v2.46 upstream's own permission engine is Enterprise-licensed and the internal context carries `permissionsPrincipals` instead of role maps, so `workspace-orm.manager.ts` loads three AGPL cache keys itself (`recordScopingRulesByRoleId`, `userWorkspaceRoleMap`, `roleIdsWithAllRecordsAccess`) into one `recordScoping` field (`RecordScopingWorkspaceContext`) → `ORMWorkspaceContext` → `WorkspaceDataSourceService.buildInternalContext` → `WorkspaceInternalContext`. Never import from `src/engine/permissions/` Enterprise files in our code (`types/sql-condition.type.ts` has no license header and is fine). Rules live in `core.recordScopingRule` (`metadata-modules/record-scoping-rule/`, registered in `metadata-engine.module.ts`, its cache module in `twenty-orm.module.ts`, the entity in `all-workspace-cache-entity-by-name.constant.ts` and the key in `workspace-cache-key.type.ts`). Front: our `record-scoping/` section replaces the Enterprise one in `SettingsRolePermissionsObjectLevelObjectForm.tsx`; on a sync, re-apply that swap if upstream edits the form. That leaves upstream's Enterprise `record-level-permissions/` UI unreferenced; it stays untouched (clean-room) and `knip.json` ignores that folder so the unused-files rule doesn't fail. The fork sits on its own patch version **2.45.1** (`TWENTY_CURRENT_VERSION`), which holds the `add-record-scoping-rule` instance command and the `copy-record-scoping-rules-from-env` workspace command; the 2.45.0 `import-record-scoping-rules-from-env` command is a kept no-op (see "Fork upgrade commands" below). The same hook applies a built-in mailbox-visibility rule to the messaging objects (`build-message-visibility-condition.util.ts`); outside the chokepoint it is wired into `TimelineMessagingService` / `GetMessagesService` (timeline threads), and the `CommonRecordVisibilityService` handlers that replaced the message post-query hooks in v2.5x (#28679): the admin bypass sits in `ApplyMessagesVisibilityRestrictionsService`, and thread-subject masking is our `messageThread` handler (`query-hooks/message-thread/`). Timeline list, count and thread search take a `restrictedUserWorkspaceId` (undefined for admins). On a sync, re-check those files and any new message read path that bypasses permission checks. See `packages/twenty-server/docs/RECORD_SCOPING.md`. |
 | **deploy/telemetry** | Railway deploy config + telemetry-off (via env, not code default) | Disables telemetry through environment, keeps Railway config. |
 | **deploy/fail-closed upgrade** | fix (entrypoint) | `packages/twenty-docker/twenty/entrypoint.sh`: a failed boot `upgrade` exits non-zero (override `UPGRADE_CONTINUE_ON_ERROR=true`), and init/upgrade run with `UPGRADE_PG_DATABASE_TIMEOUT_MS` (default 600000) instead of the 10s runtime timeout. Fixes the v2.20.0 prod incident. Upstream closed our PR #23013 unmerged, so we carry it. |
 | **CI / image build** | GHCR production-image workflow + APP_VERSION semver fix + `railway-deploy.sh` | Builds `ghcr.io/machinagod/twenty:main`; bakes a valid semver `APP_VERSION`. The `deploy` job runs `.github/scripts/railway-deploy.sh` in `routine` or `upgrade` mode through the Railway public API (needs `RAILWAY_TOKEN`); tested by `CI Railway deploy script`. |
@@ -65,6 +65,16 @@ At the 2026-10-09 (v2.45.0) sync three more were dropped because upstream shippe
 them: the **front-component decrypt** fix (upstream #23494, `getPublicEnvVariables`),
 the **EventRow** `height: 'auto'` fix, and the **local logic-function IPC flush**
 fix + its regression test (our upstream PR #22920, merged).
+
+At the 2026-11-13 (v2.57.1) sync the 18 record-scoping and mailbox-visibility
+commits were **ported as three consolidated commits** (server, regenerated clients,
+Settings UI) instead of replayed one by one: v2.46-v2.57 rewrote the permission
+layer every one of them touched, so a per-commit replay would have re-resolved the
+same hook 18 times with no compilable state in between. The net diff
+`twenty/v2.45.0..<last record-scoping commit>` was applied 3-way and then adapted.
+The two AI structured-output fixes moved from the deleted
+`agent-async-executor.service.ts` to `AgentRunTurnService.completeTurn`
+(upstream #28076, one turn engine).
 
 **History note (2026-07-15):** the 2026-06-24 v2.14.0 sync was landed as a **merge**
 (`merge: roll fork main back to stable release twenty/v2.14.0`), not the clean
@@ -167,7 +177,7 @@ NODE_ENV=test NODE_OPTIONS="--max-old-space-size=8192" corepack yarn jest \
   test/integration/graphql/suites/record-scoping.integration-spec.ts
 ```
 
-Gotcha: must run under Node 24 (see Watch-items). `nx jest --config …` silently
+Gotcha: must run under the Node in `.nvmrc` (26 since v2.5x). `nx jest --config …` silently
 ignores `--config` — invoke the jest binary through `yarn`, not the nx target.
 
 ## Fork CI / workflows (upstream automation that can't run here)
@@ -321,5 +331,16 @@ half-migrated DB, and the upgrade resumes where it stopped on the next attempt
   `affectedfileshandler.go` after a big jump. Delete
   `packages/twenty-server/dist/packages/twenty-server/tsconfig.tsbuildinfo` and rerun.
   Also rebuild `twenty-emails` if typecheck reports missing `renderEmail` exports.
+- **Node major bumps with upstream.** v2.57 requires Node `^26.5.1` (`.nvmrc`
+  26.12.1); `yarn install` refuses anything else. Homebrew's `node@26` is just
+  `node`, so `brew upgrade node` was used at the 2026-11-13 sync.
+- **No Docker? Run Postgres 18 from Homebrew.** `brew install postgresql@18`
+  (keg-only), `initdb` a throwaway data dir and `pg_ctl -o "-p 5433"`, then point
+  `.env.test` at 5433 for the run. Colima's DNS has failed to reach Docker Hub.
+- **Generated metadata clients need a live server.** `twenty-front:graphql:generate
+  --configuration=metadata` and `twenty-client-sdk:generate-metadata-client`
+  introspect `localhost:3000/metadata`; start one with `NODE_ENV=test npx nest
+  start` against the seeded test DB. Take upstream's generated files on conflict,
+  then regenerate.
 - **Keep this file and the custom-surface table updated every sync** — it is the
   source of truth for what we replay.
